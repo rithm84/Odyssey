@@ -29,7 +29,7 @@ client.once('clientReady', async() => {
 
     await rest.put(
       Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
-      { body: [pingCommand.toJSON()]}
+      { body: [pingCommand.data.toJSON()]}
     )
     console.log('Slash commands registered!')
   } catch (error) {
