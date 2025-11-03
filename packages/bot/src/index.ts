@@ -1,6 +1,7 @@
 // importing Client and Intents objects from discord.js
 import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { pingCommand } from './commands/ping.js';
+import { createEventCommand } from './commands/createEvent.js';
 import { handleInteraction } from './handlers/interactionHandler.js';
 import dotenv from 'dotenv';
 
@@ -29,7 +30,7 @@ client.once('clientReady', async() => {
 
     await rest.put(
       Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
-      { body: [pingCommand.data.toJSON()]}
+      { body: [pingCommand.data.toJSON(), createEventCommand.data.toJSON()]}
     )
     console.log('Slash commands registered!')
   } catch (error) {
