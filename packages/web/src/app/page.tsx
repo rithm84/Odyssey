@@ -1,65 +1,135 @@
-import Image from "next/image";
+import { NavBar } from "@/components/NavBar";
+import { Calendar, MapPin, Users } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Mock data for events from different servers
+const events = [
+  {
+    id: 1,
+    name: "Weekend Camping Trip",
+    server: "Adventure Club",
+    serverColor: "from-emerald-500 to-teal-500",
+    date: "Nov 15-17, 2024",
+    location: "Yosemite National Park",
+    attendees: 12,
+    description: "Join us for an amazing weekend in nature!",
+    type: "Outdoor Adventure"
+  },
+  {
+    id: 2,
+    name: "Game Night",
+    server: "Friends Group",
+    serverColor: "from-pink-500 to-rose-500",
+    date: "Nov 20, 2024",
+    location: "Mike's Place",
+    attendees: 8,
+    description: "Board games, video games, and fun times!",
+    type: "Social"
+  },
+  {
+    id: 3,
+    name: "Hackathon 2024",
+    server: "UCLA Coding Club",
+    serverColor: "from-blue-500 to-cyan-500",
+    date: "Dec 1-3, 2024",
+    location: "UCLA Campus",
+    attendees: 45,
+    description: "48-hour coding challenge with amazing prizes",
+    type: "Tech Event"
+  },
+  {
+    id: 4,
+    name: "Thanksgiving Dinner",
+    server: "Family",
+    serverColor: "from-orange-500 to-amber-500",
+    date: "Nov 28, 2024",
+    location: "Mom's House",
+    attendees: 15,
+    description: "Annual family gathering and feast",
+    type: "Family"
+  },
+  {
+    id: 5,
+    name: "Beach Cleanup",
+    server: "Eco Warriors",
+    serverColor: "from-green-500 to-emerald-600",
+    date: "Nov 25, 2024",
+    location: "Santa Monica Beach",
+    attendees: 32,
+    description: "Help keep our beaches clean!",
+    type: "Community Service"
+  }
+];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-background">
+      <NavBar />
+      
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden rounded-3xl p-12 mb-12 shadow-glow">
+          <div className="absolute inset-0 gradient-hero opacity-90" />
+          <div className="relative z-10 text-center">
+            <h1 className="text-5xl font-bold text-white mb-4">
+              Your Events, All in One Place
+            </h1>
+            <p className="text-white/90 text-lg max-w-2xl mx-auto">
+              Manage events from all your Discord servers seamlessly. Plan, coordinate, and never miss a moment.
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Events Grid */}
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold mb-2">Your Events ({events.length})</h2>
+          <p className="text-muted-foreground">Events from all your servers</p>
         </div>
-      </main>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {events.map((event) => (
+            <Link key={event.id} href={`/event/${event.id}`} className="block group">
+              <Card className="h-full transition-all duration-300 hover:shadow-elegant hover:-translate-y-1 border-border/50">
+                <CardHeader className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <Badge 
+                      variant="secondary" 
+                      className={`bg-gradient-to-r ${event.serverColor} text-white border-0 px-3 py-1 text-xs font-semibold`}
+                    >
+                      {event.server}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {event.type}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                    {event.name}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {event.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>{event.date}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span>{event.location}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span>{event.attendees} attending</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
