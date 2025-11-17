@@ -1,10 +1,10 @@
 import { NavBar } from "@/components/NavBar";
 import { Calendar, MapPin, Users } from "lucide-react";
-import Link from "next/link";
+import Link from "next/link"; 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Mock data for events from different servers
+// Mock data for events from different servers; array of objects
 const events = [
   {
     id: 1,
@@ -63,16 +63,19 @@ const events = [
   }
 ];
 
+// homepage at '/', root page, Next needs 'export default' for pages
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
-      <NavBar />
+    <div className="min-h-screen bg-background"> {/* div containing full webpage area */}
+
+      <NavBar /> {/* navigation bar attached to top of screen */}
       
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-3xl p-12 mb-12 shadow-glow">
-          <div className="absolute inset-0 gradient-hero opacity-90" />
-          <div className="relative z-10 text-center">
+      <div className="container mx-auto px-4 py-8 max-w-7xl"> {/* div for all page content */}
+        
+        {/* Hero Section Div */}
+        <div className="relative overflow-hidden rounded-3xl p-12 mb-12 shadow-glow"> {/* uses relative to set up positioning context for absolute div */}
+          <div className="absolute inset-0 gradient-hero opacity-90" /> {/* inset 0 makes it so gradient fills up all of relative div before, self closing */}
+          <div className="relative z-10 text-center"> {/* 'relative z-10' puts text on top of gradient */}
             <h1 className="text-5xl font-bold text-white mb-4">
               Your Events, All in One Place
             </h1>
@@ -82,45 +85,47 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Events Grid */}
+        {/* Events Title Div */}
         <div className="mb-6">
           <h2 className="text-3xl font-bold mb-2">Your Events ({events.length})</h2>
           <p className="text-muted-foreground">Events from all your servers</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Events Grid Div */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> {/* grid layout for events, columns dependent on screen size */}
+          {/* map through events array and return JSX for each event */}
           {events.map((event) => (
-            <Link key={event.id} href={`/event/${event.id}`} className="block group">
-              <Card className="h-full transition-all duration-300 hover:shadow-elegant hover:-translate-y-1 border-border/50">
-                <CardHeader className="space-y-3">
-                  <div className="flex items-start justify-between gap-2">
+            <Link key={event.id} href={`/event/${event.id}`} className="block group"> {/* link to specific event page based on event id, 'block group' sets up hover effects */}
+              <Card className="h-full transition-all duration-300 hover:shadow-elegant hover:-translate-y-1 border-border/50"> {/* card for event, hovering shifts up and creates shadow */}
+                <CardHeader className="space-y-3"> {/* card header div */}
+                  <div className="flex items-start justify-between gap-2"> {/* flex div for badges */}
                     <Badge 
                       variant="secondary" 
                       className={`bg-gradient-to-r ${event.serverColor} text-white border-0 px-3 py-1 text-xs font-semibold`}
-                    >
+                    > {/* badge for server identification */}
                       {event.server}
                     </Badge>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs"> {/* badge for event type */}
                       {event.type}
                     </Badge>
                   </div>
-                  <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors"> {/* card title, hover shifts text color based on parent Link */}
                     {event.name}
                   </CardTitle>
-                  <CardDescription className="line-clamp-2">
+                  <CardDescription className="line-clamp-2"> {/* card description */}
                     {event.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4 text-primary" />
+                <CardContent className="space-y-3"> {/* card content div, all 3 children use identical structuring */}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground"> {/* flex div for event details */}
+                    <Calendar className="h-4 w-4 text-primary" /> { /* calendar icon as component returns svg file using props passed in */}
                     <span>{event.date}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground"> {/* flex div for event location */}
                     <MapPin className="h-4 w-4 text-primary" />
                     <span>{event.location}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground"> {/* flex div for event attendees */}
                     <Users className="h-4 w-4 text-primary" />
                     <span>{event.attendees} attending</span>
                   </div>
