@@ -17,8 +17,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode; // React.ReactNode means children can be anything that react can render (string, number, div, component with multiple divs, etc)
 }>) {
+  // in the case of a mismatch between server and client render, ignore React hydration warning
   return (
-    <html lang="en" suppressHydrationWarning> {/* in the case of a mismatch between server and client render, ignore React hydration warning */}
+    <html lang="en" suppressHydrationWarning> 
       <body className={inter.className}>
         {/* head will be inserted above body by Next.js when user visits a route like '/ */}
         <ThemeProvider

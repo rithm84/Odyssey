@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+// dummy data
 const expenses = [
   {
     item: "Campsite reservation",
@@ -39,25 +40,25 @@ const expenses = [
 ];
 
 export function BudgetModule() {
-  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0); // combine all array items into one value using arrow function; sum = running total, exp = current item
 
   return (
     <Card className="p-6 shadow-soft transition-smooth hover:shadow-medium">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <DollarSign className="h-6 w-6 text-primary" />
           Budget Tracker
         </h2>
-        <div className="text-right">
+        <div className="text-right"> {/* since there is no flex, items aligned vertically; text-right aligns text to the right instead of flex-1 taking up space in h2 */}
           <p className="text-sm text-muted-foreground">Total Expenses</p>
-          <p className="text-2xl font-bold text-primary">${totalExpenses}</p>
+          <p className="text-2xl font-bold text-primary">${totalExpenses}</p> {/* dollar sign part of amount, not template literal */}
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto"> {/* overflow-x-auto allows horizontal scrolling */}
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Item</TableHead>
+              <TableHead>Item</TableHead> 
               <TableHead>Paid By</TableHead>
               <TableHead className="text-right">Amount</TableHead>
               <TableHead>Split Between</TableHead>
@@ -83,7 +84,7 @@ export function BudgetModule() {
                   ${expense.amount}
                 </TableCell>
                 <TableCell>
-                  <div className="flex -space-x-2">
+                  <div className="flex -space-x-2"> {/* -space-x-2 removes horizontal space between avatars, creates overlap */}
                     {expense.splitBetween.map((person, i) => (
                       <Avatar key={i} className="h-6 w-6 bg-secondary text-white text-xs border-2 border-background">
                         <AvatarFallback className="bg-secondary text-xs">
