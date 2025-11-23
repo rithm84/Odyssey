@@ -1,7 +1,8 @@
 "use client";
-import { Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
 const scheduleByDay = [
@@ -46,54 +47,75 @@ export function ScheduleTimeline() {
   const schedule = scheduleByDay[currentDay];
 
   return (
-    <Card className="p-6 shadow-soft transition-smooth hover:shadow-medium">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Clock className="h-6 w-6 text-primary" />
-          Schedule of Events
-        </h2>
-        {scheduleByDay.length > 1 && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentDay(Math.max(0, currentDay - 1))}
-              disabled={currentDay === 0}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium min-w-[120px] text-center">
-              {schedule.day}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentDay(Math.min(scheduleByDay.length - 1, currentDay + 1))}
-              disabled={currentDay === scheduleByDay.length - 1}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </div>
-      <p className="text-sm text-muted-foreground mb-6">{schedule.date}</p>
-      <div className="relative">
-        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent" />
-        <div className="space-y-6">
-          {schedule.items.map((item, index) => (
-            <div key={index} className="relative pl-12">
-              <div className="absolute left-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-soft">
-                <div className="w-3 h-3 rounded-full bg-white" />
+    <Card className="p-6 shadow-soft transition-all duration-500 hover:shadow-glow-red border-border/60 backdrop-blur-sm bg-card/80 group relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
+          <div>
+            <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
+                <Clock className="h-5 w-5 text-white" />
               </div>
-              <div className="transition-smooth hover:translate-x-1">
-                <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-sm font-semibold text-primary">{item.time}</span>
-                  <h3 className="font-semibold text-foreground">{item.title}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
-              </div>
+              <span>Schedule of Events</span>
+            </h2>
+            <div className="flex items-center gap-2 ml-[52px]">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <p className="text-muted-foreground font-medium">{schedule.date}</p>
             </div>
-          ))}
+          </div>
+
+          {scheduleByDay.length > 1 && (
+            <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCurrentDay(Math.max(0, currentDay - 1))}
+                disabled={currentDay === 0}
+                className="h-9 w-9 rounded-lg hover:bg-primary hover:text-white"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Badge className="gradient-primary text-white border-0 px-4 py-2 font-bold shadow-medium">
+                {schedule.day}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCurrentDay(Math.min(scheduleByDay.length - 1, currentDay + 1))}
+                disabled={currentDay === scheduleByDay.length - 1}
+                className="h-9 w-9 rounded-lg hover:bg-primary hover:text-white"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-5 top-0 bottom-0 w-1 gradient-primary rounded-full" />
+
+          <div className="space-y-6">
+            {schedule.items.map((item, index) => (
+              <div key={index} className="relative pl-14 group/item">
+                <div className="absolute left-0 w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium group-hover/item:scale-110 transition-transform duration-300">
+                  <div className="w-4 h-4 rounded-full bg-white shadow-soft" />
+                </div>
+
+                <div className="p-4 rounded-xl border border-border/60 hover:border-primary/40 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-medium group-hover/item:translate-x-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
+                    <Badge className="gradient-warm text-white border-0 font-bold px-3 py-1 shadow-medium" style={{ color: '#ffffff' }}>
+                      {item.time}
+                    </Badge>
+                    <h3 className="font-black text-lg group-hover/item:text-primary transition-colors">
+                      {item.title}
+                    </h3>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </Card>

@@ -1,4 +1,4 @@
-import { DollarSign } from "lucide-react";
+import { DollarSign, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// dummy data
 const expenses = [
   {
     item: "Campsite reservation",
@@ -40,70 +39,89 @@ const expenses = [
 ];
 
 export function BudgetModule() {
-  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0); // combine all array items into one value using arrow function; sum = running total, exp = current item
+  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
   return (
-    <Card className="p-6 shadow-soft transition-smooth hover:shadow-medium">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <DollarSign className="h-6 w-6 text-primary" />
-          Budget Tracker
-        </h2>
-        <div className="text-right"> {/* since there is no flex, items aligned vertically; text-right aligns text to the right instead of flex-1 taking up space in h2 */}
-          <p className="text-sm text-muted-foreground">Total Expenses</p>
-          <p className="text-2xl font-bold text-primary">${totalExpenses}</p> {/* dollar sign part of amount, not template literal */}
+    <Card className="p-6 shadow-soft transition-all duration-500 hover:shadow-glow-red border-border/60 backdrop-blur-sm bg-card/80 group relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
+                <DollarSign className="h-5 w-5 text-white" />
+              </div>
+              <span>Budget Tracker</span>
+            </h2>
+            <p className="text-muted-foreground ml-[52px]">Shared expenses overview</p>
+          </div>
+
+          <div className="text-right bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-4 shadow-medium">
+            <div className="flex items-center gap-2 justify-end mb-1">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Total Expenses</p>
+            </div>
+            <p className="text-3xl font-black text-gradient">${totalExpenses}</p>
+          </div>
         </div>
-      </div>
-      <div className="overflow-x-auto"> {/* overflow-x-auto allows horizontal scrolling */}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Item</TableHead> 
-              <TableHead>Paid By</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Split Between</TableHead>
-              <TableHead className="text-right">Per Person</TableHead>
-              <TableHead>Payment Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {expenses.map((expense, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{expense.item}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6 bg-primary text-white text-xs">
-                      <AvatarFallback className="bg-primary text-xs">
-                        {expense.paidBy.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">{expense.paidBy.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right font-semibold">
-                  ${expense.amount}
-                </TableCell>
-                <TableCell>
-                  <div className="flex -space-x-2"> {/* -space-x-2 removes horizontal space between avatars, creates overlap */}
-                    {expense.splitBetween.map((person, i) => (
-                      <Avatar key={i} className="h-6 w-6 bg-secondary text-white text-xs border-2 border-background">
-                        <AvatarFallback className="bg-secondary text-xs">
-                          {person}
+
+        <div className="overflow-x-auto rounded-xl border border-border/60">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-muted/50 border-border/60">
+                <TableHead className="font-bold">Item</TableHead>
+                <TableHead className="font-bold">Paid By</TableHead>
+                <TableHead className="text-right font-bold">Amount</TableHead>
+                <TableHead className="font-bold">Split Between</TableHead>
+                <TableHead className="text-right font-bold">Per Person</TableHead>
+                <TableHead className="font-bold">Payment Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {expenses.map((expense, index) => (
+                <TableRow key={index} className="hover:bg-muted/50 border-border/60 transition-colors">
+                  <TableCell className="font-bold text-base">{expense.item}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8 gradient-primary text-white shadow-medium">
+                        <AvatarFallback className="gradient-primary font-bold">
+                          {expense.paidBy.initials}
                         </AvatarFallback>
                       </Avatar>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Badge variant="secondary">${expense.perPerson}</Badge>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {expense.paymentDate}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      <span className="font-medium">{expense.paidBy.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right font-black text-lg text-primary">
+                    ${expense.amount}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex -space-x-2">
+                      {expense.splitBetween.map((person, i) => (
+                        <Avatar
+                          key={i}
+                          className="h-8 w-8 bg-[hsl(var(--accent-purple))] text-white border-2 border-background shadow-medium"
+                        >
+                          <AvatarFallback className="bg-[hsl(var(--accent-purple))] font-bold text-xs">
+                            {person}
+                          </AvatarFallback>
+                        </Avatar>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Badge className="gradient-warm text-white border-0 font-bold px-3 py-1.5 shadow-medium" style={{ color: '#ffffff' }}>
+                      ${expense.perPerson}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="font-medium text-muted-foreground">
+                    {expense.paymentDate}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </Card>
   );

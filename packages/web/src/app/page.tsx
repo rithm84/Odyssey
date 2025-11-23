@@ -1,16 +1,15 @@
 import { NavBar } from "@/components/NavBar";
-import { Calendar, MapPin, Users } from "lucide-react";
-import Link from "next/link"; 
+import { Calendar, MapPin, Users, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Mock data for events from different servers; array of objects
 const events = [
   {
     id: 1,
     name: "Weekend Camping Trip",
     server: "Adventure Club",
-    serverColor: "from-emerald-500 to-teal-500",
+    serverColor: "from-emerald-500 to-teal-600",
     date: "Nov 15-17, 2024",
     location: "Yosemite National Park",
     attendees: 12,
@@ -21,7 +20,7 @@ const events = [
     id: 2,
     name: "Game Night",
     server: "Friends Group",
-    serverColor: "from-pink-500 to-rose-500",
+    serverColor: "from-pink-500 to-rose-600",
     date: "Nov 20, 2024",
     location: "Mike's Place",
     attendees: 8,
@@ -32,7 +31,7 @@ const events = [
     id: 3,
     name: "Hackathon 2024",
     server: "UCLA Coding Club",
-    serverColor: "from-blue-500 to-cyan-500",
+    serverColor: "from-blue-500 to-cyan-600",
     date: "Dec 1-3, 2024",
     location: "UCLA Campus",
     attendees: 45,
@@ -43,7 +42,7 @@ const events = [
     id: 4,
     name: "Thanksgiving Dinner",
     server: "Family",
-    serverColor: "from-orange-500 to-amber-500",
+    serverColor: "from-red-500 to-orange-600",
     date: "Nov 28, 2024",
     location: "Mom's House",
     attendees: 15,
@@ -63,71 +62,114 @@ const events = [
   }
 ];
 
-// homepage at '/', root page, Next needs 'export default' for pages
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background"> {/* div containing full webpage area */}
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <div className="absolute inset-0 gradient-mesh pointer-events-none" />
+      <div className="absolute inset-0 grid-overlay-dots pointer-events-none" />
 
-      <NavBar /> {/* navigation bar attached to top of screen */}
-      
-      <div className="container mx-auto px-4 py-8 max-w-7xl"> {/* div for all page content */}
-        
-        {/* Hero Section Div */}
-        <div className="relative overflow-hidden rounded-3xl p-12 mb-12 shadow-glow"> {/* uses relative to set up positioning context for absolute div */}
-          <div className="absolute inset-0 gradient-hero opacity-90" /> {/* inset 0 makes it so gradient fills up all of relative div before, self closing */}
-          <div className="relative z-10 text-center"> {/* 'relative z-10' puts text on top of gradient */}
-            <h1 className="text-5xl font-bold text-white mb-4">
-              Your Events, All in One Place
+      <NavBar />
+
+      <div className="container mx-auto px-4 py-12 max-w-7xl relative z-10">
+
+        <div className="relative overflow-hidden rounded-3xl p-16 mb-16 shadow-glow group">
+          <div className="absolute inset-0 gradient-hero" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
+
+          <div className="relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
+              <Sparkles className="h-4 w-4 text-white animate-pulse-glow" />
+              <span className="text-white/90 text-sm font-medium">Unified Event Management</span>
+            </div>
+
+            <h1 className="text-6xl md:text-7xl font-black text-white mb-6 tracking-tight leading-none">
+              Your Events,
+              <br />
+              <span className="drop-shadow-[0_0_30px_rgba(255,80,60,1)]" style={{
+                color: '#ffeeee',
+                textShadow: '0 0 20px rgba(255,100,70,0.9), 0 0 40px rgba(255,120,80,0.7), 0 0 60px rgba(255,90,60,0.5)'
+              }}>All in One Place</span>
             </h1>
-            <p className="text-white/90 text-lg max-w-2xl mx-auto">
+
+            <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
               Manage events from all your Discord servers seamlessly. Plan, coordinate, and never miss a moment.
             </p>
+
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
+                <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse-glow" />
+                <span className="text-white/90 text-sm">{events.length} Active Events</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
+                <Users className="h-4 w-4 text-white" />
+                <span className="text-white/90 text-sm">{events.reduce((sum, e) => sum + e.attendees, 0)} Total Attendees</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Events Title Div */}
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold mb-2">Your Events ({events.length})</h2>
-          <p className="text-muted-foreground">Events from all your servers</p>
+        <div className="mb-8">
+          <h2 className="text-4xl font-black mb-3 tracking-tight">
+            Your Events <span className="text-gradient">({events.length})</span>
+          </h2>
+          <p className="text-muted-foreground text-lg">Events from all your servers</p>
         </div>
 
-        {/* Events Grid Div */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> {/* grid layout for events, columns dependent on screen size */}
-          {/* map through events array and return JSX for each event */}
-          {events.map((event) => (
-            <Link key={event.id} href={`/event/${event.id}`} className="block group"> {/* link to specific event page based on event id, 'block group' sets up hover effects */}
-              <Card className="h-full transition-all duration-300 hover:shadow-elegant hover:-translate-y-1 border-border/50"> {/* card for event, hovering shifts up and creates shadow */}
-                <CardHeader className="space-y-3"> {/* card header div */}
-                  <div className="flex items-start justify-between gap-2"> {/* flex div for badges */}
-                    <Badge 
-                      variant="secondary" 
-                      className={`bg-gradient-to-r ${event.serverColor} text-white border-0 px-3 py-1 text-xs font-semibold`}
-                    > {/* badge for server identification */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {events.map((event, index) => (
+            <Link
+              key={event.id}
+              href={`/event/${event.id}`}
+              className={`block group animate-slide-up stagger-${(index % 6) + 1}`}
+            >
+              <Card className="h-full transition-all duration-500 hover:shadow-glow-orange hover:scale-[1.02] border-border/60 backdrop-blur-sm bg-card/80 group-hover:border-primary/40 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                <CardHeader className="space-y-4 relative z-10">
+                  <div className="flex items-start justify-between gap-2">
+                    <Badge
+                      variant="secondary"
+                      className={`bg-gradient-to-r ${event.serverColor} text-white border-0 px-4 py-1.5 text-xs font-bold shadow-medium`}
+                    >
                       {event.server}
                     </Badge>
-                    <Badge variant="outline" className="text-xs"> {/* badge for event type */}
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-border/60 bg-background/60 backdrop-blur-sm font-semibold"
+                    >
                       {event.type}
                     </Badge>
                   </div>
-                  <CardTitle className="text-xl group-hover:text-primary transition-colors"> {/* card title, hover shifts text color based on parent Link */}
+
+                  <CardTitle className="text-2xl group-hover:text-primary transition-all duration-300 font-black tracking-tight leading-tight">
                     {event.name}
                   </CardTitle>
-                  <CardDescription className="line-clamp-2"> {/* card description */}
+
+                  <CardDescription className="line-clamp-2 text-base leading-relaxed">
                     {event.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3"> {/* card content div, all 3 children use identical structuring */}
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground"> {/* flex div for event details */}
-                    <Calendar className="h-4 w-4 text-primary" /> { /* calendar icon as component returns svg file using props passed in */}
-                    <span>{event.date}</span>
+
+                <CardContent className="space-y-3 relative z-10">
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Calendar className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-medium">{event.date}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground"> {/* flex div for event location */}
-                    <MapPin className="h-4 w-4 text-primary" />
-                    <span>{event.location}</span>
+
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <MapPin className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-medium">{event.location}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground"> {/* flex div for event attendees */}
-                    <Users className="h-4 w-4 text-primary" />
-                    <span>{event.attendees} attending</span>
+
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Users className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-medium">{event.attendees} attending</span>
                   </div>
                 </CardContent>
               </Card>

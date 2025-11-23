@@ -1,10 +1,11 @@
 "use client";
-import { ListTodo } from "lucide-react";
+import { ListTodo, Package, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { useState, useMemo } from "react";
 
 const packingItems = [
@@ -44,77 +45,100 @@ export function GroupDashboard() {
   }, [tasksChecked]);
 
   return (
-    <Card className="p-6 shadow-soft transition-smooth hover:shadow-medium">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <ListTodo className="h-6 w-6 text-primary" />
-        Group Dashboard
-      </h2>
-      <Tabs defaultValue="packing" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="packing">Shared Packing List</TabsTrigger>
-          <TabsTrigger value="tasks">Group Tasks</TabsTrigger>
-        </TabsList>
-        <TabsContent value="packing" className="space-y-3 mt-4">
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">
-                {Object.values(packingChecked).filter(Boolean).length} of {packingItems.length} items packed
-              </span>
-              <span className="text-sm font-semibold text-primary">{Math.round(packingProgress)}%</span>
-            </div>
-            <Progress value={packingProgress} />
+    <Card className="p-6 shadow-soft transition-all duration-500 hover:shadow-glow-red border-border/60 backdrop-blur-sm bg-card/80 group relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      <div className="relative z-10">
+        <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-6">
+          <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
+            <ListTodo className="h-5 w-5 text-white" />
           </div>
-          {packingItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-smooth"
-            >
-              <Checkbox
-                checked={packingChecked[item.id]}
-                onCheckedChange={(checked) =>
-                  setPackingChecked({ ...packingChecked, [item.id]: !!checked })
-                }
-              />
-              <span className={`flex-1 ${packingChecked[item.id] ? "line-through text-muted-foreground" : ""}`}>
-                {item.item}
-              </span>
-              <Avatar className="h-8 w-8 bg-primary text-white text-xs">
-                <AvatarFallback className="bg-primary text-xs">{item.assignee}</AvatarFallback>
-              </Avatar>
+          <span>Group Dashboard</span>
+        </h2>
+
+        <Tabs defaultValue="packing" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1 rounded-xl">
+            <TabsTrigger value="packing" className="rounded-lg font-bold data-[state=active]:gradient-primary data-[state=active]:text-white data-[state=active]:shadow-medium">
+              <Package className="h-4 w-4 mr-2" />
+              Shared Packing
+            </TabsTrigger>
+            <TabsTrigger value="tasks" className="rounded-lg font-bold data-[state=active]:gradient-primary data-[state=active]:text-white data-[state=active]:shadow-medium">
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Group Tasks
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="packing" className="space-y-3 mt-6">
+            <div className="mb-6 p-4 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-foreground">
+                  {Object.values(packingChecked).filter(Boolean).length} of {packingItems.length} items packed
+                </span>
+                <Badge className="gradient-primary text-white border-0 font-bold px-3 py-1 shadow-medium">
+                  {Math.round(packingProgress)}%
+                </Badge>
+              </div>
+              <Progress value={packingProgress} className="h-3" />
             </div>
-          ))}
-        </TabsContent>
-        <TabsContent value="tasks" className="space-y-3 mt-4">
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">
-                {Object.values(tasksChecked).filter(Boolean).length} of {tasks.length} tasks completed
-              </span>
-              <span className="text-sm font-semibold text-primary">{Math.round(tasksProgress)}%</span>
+
+            {packingItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-4 p-4 rounded-xl hover:bg-muted/50 transition-all border border-transparent hover:border-primary/20 group/item"
+              >
+                <Checkbox
+                  checked={packingChecked[item.id]}
+                  onCheckedChange={(checked) =>
+                    setPackingChecked({ ...packingChecked, [item.id]: !!checked })
+                  }
+                  className="h-5 w-5"
+                />
+                <span className={`flex-1 font-medium text-base ${packingChecked[item.id] ? "line-through text-muted-foreground" : "group-hover/item:text-primary transition-colors"}`}>
+                  {item.item}
+                </span>
+                <Avatar className="h-9 w-9 gradient-primary text-white shadow-medium">
+                  <AvatarFallback className="gradient-primary font-bold text-sm">{item.assignee}</AvatarFallback>
+                </Avatar>
+              </div>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="tasks" className="space-y-3 mt-6">
+            <div className="mb-6 p-4 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-foreground">
+                  {Object.values(tasksChecked).filter(Boolean).length} of {tasks.length} tasks completed
+                </span>
+                <Badge className="gradient-primary text-white border-0 font-bold px-3 py-1 shadow-medium">
+                  {Math.round(tasksProgress)}%
+                </Badge>
+              </div>
+              <Progress value={tasksProgress} className="h-3" />
             </div>
-            <Progress value={tasksProgress} />
-          </div>
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-smooth"
-            >
-              <Checkbox
-                checked={tasksChecked[task.id]}
-                onCheckedChange={(checked) =>
-                  setTasksChecked({ ...tasksChecked, [task.id]: !!checked })
-                }
-              />
-              <span className={`flex-1 ${tasksChecked[task.id] ? "line-through text-muted-foreground" : ""}`}>
-                {task.task}
-              </span>
-              <Avatar className="h-8 w-8 bg-secondary text-white text-xs">
-                <AvatarFallback className="bg-secondary text-xs">{task.assignee}</AvatarFallback>
-              </Avatar>
-            </div>
-          ))}
-        </TabsContent>
-      </Tabs>
+
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className="flex items-center gap-4 p-4 rounded-xl hover:bg-muted/50 transition-all border border-transparent hover:border-primary/20 group/item"
+              >
+                <Checkbox
+                  checked={tasksChecked[task.id]}
+                  onCheckedChange={(checked) =>
+                    setTasksChecked({ ...tasksChecked, [task.id]: !!checked })
+                  }
+                  className="h-5 w-5"
+                />
+                <span className={`flex-1 font-medium text-base ${tasksChecked[task.id] ? "line-through text-muted-foreground" : "group-hover/item:text-primary transition-colors"}`}>
+                  {task.task}
+                </span>
+                <Avatar className="h-9 w-9 gradient-warm text-white shadow-medium">
+                  <AvatarFallback className="gradient-warm font-bold text-sm">{task.assignee}</AvatarFallback>
+                </Avatar>
+              </div>
+            ))}
+          </TabsContent>
+        </Tabs>
+      </div>
     </Card>
   );
 }
