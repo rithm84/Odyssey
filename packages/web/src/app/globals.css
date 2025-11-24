@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Syne:wght@800&family=Share+Tech+Mono&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,102 +6,124 @@
 
 @layer base {
   :root {
-    --background: 0 0% 97%;
-    --foreground: 0 0% 8%;
+    /* DAY THEME - Orange-dominant with Light Blue/Indigo accents */
+    --font-body: 'Shrikhand', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Shrikhand', sans-serif;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --background: 210 40% 96%;
+    --foreground: 240 50% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --card: 205 45% 97%;
+    --card-foreground: 240 45% 15%;
 
-    --primary: 10 95% 55%;
+    --popover: 200 40% 96%;
+    --popover-foreground: 240 50% 12%;
+
+    --primary: 18 95% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 15 100% 60%;
+    --primary-glow: 25 100% 62%;
 
-    --secondary: 5 90% 60%;
+    --secondary: 220 65% 60%;
     --secondary-foreground: 0 0% 100%;
 
-    --accent-cyan: 180 85% 35%;
-    --accent-blue: 210 85% 40%;
-    --accent-magenta: 320 85% 40%;
-    --accent-purple: 270 85% 40%;
-    --accent-green: 160 85% 35%;
+    --accent-cyan: 195 75% 50%;
+    --accent-blue: 215 70% 55%;
+    --accent-magenta: 330 80% 55%;
+    --accent-purple: 260 70% 55%;
+    --accent-green: 160 70% 42%;
+    --accent-amber: 38 95% 55%;
 
-    --muted: 0 0% 92%;
-    --muted-foreground: 0 0% 30%;
+    --muted: 210 25% 88%;
+    --muted-foreground: 220 30% 35%;
 
-    --accent: 20 95% 58%;
-    --accent-foreground: 0 0% 8%;
+    --accent: 22 90% 60%;
+    --accent-foreground: 240 50% 12%;
 
-    --destructive: 0 90% 45%;
+    --destructive: 0 85% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 10 90% 55% / 0.2;
-    --input: 0 0% 88%;
-    --ring: 10 95% 55%;
+    --border: 18 80% 58% / 0.25;
+    --input: 210 30% 86%;
+    --ring: 18 95% 58%;
 
-    --radius: 0.25rem;
+    --radius: 0.375rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(5 95% 58%), hsl(20 95% 60%));
-    --gradient-neon: linear-gradient(135deg, hsl(0 95% 60%), hsl(15 95% 62%), hsl(25 90% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(5 95% 58%) 0%, hsl(15 95% 60%) 40%, hsl(0 0% 8%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-primary: linear-gradient(135deg, hsl(16 95% 58%), hsl(22 88% 62%), hsl(220 60% 68%));
+    --gradient-neon: linear-gradient(135deg, hsl(14 98% 60%), hsl(20 92% 64%), hsl(218 62% 70%), hsl(222 58% 74%));
+    --gradient-hero: linear-gradient(135deg, hsl(16 95% 58%) 0%, hsl(20 90% 62%) 30%, hsl(220 60% 66%) 75%, hsl(224 58% 55%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(210 48% 97%), hsl(214 45% 96%), hsl(220 42% 95%));
+    --gradient-mesh-day: radial-gradient(at 0% 0%, hsl(16 92% 65% / 0.4) 0px, transparent 50%),
+                         radial-gradient(at 100% 0%, hsl(220 68% 75% / 0.45) 0px, transparent 50%),
+                         radial-gradient(at 100% 100%, hsl(20 85% 68% / 0.3) 0px, transparent 50%),
+                         radial-gradient(at 0% 100%, hsl(218 65% 72% / 0.38) 0px, transparent 50%);
 
-    --shadow-soft: 0 2px 16px hsl(10 95% 55% / 0.2);
-    --shadow-medium: 0 8px 32px hsl(10 95% 55% / 0.3);
-    --shadow-strong: 0 16px 64px hsl(10 95% 55% / 0.4);
+    --shadow-soft: 0 2px 16px hsl(18 90% 58% / 0.25), 0 1px 8px hsl(215 60% 60% / 0.15);
+    --shadow-medium: 0 8px 32px hsl(18 90% 58% / 0.35), 0 4px 16px hsl(215 60% 60% / 0.2);
+    --shadow-strong: 0 16px 64px hsl(18 90% 58% / 0.45), 0 8px 32px hsl(215 60% 60% / 0.25);
+    --shadow-glow-primary: 0 0 20px hsl(18 95% 58% / 0.6), 0 0 40px hsl(18 95% 58% / 0.4), 0 0 60px hsl(215 70% 65% / 0.3);
+    --shadow-glow-secondary: 0 0 20px hsl(215 70% 65% / 0.5), 0 0 40px hsl(215 70% 65% / 0.3), 0 0 60px hsl(18 95% 58% / 0.2);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
-    --background: 0 0% 3%;
-    --foreground: 0 0% 98%;
+    /* NIGHT THEME - Deep Indigo-dominant with Orange accents */
+    --font-body: 'Syne', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Syne', sans-serif;
 
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 98%;
+    --background: 238 50% 5%;
+    --foreground: 30 40% 95%;
 
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 98%;
+    --card: 238 52% 7%;
+    --card-foreground: 28 35% 96%;
 
-    --primary: 10 100% 58%;
-    --primary-foreground: 0 0% 0%;
-    --primary-glow: 15 100% 65%;
+    --popover: 238 55% 6%;
+    --popover-foreground: 30 38% 95%;
 
-    --secondary: 5 100% 60%;
-    --secondary-foreground: 0 0% 0%;
+    --primary: 238 80% 62%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 245 85% 70%;
 
-    --accent-cyan: 180 100% 60%;
-    --accent-blue: 210 100% 60%;
-    --accent-magenta: 320 100% 60%;
-    --accent-purple: 270 100% 60%;
-    --accent-green: 160 100% 55%;
+    --secondary: 18 85% 60%;
+    --secondary-foreground: 240 40% 10%;
 
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 65%;
+    --accent-cyan: 195 80% 58%;
+    --accent-blue: 225 90% 68%;
+    --accent-magenta: 325 75% 60%;
+    --accent-purple: 270 85% 68%;
+    --accent-green: 160 70% 50%;
+    --accent-amber: 35 85% 58%;
 
-    --accent: 20 100% 62%;
-    --accent-foreground: 0 0% 5%;
+    --muted: 238 35% 12%;
+    --muted-foreground: 235 25% 65%;
 
-    --destructive: 0 100% 55%;
-    --destructive-foreground: 0 0% 0%;
+    --accent: 240 85% 68%;
+    --accent-foreground: 30 35% 96%;
 
-    --border: 10 100% 55% / 0.2;
-    --input: 0 0% 12%;
-    --ring: 10 100% 58%;
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(5 100% 60%), hsl(20 100% 62%));
-    --gradient-neon: linear-gradient(135deg, hsl(0 100% 58%), hsl(15 100% 60%), hsl(25 95% 63%));
-    --gradient-hero: linear-gradient(135deg, hsl(5 100% 60%) 0%, hsl(15 100% 62%) 30%, hsl(25 95% 65%) 60%, hsl(0 0% 5%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 6%), hsl(0 0% 5%));
+    --border: 238 80% 62% / 0.3;
+    --input: 238 40% 10%;
+    --ring: 238 80% 62%;
 
-    --shadow-soft: 0 4px 24px hsl(10 100% 55% / 0.3);
-    --shadow-medium: 0 8px 40px hsl(10 100% 55% / 0.4);
-    --shadow-strong: 0 16px 80px hsl(10 100% 55% / 0.5);
-    --shadow-neon-orange: 0 0 20px hsl(10 100% 55%), 0 0 40px hsl(10 100% 55% / 0.6), 0 0 60px hsl(10 100% 55% / 0.4);
-    --shadow-neon-intense: 0 0 30px hsl(5 100% 58%), 0 0 60px hsl(15 100% 60% / 0.7), 0 0 90px hsl(20 100% 62% / 0.5);
+    --gradient-primary: linear-gradient(135deg, hsl(238 80% 58%), hsl(242 78% 60%), hsl(18 75% 60%));
+    --gradient-neon: linear-gradient(135deg, hsl(240 85% 60%), hsl(244 82% 62%), hsl(248 78% 64%), hsl(25 80% 62%));
+    --gradient-hero: linear-gradient(135deg, hsl(238 80% 58%) 0%, hsl(242 75% 52%) 40%, hsl(18 80% 58%) 88%, hsl(25 85% 62%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(238 52% 8%), hsl(240 48% 6%), hsl(244 45% 9%));
+    --gradient-mesh-night: radial-gradient(at 0% 0%, hsl(238 80% 48% / 0.6) 0px, transparent 50%),
+                           radial-gradient(at 100% 0%, hsl(18 80% 58% / 0.2) 0px, transparent 50%),
+                           radial-gradient(at 100% 100%, hsl(244 75% 52% / 0.5) 0px, transparent 50%),
+                           radial-gradient(at 0% 100%, hsl(25 75% 60% / 0.15) 0px, transparent 50%);
+
+    --shadow-soft: 0 4px 24px hsl(238 80% 58% / 0.45), 0 2px 12px hsl(18 80% 58% / 0.12);
+    --shadow-medium: 0 8px 40px hsl(238 80% 58% / 0.55), 0 4px 20px hsl(18 80% 58% / 0.18);
+    --shadow-strong: 0 16px 80px hsl(238 80% 58% / 0.65), 0 8px 40px hsl(18 80% 58% / 0.22);
+    --shadow-glow-primary: 0 0 25px hsl(238 80% 62% / 0.8), 0 0 50px hsl(238 80% 62% / 0.6), 0 0 75px hsl(18 80% 58% / 0.25);
+    --shadow-glow-secondary: 0 0 25px hsl(18 80% 58% / 0.55), 0 0 50px hsl(18 80% 58% / 0.35), 0 0 75px hsl(238 80% 62% / 0.3);
+    --shadow-neon-blue: 0 0 20px hsl(238 80% 62%), 0 0 40px hsl(238 80% 62% / 0.65), 0 0 60px hsl(238 80% 62% / 0.45);
+    --shadow-neon-intense: 0 0 30px hsl(240 85% 64%), 0 0 60px hsl(244 82% 66% / 0.75), 0 0 90px hsl(18 80% 58% / 0.4);
   }
 }
 
@@ -113,14 +135,27 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Rajdhani', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
+    font-weight: 400;
+    transition: font-family 0.3s ease;
+  }
+
+  .dark body {
+    font-weight: 800;
+    letter-spacing: 0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    transition: font-family 0.3s ease;
+  }
+
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
   }
 
   code, pre {
@@ -150,10 +185,11 @@
   }
 
   .gradient-mesh {
-    background: radial-gradient(at 0% 0%, hsl(5 100% 58% / 0.2) 0px, transparent 50%),
-                  radial-gradient(at 100% 0%, hsl(15 100% 60% / 0.2) 0px, transparent 50%),
-                  radial-gradient(at 100% 100%, hsl(0 100% 55% / 0.15) 0px, transparent 50%),
-                  radial-gradient(at 0% 100%, hsl(20 100% 62% / 0.15) 0px, transparent 50%);
+    background: var(--gradient-mesh-day);
+  }
+
+  .dark .gradient-mesh {
+    background: var(--gradient-mesh-night);
   }
 
   .shadow-soft {
@@ -169,19 +205,23 @@
   }
 
   .shadow-neon {
-    box-shadow: var(--shadow-neon-orange, 0 0 20px hsl(10 100% 55%), 0 0 40px hsl(10 100% 55% / 0.6), 0 0 60px hsl(10 100% 55% / 0.4));
+    box-shadow: var(--shadow-glow-primary);
   }
 
   .shadow-neon-intense {
-    box-shadow: var(--shadow-neon-intense, 0 0 30px hsl(5 100% 58%), 0 0 60px hsl(15 100% 60% / 0.7), 0 0 90px hsl(20 100% 62% / 0.5));
+    box-shadow: var(--shadow-neon-intense);
   }
 
   .shadow-glow-orange {
-    box-shadow: 0 0 20px hsl(10 100% 58% / 0.6), 0 8px 32px hsl(10 100% 58% / 0.4);
+    box-shadow: var(--shadow-glow-primary);
   }
 
   .shadow-glow-pink {
-    box-shadow: 0 0 20px hsl(350 95% 65% / 0.6), 0 8px 32px hsl(350 95% 65% / 0.4);
+    box-shadow: var(--shadow-glow-secondary);
+  }
+
+  .dark .shadow-neon {
+    box-shadow: var(--shadow-neon-blue);
   }
 
   .transition-smooth {
@@ -219,34 +259,56 @@
 
   .grid-overlay {
     background-image:
-      linear-gradient(hsl(10 100% 58% / 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(10 100% 58% / 0.1) 1px, transparent 1px);
+      linear-gradient(hsl(18 95% 58% / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(215 70% 65% / 0.12) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .dark .grid-overlay {
+    background-image:
+      linear-gradient(hsl(238 80% 62% / 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(238 80% 62% / 0.2) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
   .grid-overlay-dots {
-    background-image: radial-gradient(circle, hsl(10 100% 58% / 0.15) 1.5px, transparent 1.5px);
+    background-image: radial-gradient(circle, hsl(215 70% 65% / 0.15) 1.5px, transparent 1.5px);
+    background-size: 20px 20px;
+  }
+
+  .dark .grid-overlay-dots {
+    background-image: radial-gradient(circle, hsl(238 80% 62% / 0.28) 1.5px, transparent 1.5px);
     background-size: 20px 20px;
   }
 
   .cyber-grid {
     background-image:
-      linear-gradient(hsl(10 100% 58% / 0.2) 2px, transparent 2px),
-      linear-gradient(90deg, hsl(10 100% 58% / 0.2) 2px, transparent 2px),
-      linear-gradient(hsl(10 100% 58% / 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(10 100% 58% / 0.05) 1px, transparent 1px);
+      linear-gradient(hsl(18 95% 58% / 0.2) 2px, transparent 2px),
+      linear-gradient(90deg, hsl(18 95% 58% / 0.2) 2px, transparent 2px),
+      linear-gradient(hsl(215 70% 65% / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(215 70% 65% / 0.1) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+  }
+
+  .dark .cyber-grid {
+    background-image:
+      linear-gradient(hsl(238 80% 62% / 0.32) 2px, transparent 2px),
+      linear-gradient(90deg, hsl(238 80% 62% / 0.32) 2px, transparent 2px),
+      linear-gradient(hsl(18 80% 58% / 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(18 80% 58% / 0.12) 1px, transparent 1px);
     background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
     background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
   }
 
   .neon-border {
-    border: 1px solid hsl(10 100% 58% / 0.5);
-    box-shadow: inset 0 0 10px hsl(10 100% 58% / 0.3), 0 0 10px hsl(10 100% 58% / 0.3);
+    border: 1px solid hsl(var(--primary) / 0.5);
+    box-shadow: inset 0 0 10px hsl(var(--primary) / 0.3), 0 0 10px hsl(var(--primary) / 0.3);
   }
 
   .neon-border-intense {
-    border: 2px solid hsl(10 100% 58%);
-    box-shadow: inset 0 0 15px hsl(10 100% 58% / 0.5), 0 0 20px hsl(10 100% 58% / 0.6), 0 0 40px hsl(10 100% 58% / 0.4);
+    border: 2px solid hsl(var(--primary));
+    box-shadow: inset 0 0 15px hsl(var(--primary) / 0.5), 0 0 20px hsl(var(--primary) / 0.6), 0 0 40px hsl(var(--primary) / 0.4);
   }
 
   .text-gradient {
@@ -284,10 +346,10 @@
 
   @keyframes pulse-neon {
     0%, 100% {
-      box-shadow: 0 0 20px hsl(5 100% 58% / 0.6), 0 0 40px hsl(15 100% 60% / 0.4);
+      box-shadow: var(--shadow-glow-primary);
     }
     50% {
-      box-shadow: 0 0 30px hsl(5 100% 58% / 0.8), 0 0 60px hsl(15 100% 60% / 0.6);
+      box-shadow: var(--shadow-neon-intense);
     }
   }
 

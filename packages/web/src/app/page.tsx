@@ -9,7 +9,7 @@ const events = [
     id: 1,
     name: "Weekend Camping Trip",
     server: "Adventure Club",
-    serverColor: "from-emerald-500 to-teal-600",
+    serverColor: "from-emerald-500 to-teal-500 dark:from-emerald-600 dark:to-indigo-600",
     date: "Nov 15-17, 2024",
     location: "Yosemite National Park",
     attendees: 12,
@@ -20,7 +20,7 @@ const events = [
     id: 2,
     name: "Game Night",
     server: "Friends Group",
-    serverColor: "from-pink-500 to-rose-600",
+    serverColor: "from-pink-500 to-orange-500 dark:from-fuchsia-600 dark:to-indigo-700",
     date: "Nov 20, 2024",
     location: "Mike's Place",
     attendees: 8,
@@ -31,7 +31,7 @@ const events = [
     id: 3,
     name: "Hackathon 2024",
     server: "UCLA Coding Club",
-    serverColor: "from-blue-500 to-cyan-600",
+    serverColor: "from-blue-500 to-indigo-500 dark:from-indigo-600 dark:to-blue-800",
     date: "Dec 1-3, 2024",
     location: "UCLA Campus",
     attendees: 45,
@@ -42,7 +42,7 @@ const events = [
     id: 4,
     name: "Thanksgiving Dinner",
     server: "Family",
-    serverColor: "from-red-500 to-orange-600",
+    serverColor: "from-orange-500 to-amber-600 dark:from-orange-600 dark:to-indigo-700",
     date: "Nov 28, 2024",
     location: "Mom's House",
     attendees: 15,
@@ -53,7 +53,7 @@ const events = [
     id: 5,
     name: "Beach Cleanup",
     server: "Eco Warriors",
-    serverColor: "from-green-500 to-emerald-600",
+    serverColor: "from-green-500 to-emerald-500 dark:from-teal-600 dark:to-indigo-700",
     date: "Nov 25, 2024",
     location: "Santa Monica Beach",
     attendees: 32,
@@ -85,10 +85,9 @@ export default function Home() {
             <h1 className="text-6xl md:text-7xl font-black text-white mb-6 tracking-tight leading-none">
               Your Events,
               <br />
-              <span className="drop-shadow-[0_0_30px_rgba(255,80,60,1)]" style={{
-                color: '#ffeeee',
-                textShadow: '0 0 20px rgba(255,100,70,0.9), 0 0 40px rgba(255,120,80,0.7), 0 0 60px rgba(255,90,60,0.5)'
-              }}>All in One Place</span>
+              <span className="text-white [text-shadow:_0_0_20px_rgba(255,150,100,0.9),_0_0_40px_rgba(255,130,90,0.7),_0_0_60px_rgba(150,100,255,0.4)] dark:[text-shadow:_0_0_25px_rgba(150,120,255,0.9),_0_0_50px_rgba(130,110,255,0.7),_0_0_75px_rgba(255,150,100,0.5)]">
+                All in One Place
+              </span>
             </h1>
 
             <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">

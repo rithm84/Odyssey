@@ -11,7 +11,7 @@ const weatherData = [
     low: 52,
     condition: "Sunny",
     icon: Sun,
-    gradient: "from-red-500 via-orange-500 to-amber-500",
+    gradient: "from-orange-400 via-amber-400 to-yellow-500 dark:from-orange-500 dark:via-amber-500 dark:to-yellow-600",
     description: "Perfect weather for outdoor activities!",
   },
   {
@@ -20,7 +20,7 @@ const weatherData = [
     low: 48,
     condition: "Partly Cloudy",
     icon: Cloud,
-    gradient: "from-blue-500 via-indigo-500 to-purple-600",
+    gradient: "from-sky-400 via-blue-400 to-indigo-500 dark:from-sky-500 dark:via-blue-600 dark:to-indigo-700",
     description: "Great day for hiking with some cloud cover",
   },
   {
@@ -29,7 +29,7 @@ const weatherData = [
     low: 45,
     condition: "Light Rain",
     icon: CloudRain,
-    gradient: "from-slate-500 via-slate-600 to-gray-700",
+    gradient: "from-slate-500 via-gray-500 to-blue-600 dark:from-slate-700 dark:via-gray-700 dark:to-blue-800",
     description: "Bring rain gear for morning activities",
   },
 ];
