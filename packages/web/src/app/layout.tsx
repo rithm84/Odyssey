@@ -1,9 +1,6 @@
 import type { Metadata } from "next"; // type import, discarded after compilation, saves space
-import { Inter } from "next/font/google"; // import function to import 'inter' google font
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-
-const inter = Inter({ subsets: ["latin"] }); // create instance of 'inter' font with object as parameter; constant will hold an object that has a className property
 
 // metadata for page, important for SEO -> Next.js reads this and generates <head> tags with title and meta tags
 export const metadata: Metadata = {
@@ -19,8 +16,8 @@ export default function RootLayout({
 }>) {
   // in the case of a mismatch between server and client render, ignore React hydration warning
   return (
-    <html lang="en" suppressHydrationWarning> 
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body>
         {/* head will be inserted above body by Next.js when user visits a route like '/ */}
         <ThemeProvider
           // tells the theme provider how to apply theme (in this case, class); it does <html class="dark"> or <html class="light"> (based on globals.css)

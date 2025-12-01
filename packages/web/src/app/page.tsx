@@ -74,7 +74,7 @@ export default function Home() {
 
         <div className="relative overflow-hidden rounded-3xl p-16 mb-16 shadow-glow group">
           <div className="absolute inset-0 gradient-hero" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
+          <div className="absolute inset-0 hero-grid" />
 
           <div className="relative z-10 text-center">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
@@ -82,10 +82,10 @@ export default function Home() {
               <span className="text-white/90 text-sm font-medium">Unified Event Management</span>
             </div>
 
-            <h1 className="text-6xl md:text-7xl font-black text-white mb-6 tracking-tight leading-none">
+            <h1 className="text-6xl md:text-7xl font-black text-white mb-6 tracking-tight" style={{ lineHeight: '1.4' }}>
               Your Events,
               <br />
-              <span className="text-white [text-shadow:_0_0_20px_rgba(255,150,100,0.9),_0_0_40px_rgba(255,130,90,0.7),_0_0_60px_rgba(150,100,255,0.4)] dark:[text-shadow:_0_0_25px_rgba(150,120,255,0.9),_0_0_50px_rgba(130,110,255,0.7),_0_0_75px_rgba(255,150,100,0.5)]">
+              <span className="text-white hero-text-glow">
                 All in One Place
               </span>
             </h1>

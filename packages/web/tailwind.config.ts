@@ -20,7 +20,14 @@ const config: Config = {
       fontFamily: {
         body: "var(--font-body)",
         heading: "var(--font-heading)",
-        mono: ["Share Tech Mono", "monospace"],
+      },
+      fontSize: {
+        'dark-xs': ['0.9296875rem', { lineHeight: '1rem' }],
+        'dark-sm': ['0.9296875rem', { lineHeight: '1.25rem' }],
+        'dark-base': ['1.0625rem', { lineHeight: '1.5rem' }],
+        'dark-lg': ['1.1953125rem', { lineHeight: '1.75rem' }],
+        'dark-xl': ['1.328125rem', { lineHeight: '1.75rem' }],
+        'dark-2xl': ['1.59375rem', { lineHeight: '2rem' }],
       },
       colors: {
         border: "hsl(var(--border))",

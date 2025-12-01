@@ -68,7 +68,7 @@ export function IndividualPackingList() {
                 }
                 className="h-5 w-5"
               />
-              <span className={`flex-1 font-medium text-base ${checked[item.id] ? "line-through text-muted-foreground" : "group-hover/item:text-primary transition-colors"}`}>
+              <span className={`flex-1 font-medium text-base dark:text-dark-base ${checked[item.id] ? "line-through text-muted-foreground" : "group-hover/item:text-primary transition-colors"}`}>
                 {item.item}
               </span>
             </div>

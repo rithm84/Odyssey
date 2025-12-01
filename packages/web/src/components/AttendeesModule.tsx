@@ -65,7 +65,7 @@ export function AttendeesModule() {
                 </div>
 
                 <div className="flex-1">
-                  <p className="font-bold text-lg group-hover/item:text-primary transition-colors">
+                  <p className="font-bold text-lg dark:text-dark-lg group-hover/item:text-primary transition-colors">
                     {attendee.name}
                   </p>
                 </div>

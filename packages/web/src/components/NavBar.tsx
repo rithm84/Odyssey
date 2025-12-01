@@ -14,7 +14,7 @@ export function NavBar() {
                 <Compass className="h-6 w-6 text-white" />
               </div>
             </div>
-            <span className="text-2xl font-black text-gradient uppercase font-heading tracking-wide">
+            <span className="text-2xl font-black text-gradient capitalize font-body tracking-wide">
               Odyssey
             </span>
           </Link>

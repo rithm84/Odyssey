@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Syne:wght@800&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Syne:wght@800&family=Lora:wght@400;500;600&family=Sour+Gummy:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,8 +7,8 @@
 @layer base {
   :root {
     /* DAY THEME - Orange-dominant with Light Blue/Indigo accents */
-    --font-body: 'Shrikhand', system-ui, -apple-system, sans-serif;
-    --font-heading: 'Shrikhand', sans-serif;
+    --font-body: 'Lora', serif;
+    --font-heading: 'Pacifico', cursive;
 
     --background: 210 40% 96%;
     --foreground: 240 50% 12%;
@@ -69,7 +69,7 @@
 
   .dark {
     /* NIGHT THEME - Deep Indigo-dominant with Orange accents */
-    --font-body: 'Syne', system-ui, -apple-system, sans-serif;
+    --font-body: 'Sour Gummy', sans-serif;
     --font-heading: 'Syne', sans-serif;
 
     --background: 238 50% 5%;
@@ -156,10 +156,6 @@
     font-weight: 800;
     letter-spacing: 0.04em;
     text-transform: lowercase;
-  }
-
-  code, pre {
-    font-family: 'Share Tech Mono', monospace;
   }
 }
 
@@ -259,15 +255,15 @@
 
   .grid-overlay {
     background-image:
-      linear-gradient(hsl(18 95% 58% / 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(215 70% 65% / 0.12) 1px, transparent 1px);
+      linear-gradient(hsl(18 95% 58% / 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(215 70% 65% / 0.24) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
   .dark .grid-overlay {
     background-image:
-      linear-gradient(hsl(238 80% 62% / 0.2) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(238 80% 62% / 0.2) 1px, transparent 1px);
+      linear-gradient(hsl(238 80% 62% / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(238 80% 62% / 0.3) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
@@ -281,24 +277,20 @@
     background-size: 20px 20px;
   }
 
-  .cyber-grid {
+  .hero-grid {
     background-image:
-      linear-gradient(hsl(18 95% 58% / 0.2) 2px, transparent 2px),
-      linear-gradient(90deg, hsl(18 95% 58% / 0.2) 2px, transparent 2px),
-      linear-gradient(hsl(215 70% 65% / 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(215 70% 65% / 0.1) 1px, transparent 1px);
-    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+      linear-gradient(white 1px, transparent 1px),
+      linear-gradient(90deg, white 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.10;
   }
 
-  .dark .cyber-grid {
-    background-image:
-      linear-gradient(hsl(238 80% 62% / 0.32) 2px, transparent 2px),
-      linear-gradient(90deg, hsl(238 80% 62% / 0.32) 2px, transparent 2px),
-      linear-gradient(hsl(18 80% 58% / 0.12) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(18 80% 58% / 0.12) 1px, transparent 1px);
-    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+  .hero-text-glow {
+    text-shadow: 0 0 20px rgba(255,150,100,0.9), 0 0 40px rgba(255,130,90,0.7), 0 0 60px rgba(150,100,255,0.4);
+  }
+
+  .dark .hero-text-glow {
+    text-shadow: 0 0 25px rgba(150,120,255,0.9), 0 0 50px rgba(130,110,255,0.7), 0 0 75px rgba(255,150,100,0.5);
   }
 
   .neon-border {

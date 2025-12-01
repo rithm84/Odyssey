@@ -52,7 +52,7 @@ export function TransportationModule() {
                   </div>
 
                   <div className="flex-1">
-                    <p className="font-black text-lg group-hover/carpool:text-primary transition-colors">
+                    <p className="font-black text-lg dark:text-dark-lg group-hover/carpool:text-primary transition-colors">
                       {carpool.driver.name}
                     </p>
                     <p className="text-sm text-muted-foreground font-medium">Driver</p>

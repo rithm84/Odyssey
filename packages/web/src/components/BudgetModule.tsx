@@ -81,7 +81,7 @@ export function BudgetModule() {
             <TableBody>
               {expenses.map((expense, index) => (
                 <TableRow key={index} className="hover:bg-muted/50 border-border/60 transition-colors">
-                  <TableCell className="font-bold text-base">{expense.item}</TableCell>
+                  <TableCell className="font-bold text-base dark:text-dark-base">{expense.item}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8 gradient-primary text-white shadow-medium">
@@ -92,7 +92,7 @@ export function BudgetModule() {
                       <span className="font-medium">{expense.paidBy.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-black text-lg text-primary">
+                  <TableCell className="text-right font-black text-lg dark:text-dark-lg text-primary">
                     ${expense.amount}
                   </TableCell>
                   <TableCell>
