@@ -65,8 +65,8 @@ const events = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <div className="absolute inset-0 gradient-mesh pointer-events-none" />
-      <div className="absolute inset-0 grid-overlay-dots pointer-events-none" />
+      <div className="absolute inset-0 gradient-mesh" />
+      <div className="absolute inset-0 grid-overlay-dots" />
 
       <NavBar />
 
@@ -85,7 +85,7 @@ export default function Home() {
             <h1 className="text-6xl md:text-7xl font-black text-white mb-6 tracking-tight" style={{ lineHeight: '1.4' }}>
               Your Events,
               <br />
-              <span className="text-white hero-text-glow">
+              <span className="text-white">
                 All in One Place
               </span>
             </h1>

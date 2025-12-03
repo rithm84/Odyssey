@@ -52,7 +52,7 @@
     --gradient-neon: linear-gradient(135deg, hsl(14 98% 60%), hsl(20 92% 64%), hsl(218 62% 70%), hsl(222 58% 74%));
     --gradient-hero: linear-gradient(135deg, hsl(16 95% 58%) 0%, hsl(20 90% 62%) 30%, hsl(220 60% 66%) 75%, hsl(224 58% 55%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(210 48% 97%), hsl(214 45% 96%), hsl(220 42% 95%));
-    --gradient-mesh-day: radial-gradient(at 0% 0%, hsl(16 92% 65% / 0.4) 0px, transparent 50%),
+    --gradient-mesh: radial-gradient(at 0% 0%, hsl(16 92% 65% / 0.4) 0px, transparent 50%),
                          radial-gradient(at 100% 0%, hsl(220 68% 75% / 0.45) 0px, transparent 50%),
                          radial-gradient(at 100% 100%, hsl(20 85% 68% / 0.3) 0px, transparent 50%),
                          radial-gradient(at 0% 100%, hsl(218 65% 72% / 0.38) 0px, transparent 50%);
@@ -112,7 +112,7 @@
     --gradient-neon: linear-gradient(135deg, hsl(240 85% 60%), hsl(244 82% 62%), hsl(248 78% 64%), hsl(25 80% 62%));
     --gradient-hero: linear-gradient(135deg, hsl(238 80% 58%) 0%, hsl(242 75% 52%) 40%, hsl(18 80% 58%) 88%, hsl(25 85% 62%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(238 52% 8%), hsl(240 48% 6%), hsl(244 45% 9%));
-    --gradient-mesh-night: radial-gradient(at 0% 0%, hsl(238 80% 48% / 0.6) 0px, transparent 50%),
+    --gradient-mesh: radial-gradient(at 0% 0%, hsl(238 80% 48% / 0.6) 0px, transparent 50%),
                            radial-gradient(at 100% 0%, hsl(18 80% 58% / 0.2) 0px, transparent 50%),
                            radial-gradient(at 100% 100%, hsl(244 75% 52% / 0.5) 0px, transparent 50%),
                            radial-gradient(at 0% 100%, hsl(25 75% 60% / 0.15) 0px, transparent 50%);
@@ -168,10 +168,6 @@
     background: var(--gradient-neon);
   }
 
-  .gradient-warm {
-    background: var(--gradient-neon);
-  }
-
   .gradient-card {
     background: var(--gradient-card);
   }
@@ -181,11 +177,7 @@
   }
 
   .gradient-mesh {
-    background: var(--gradient-mesh-day);
-  }
-
-  .dark .gradient-mesh {
-    background: var(--gradient-mesh-night);
+    background: var(--gradient-mesh);
   }
 
   .shadow-soft {
@@ -283,10 +275,6 @@
       linear-gradient(90deg, white 1px, transparent 1px);
     background-size: 20px 20px;
     opacity: 0.10;
-  }
-
-  .hero-text-glow {
-    text-shadow: 0 0 20px rgba(255,150,100,0.9), 0 0 40px rgba(255,130,90,0.7), 0 0 60px rgba(150,100,255,0.4);
   }
 
   .dark .hero-text-glow {

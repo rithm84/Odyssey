@@ -104,7 +104,7 @@ export function ScheduleTimeline() {
 
                 <div className="p-4 rounded-xl border border-border/60 hover:border-primary/40 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-medium group-hover/item:translate-x-2">
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <Badge className="gradient-warm text-white border-0 font-bold px-3 py-1 shadow-medium" style={{ color: '#ffffff' }}>
+                    <Badge className="gradient-neon text-white border-0 font-bold px-3 py-1 shadow-medium" style={{ color: '#ffffff' }}>
                       {item.time}
                     </Badge>
                     <h3 className="font-black text-lg dark:text-dark-lg group-hover/item:text-primary transition-colors">

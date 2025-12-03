@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const attendees = [
   { name: "Sarah Johnson", role: "Host", initials: "SJ", color: "gradient-primary" },
-  { name: "Mike Chen", role: "Co-Host", initials: "MC", color: "gradient-warm" },
+  { name: "Mike Chen", role: "Co-Host", initials: "MC", color: "gradient-neon" },
   { name: "Emily Davis", role: "Attendee", initials: "ED", color: "bg-[hsl(var(--accent-purple))]" },
   { name: "James Wilson", role: "Attendee", initials: "JW", color: "bg-[hsl(var(--accent-blue))]" },
   { name: "Lisa Anderson", role: "Attendee", initials: "LA", color: "bg-[hsl(var(--accent-green))]" },
@@ -18,7 +18,7 @@ const roleConfig = {
     icon: Crown
   },
   "Co-Host": {
-    className: "gradient-warm text-white border-0 shadow-medium",
+    className: "gradient-neon text-white border-0 shadow-medium",
     icon: Shield
   },
   Attendee: {

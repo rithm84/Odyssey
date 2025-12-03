@@ -11,8 +11,8 @@ import { BudgetModule } from "@/components/BudgetModule";
 export default function EventDetail({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <div className="absolute inset-0 gradient-mesh pointer-events-none" />
-      <div className="absolute inset-0 grid-overlay-dots pointer-events-none" />
+      <div className="absolute inset-0 gradient-mesh" />
+      <div className="absolute inset-0 grid-overlay-dots" />
 
       <NavBar />
 

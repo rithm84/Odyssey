@@ -110,7 +110,7 @@ export function BudgetModule() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Badge className="gradient-warm text-white border-0 font-bold px-3 py-1.5 shadow-medium" style={{ color: '#ffffff' }}>
+                    <Badge className="gradient-neon text-white border-0 font-bold px-3 py-1.5 shadow-medium" style={{ color: '#ffffff' }}>
                       ${expense.perPerson}
                     </Badge>
                   </TableCell>

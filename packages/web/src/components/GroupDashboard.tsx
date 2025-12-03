@@ -131,8 +131,8 @@ export function GroupDashboard() {
                 <span className={`flex-1 font-medium text-base ${tasksChecked[task.id] ? "line-through text-muted-foreground" : "group-hover/item:text-primary transition-colors"}`}>
                   {task.task}
                 </span>
-                <Avatar className="h-9 w-9 gradient-warm text-white shadow-medium">
-                  <AvatarFallback className="gradient-warm font-bold text-sm">{task.assignee}</AvatarFallback>
+                <Avatar className="h-9 w-9 gradient-neon text-white shadow-medium">
+                  <AvatarFallback className="gradient-neon font-bold text-sm">{task.assignee}</AvatarFallback>
                 </Avatar>
               </div>
             ))}
