@@ -1,15 +1,8 @@
 "use client";
 
-import * as React from "react"; // import all react
-import { ThemeProvider as NextThemesProvider } from "next-themes"; // use alias because of function name
+import * as React from "react";
+import { ThemeProvider as NextThemesProvider, type ThemeProviderProps as NextThemeProviderProps } from "next-themes";
 
-// create interface for typing
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  [key: string]: any; // use index signature; property name can be any string, property itself can be anything
-}
-
-// use rest and spread to pass props to next-themes
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+export function ThemeProvider({ children, ...props }: NextThemeProviderProps) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }

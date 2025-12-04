@@ -25,7 +25,7 @@ const needRide = [
 
 export function TransportationModule() {
   return (
-    <Card className="p-6 shadow-soft transition-all duration-500 hover:shadow-glow-red border-border/60 backdrop-blur-sm bg-card/80 group relative overflow-hidden">
+    <Card className="p-6 shadow-soft transition-all duration-500 hover:shadow-glow border-border/60 backdrop-blur-sm bg-card/80 group relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10">
@@ -58,7 +58,7 @@ export function TransportationModule() {
                     <p className="text-sm text-muted-foreground font-medium">Driver</p>
                   </div>
 
-                  <Badge className="gradient-primary text-white border-0 font-bold px-4 py-2 flex items-center gap-2 shadow-medium" style={{ color: '#ffffff' }}>
+                  <Badge className="gradient-primary text-white border-0 font-bold px-4 py-2 flex items-center gap-2 shadow-medium">
                     <Users className="h-4 w-4" />
                     {remainingSeats} seats left
                   </Badge>

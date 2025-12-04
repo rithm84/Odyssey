@@ -9,11 +9,12 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch
+  // Avoid hydration mismatch by checking if component is mounted on client
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Return a placeholder to avoid hydration mismatch
   if (!mounted) {
     return (
       <Button

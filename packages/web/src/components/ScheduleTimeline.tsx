@@ -47,7 +47,7 @@ export function ScheduleTimeline() {
   const schedule = scheduleByDay[currentDay];
 
   return (
-    <Card className="p-6 shadow-soft transition-all duration-500 hover:shadow-glow-red border-border/60 backdrop-blur-sm bg-card/80 group relative overflow-hidden">
+    <Card className="p-6 shadow-soft transition-all duration-500 hover:shadow-glow border-border/60 backdrop-blur-sm bg-card/80 group relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10">
@@ -104,7 +104,7 @@ export function ScheduleTimeline() {
 
                 <div className="p-4 rounded-xl border border-border/60 hover:border-primary/40 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-medium group-hover/item:translate-x-2">
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <Badge className="gradient-neon text-white border-0 font-bold px-3 py-1 shadow-medium" style={{ color: '#ffffff' }}>
+                    <Badge className="gradient-neon text-white border-0 font-bold px-3 py-1 shadow-medium">
                       {item.time}
                     </Badge>
                     <h3 className="font-black text-lg dark:text-dark-lg group-hover/item:text-primary transition-colors">
