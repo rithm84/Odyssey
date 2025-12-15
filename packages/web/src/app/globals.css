@@ -150,8 +150,6 @@
     --shadow-soft: 0 4px 24px hsl(238 80% 58% / 0.45), 0 2px 12px hsl(18 80% 58% / 0.12);  /* Subtle glow */
     --shadow-medium: 0 8px 40px hsl(238 80% 58% / 0.55), 0 4px 20px hsl(18 80% 58% / 0.18);  /* Medium glow */
     --shadow-strong: 0 16px 80px hsl(238 80% 58% / 0.65), 0 8px 40px hsl(18 80% 58% / 0.22);  /* Strong glow */
-    --shadow-glow-primary: 0 0 25px hsl(238 80% 62% / 0.8), 0 0 50px hsl(238 80% 62% / 0.6), 0 0 75px hsl(18 80% 58% / 0.25);  /* Indigo-orange glow */
-    --shadow-neon-blue: 0 0 20px hsl(238 80% 62%), 0 0 40px hsl(238 80% 62% / 0.65), 0 0 60px hsl(238 80% 62% / 0.45);  /* Pure indigo neon */
   }
 }
 
@@ -230,18 +228,6 @@
 
   .shadow-strong {
     box-shadow: var(--shadow-strong);  /* Heavy elevation for WeatherForecast */
-  }
-
-  .shadow-neon {
-    box-shadow: var(--shadow-glow-primary);  /* Glowing effect for special elements */
-  }
-
-  .shadow-glow-orange {
-    box-shadow: var(--shadow-glow-primary);  /* Orange glow variant */
-  }
-
-  .dark .shadow-neon {
-    box-shadow: var(--shadow-neon-blue);  /* Switches to indigo glow in dark mode */
   }
 
   /* ========================================

@@ -121,7 +121,7 @@ export default function Home() {
               href={`/event/${event.id}`}
               className={`block group animate-slide-up stagger-${(index % 6) + 1}`}
             >
-              <Card className="h-full transition-all duration-500 hover:shadow-glow-orange hover:scale-[1.02] border-border/60 backdrop-blur-sm bg-card/80 group-hover:border-primary/40 overflow-hidden">
+              <Card className="h-full transition-all duration-500 hover:shadow-glow hover:scale-[1.02] border-border/60 backdrop-blur-sm bg-card/80 group-hover:border-primary/40 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <CardHeader className="space-y-4 relative z-10">
