@@ -14,6 +14,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "dependencies": {
+    "@odyssey/shared": "workspace:*",
     "@langchain/community": "^1.0.0",
     "@langchain/core": "^1.0.3",
     "@langchain/openai": "^1.0.0",
