@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { ChatInputCommandInteraction } from "discord.js";
-import { supabase } from "../lib/supabase.js";
+import { supabase } from "@/lib/supabase.js";
 
 export const createEventCommand = {
     data: new SlashCommandBuilder()

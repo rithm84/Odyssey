@@ -1,6 +1,6 @@
 import type { Interaction } from 'discord.js';
-import { pingCommand } from '../commands/ping.js';
-import { createEventCommand } from '../commands/createEvent.js';
+import { pingCommand } from '@/commands/ping.js';
+import { createEventCommand } from '@/commands/createEvent.js';
 
 export async function handleInteraction(interaction: Interaction) {
     if (!interaction.isChatInputCommand()) return;

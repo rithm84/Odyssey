@@ -1,8 +1,8 @@
 // importing Client and Intents objects from discord.js
 import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
-import { pingCommand } from './commands/ping.js';
-import { createEventCommand } from './commands/createEvent.js';
-import { handleInteraction } from './handlers/interactionHandler.js';
+import { pingCommand } from '@/commands/ping.js';
+import { createEventCommand } from '@/commands/createEvent.js';
+import { handleInteraction } from '@/handlers/interactionHandler.js';
 import dotenv from 'dotenv';
 
 // loading plain text env vars into process.env

@@ -36,11 +36,13 @@ export interface EnabledModules {
 
     attendees: boolean;
 
-    group_packing: boolean;
+    group_dashboard: boolean;
 
     individual_packing: boolean;
 
     transportation: boolean;
+
+    budget: boolean;
 
     weather: boolean;
 

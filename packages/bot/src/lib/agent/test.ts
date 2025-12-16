@@ -1,4 +1,4 @@
-import { llm } from './llm.js';
+import { llm } from '@/lib/agent/llm.js';
 
 async function testAzureConnection() {
   console.log('🧪 Testing Azure OpenAI connection...\n');

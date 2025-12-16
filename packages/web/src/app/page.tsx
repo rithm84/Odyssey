@@ -72,7 +72,7 @@ export default function Home() {
 
       <div className="container mx-auto px-4 py-12 max-w-7xl relative z-10">
 
-        <div className="relative overflow-hidden rounded-3xl p-16 mb-16 shadow-glow group">
+        <div className="relative overflow-hidden rounded-3xl p-11 mb-16 shadow-glow group">
           <div className="absolute inset-0 gradient-hero" />
           <div className="absolute inset-0 hero-grid" />
 
