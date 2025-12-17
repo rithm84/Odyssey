@@ -6,3 +6,6 @@ dist
 odysseyV2.md
 roadmap.md
 RLSpolicies.sql
+dbSchema.sql
+dbTriggers.sql
+dbIndexes.sql
