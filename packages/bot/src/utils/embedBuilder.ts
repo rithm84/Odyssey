@@ -1,4 +1,4 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import type { ParsedEventData } from '@/types/agent';
 
 export function createConfirmationEmbed(eventData: ParsedEventData) {
@@ -7,23 +7,23 @@ export function createConfirmationEmbed(eventData: ParsedEventData) {
     .setTitle('🤖 I understood:')
     .addFields(
       { name: '📅 Event', value: eventData.name, inline: true },
-      { 
-        name: '📆 Date', 
-        value: eventData.date 
-          ? eventData.date.toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              month: 'short', 
-              day: 'numeric' 
+      {
+        name: '📆 Date',
+        value: eventData.date
+          ? eventData.date.toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric'
             })
           : 'Unknown',
-        inline: true 
+        inline: true
       },
-      { 
-        name: '🕐 Time', 
+      {
+        name: '🕐 Time',
         value: eventData.startTime
-          ? `${eventData.startTime.toLocaleTimeString('en-US', { 
-              hour: 'numeric', 
-              minute: '2-digit' 
+          ? `${eventData.startTime.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit'
             })}${eventData.endTime ? ` - ${eventData.endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : ''}`
           : 'All day',
         inline: true
@@ -34,23 +34,7 @@ export function createConfirmationEmbed(eventData: ParsedEventData) {
     .setDescription('Would you like me to create this event?')
     .setTimestamp();
 
-  const buttons = new ActionRowBuilder<ButtonBuilder>()
-    .addComponents(
-      new ButtonBuilder()
-        .setCustomId('event_confirm_yes')
-        .setLabel('Yes')
-        .setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId('event_confirm_edit')
-        .setLabel('Edit')
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId('event_confirm_cancel')
-        .setLabel('Cancel')
-        .setStyle(ButtonStyle.Danger)
-    );
-
-  return { embed, buttons };
+  return embed;
 }
 
 function capitalizeFirst(str: string): string {
