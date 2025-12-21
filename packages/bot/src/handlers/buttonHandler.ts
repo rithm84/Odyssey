@@ -2,9 +2,10 @@ import { ButtonInteraction, EmbedBuilder } from 'discord.js';
 import { supabase } from '@/lib/supabase';
 import type { ParsedEventData } from '@/types/agent';
 
-// Re-declare global type for pending events
+// Declare global types for pending events and edit sessions
 declare global {
   var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
+  var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; confirmationId: string }>;
 }
 
 export async function handleEventConfirmationButton(interaction: ButtonInteraction) {
@@ -93,17 +94,34 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
       global.pendingEvents.delete(confirmationId);
 
     } else if (action === 'edit') {
-      // Ask what to edit
-      await interaction.reply({
-        content: 'What would you like to change? (Reply with your edits, e.g., "change time to 7 PM")',
-        ephemeral: true
-      });
+      // Check if user is already editing a different event
+      global.editSessions = global.editSessions || new Map();
+      const existingSession = global.editSessions.get(interaction.user.id);
 
-      // TODO: Implement edit flow (collect message, re-run agent with updated context)
+      if (existingSession && existingSession.confirmationId !== confirmationId) {
+        // User is editing a DIFFERENT event - warn and replace
+        await interaction.reply({
+          content: `⚠️ You were editing another event. Switching to edit **${eventData.name}** instead. Hit 'Edit' on the old event to revert back.`,
+          ephemeral: true
+        });
+      } else {
+        // Normal edit flow
+        await interaction.reply({
+          content: 'What would you like to change? Just type your edits in the channel (e.g., "change time to 7 PM"). No need to mention me!',
+          ephemeral: true
+        });
+      }
+
+      // Store/update edit session for this user
+      global.editSessions.set(interaction.user.id, {
+        eventData,
+        guildId,
+        confirmationId
+      });
 
     } else if (action === 'cancel') {
       await interaction.update({
-        content: 'L Event creation cancelled.',
+        content: 'Event creation cancelled. ❌',
         embeds: [],
         components: []
       });

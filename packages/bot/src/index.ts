@@ -37,10 +37,20 @@ client.once(Events.ClientReady, async (readyClient) => {
   }
 });
 
-// Handle @mentions
+// Handle @mentions and edit sessions
 client.on(Events.MessageCreate, async (message) => {
   // Ignore bot messages
   if (message.author.bot) return;
+
+  // Check if user is in edit mode (even without mentioning bot)
+  global.editSessions = global.editSessions || new Map();
+  const editSession = global.editSessions.get(message.author.id);
+
+  if (editSession) {
+    // User is editing - handle their message even without mention
+    await handleMention(message);
+    return;
+  }
 
   // Check if bot was mentioned
   if (message.mentions.has(client.user!.id)) {
