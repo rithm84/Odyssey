@@ -2,7 +2,7 @@ import { ButtonInteraction, EmbedBuilder } from 'discord.js';
 import { supabase } from '@/lib/supabase';
 import type { ParsedEventData } from '@/types/agent';
 
-// Declare global type for pending events
+// Re-declare global type for pending events
 declare global {
   var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
 }
@@ -35,14 +35,27 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
       // Save to database
       await interaction.deferReply();
 
+      // Convert string dates back to Date objects if needed (from JSON parsing)
+      const date = eventData.date ? new Date(eventData.date) : null;
+      const startTime = eventData.startTime ? new Date(eventData.startTime) : null;
+      const endTime = eventData.endTime ? new Date(eventData.endTime) : null;
+
+      // Format date as YYYY-MM-DD in local timezone (not UTC)
+      const formatLocalDate = (d: Date) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
       const { data, error } = await supabase
         .from('events')
         .insert({
           guild_id: guildId ?? '',
           channel_id: interaction.channelId ?? '',
           name: eventData.name,
-          date: eventData.date?.toISOString().split('T')[0], // Extract date only
-          time: eventData.startTime?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          date: date ? formatLocalDate(date) : null,
+          time: startTime?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
           location: eventData.location,
           event_type: eventData.eventType,
           creation_method: 'nlp',

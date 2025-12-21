@@ -1,6 +1,9 @@
 import { AzureChatOpenAI } from '@langchain/openai';
 import { createAgent, type ReactAgent } from 'langchain';
 import { createEventTool } from './tools/createEventTool';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Initialize Azure OpenAI - ensure all fields are strings, not undefined
 const model = new AzureChatOpenAI({
