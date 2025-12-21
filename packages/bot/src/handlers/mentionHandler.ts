@@ -17,8 +17,9 @@ export async function handleMention(message: Message) {
   // Extract the user's message (remove bot mention)
   const userMessage = message.content
     .replace(/<@!?(\d+)>/g, '') // Remove bot mention
-    .trim();
+    .trim(); // remove leading and trailing spaces
 
+  // case if user just mentions the bot
   if (!userMessage) {
     await message.reply("Hi! How can I help you create an event?");
     return;
@@ -41,7 +42,7 @@ export async function handleMention(message: Message) {
       { role: 'user', content: userMessage }
     ];
 
-    // Run the agent
+    // invoke agent with messages array
     const result = await eventAgentExecutor.invoke({
       messages
     });
@@ -56,7 +57,7 @@ export async function handleMention(message: Message) {
       ? lastMessage.content 
       : JSON.stringify(lastMessage?.content);
 
-    // Update conversation history
+    // update local conversation history and then set the Map properly
     history.push(
       { role: 'user', content: userMessage },
       { role: 'assistant', content: responseContent }
@@ -66,17 +67,18 @@ export async function handleMention(message: Message) {
     // Check if agent called create_event tool
     const toolOutput = findToolOutput(result);
     
+    // if toolOutput exists, then it is a JSON object with properties 'success', 'data', 'action' (see createEventTool.ts)
     if (toolOutput?.action === 'show_confirmation') {
       // Show confirmation embed
       const eventData: ParsedEventData = toolOutput.data;
       const embed = createConfirmationEmbed(eventData);
 
-      // Store event data temporarily (for button handler)
-      global.pendingEvents = global.pendingEvents || new Map();
-      const confirmationId = `${message.author.id}_${Date.now()}`;
+      // Store event data globally (for buttonHandler.ts)
+      global.pendingEvents = global.pendingEvents || new Map(); // lazy initialization
+      const confirmationId = `${message.author.id}_${Date.now()}`; // create confirmation ID for buttonHandler to fetch via later
       global.pendingEvents.set(confirmationId, { eventData, guildId: message.guildId });
 
-      // Create buttons with confirmation ID (production-safe approach)
+      // Create buttons with confirmation ID
       const buttons = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
           new ButtonBuilder()
@@ -109,6 +111,7 @@ function findToolOutput(result: any): any {
   // Extract tool output from agent result
   // Check if any messages have tool calls with responses
   for (const msg of result.messages) {
+    // Langchain Agent's outputted messages array's objects can have additional fields: tool_calls and tool_call_id
     if (msg.tool_calls && msg.tool_calls.length > 0) {
       // Find the next message which should be the tool response
       const toolCallId = msg.tool_calls[0].id;
@@ -117,7 +120,7 @@ function findToolOutput(result: any): any {
       );
       if (toolResponse) {
         try {
-          return JSON.parse(toolResponse.content);
+          return JSON.parse(toolResponse.content); // toolResponse is a JSON (with role, type, etc), toolResponse.content is a JSON string; .parse() converts it back to a JSON object
         } catch {
           return null;
         }

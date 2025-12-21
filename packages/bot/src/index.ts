@@ -1,13 +1,13 @@
-// importing Client and Intents objects from discord.js
-import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
-import { pingCommand } from '@/commands/ping.js';
-import { createEventCommand } from '@/commands/createEvent.js';
-import { handleInteraction } from '@/handlers/interactionHandler.js';
+import { Client, GatewayIntentBits, REST, Routes, Events } from 'discord.js';
+import { createEventCommand } from '@/commands/createEvent';
+import { handleInteraction } from '@/handlers/interactionHandler';
+import { handleMention } from '@/handlers/mentionHandler';
 import dotenv from 'dotenv';
 
-// loading plain text env vars into process.env
+// Load environment variables
 dotenv.config();
-// create a new client object and pass it parameters of intents (events) we want to listen to
+
+// Create Discord client with necessary intents
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -16,32 +16,42 @@ const client = new Client({
   ],
 });
 
-// using 'once' so that as soon as bot logs in, we get a message letting us know it's online and listening for events
-// ! is the null assertion operator (lets TS know that client.user is not null for sure because we know the ready event is sent back)
-client.once('clientReady', async() => {
-  console.log(`✅ Bot is online! Logged in as ${client.user!.tag}`);
-  
-  // create a rest client and set its token for authentication
-  const rest = new REST({ version: '10'}).setToken(process.env.DISCORD_BOT_TOKEN!);
+// Bot ready event - register slash commands
+client.once(Events.ClientReady, async (readyClient) => {
+  console.log(`✅ Bot is online! Logged in as ${readyClient.user.tag}`);
 
-  // use a try-catch and await to send an HTTP PUT request to the Discord API and register commands
+  // Create REST client for command registration
+  const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN!);
+
   try {
     console.log('Registering slash commands...');
 
     await rest.put(
       Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
-      { body: [pingCommand.data.toJSON(), createEventCommand.data.toJSON()]}
-    )
-    console.log('Slash commands registered!')
+      { body: [createEventCommand.toJSON()] }
+    );
+
+    console.log('✅ Slash commands registered!');
   } catch (error) {
-    console.error('Error registering commands: ', error)
+    console.error('❌ Error registering commands:', error);
   }
 });
 
-// interactionCreate event handler checks for any interaction, screens for slash commands, then has actions for each command
-client.on('interactionCreate', handleInteraction);
+// Handle @mentions
+client.on(Events.MessageCreate, async (message) => {
+  // Ignore bot messages
+  if (message.author.bot) return;
 
-// log in after registering the event handlers and start listening for events
+  // Check if bot was mentioned
+  if (message.mentions.has(client.user!.id)) {
+    await handleMention(message);
+  }
+});
+
+// Handle interactions (slash commands, buttons)
+client.on(Events.InteractionCreate, handleInteraction);
+
+// Login to Discord
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 
