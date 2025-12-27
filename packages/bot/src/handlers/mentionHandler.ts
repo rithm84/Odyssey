@@ -40,7 +40,7 @@ export async function handleMention(message: Message) {
     .trim();
 
   if (!userMessage) {
-    await message.reply("Hi! How can I help you create an event?");
+    await message.reply("Hi! How can I help you create an event?"); // if user just mentions bot without intent
     return;
   }
 
