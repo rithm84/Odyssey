@@ -1,11 +1,19 @@
 import { ButtonInteraction, EmbedBuilder } from 'discord.js';
 import { supabase } from '@/lib/supabase';
 import type { ParsedEventData } from '@/types/agent';
+import { getRecommendedModules } from '@/utils/smartDefaults';
+import { createModuleSelectionEmbed } from '@/utils/moduleSelectionEmbed';
 
-// Declare global types for pending events and edit sessions
+// Declare global types for pending events, edit sessions, and module selection
 declare global {
   var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
   var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; confirmationId: string }>;
+  var pendingModuleSelection: Map<string, {
+    eventData: ParsedEventData;
+    guildId: string | null;
+    channelId: string;
+    selectedModules: import('@odyssey/shared/types/database').EnabledModules;
+  }>;
 }
 
 export async function handleEventConfirmationButton(interaction: ButtonInteraction) {
@@ -33,64 +41,33 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
 
   try {
     if (action === 'yes') {
-      // Save to database
+      // Instead of saving directly, show module selection
       await interaction.deferReply();
 
-      // Convert string dates back to Date objects if needed (from JSON parsing)
-      const date = eventData.date ? new Date(eventData.date) : null;
-      const startTime = eventData.startTime ? new Date(eventData.startTime) : null;
-      const endTime = eventData.endTime ? new Date(eventData.endTime) : null;
 
-      // Format date as YYYY-MM-DD in local timezone (not UTC)
-      const formatLocalDate = (d: Date) => {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
+      // Get smart defaults based on event type
+      const selectedModules = getRecommendedModules(eventData.eventType);
 
-      const { data, error } = await supabase
-        .from('events')
-        .insert({
-          guild_id: guildId ?? '',
-          channel_id: interaction.channelId ?? '',
-          name: eventData.name,
-          date: date ? formatLocalDate(date) : null,
-          time: startTime?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          location: eventData.location,
-          event_type: eventData.eventType,
-          creation_method: 'nlp',
-          enabled_modules: {
-            schedule: true,
-            attendees: true,
-            group_dashboard: false,
-            individual_packing: false,
-            transportation: false,
-            budget: false,
-            weather: false,
-            photos: false,
-          },
-          synced_with_discord: false,
-          created_by: interaction.user.id,
-        })
-        .select()
-        .single();
+      // Create module selection session
+      global.pendingModuleSelection = global.pendingModuleSelection || new Map();
+      const sessionId = `${interaction.user.id}_${Date.now()}`;
+      global.pendingModuleSelection.set(sessionId, {
+        eventData,
+        guildId,
+        channelId: interaction.channelId ?? '',
+        selectedModules
+      });
 
-      if (error) throw error;
+      // Show module selection embed
+      const { embed, components } = createModuleSelectionEmbed(
+        eventData.name,
+        selectedModules,
+        sessionId
+      );
 
-      // Success embed
-      const successEmbed = new EmbedBuilder()
-        .setColor('#57F287')
-        .setTitle(' Event Created!')
-        .setDescription(`**${eventData.name}** has been added to your events.`)
-        .addFields(
-          { name: 'Event ID', value: data.id.toString() }
-        )
-        .setTimestamp();
+      await interaction.editReply({ embeds: [embed], components });
 
-      await interaction.editReply({ embeds: [successEmbed] });
-
-      // Clean up pending event
+      // Clean up pending event confirmation (moved to module selection)
       global.pendingEvents.delete(confirmationId);
 
     } else if (action === 'edit') {

@@ -46,8 +46,6 @@ export interface EnabledModules {
 
     weather: boolean;
 
-    photos: boolean;
-
 }
 
 export interface PollOption {
