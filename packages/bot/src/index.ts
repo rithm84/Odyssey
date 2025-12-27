@@ -1,6 +1,8 @@
 import { Client, GatewayIntentBits, REST, Routes, Events } from 'discord.js';
 import { createEventCommand } from '@/commands/createEvent';
+import { editEventModulesCommand } from '@/commands/editEventModules';
 import { handleInteraction } from '@/handlers/interactionHandler';
+import { handleAutocomplete } from '@/handlers/autocompleteHandler';
 import { handleMention } from '@/handlers/mentionHandler';
 import dotenv from 'dotenv';
 
@@ -28,7 +30,7 @@ client.once(Events.ClientReady, async (readyClient) => {
 
     await rest.put(
       Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
-      { body: [createEventCommand.toJSON()] }
+      { body: [createEventCommand.toJSON(), editEventModulesCommand.toJSON()] }
     );
 
     console.log('✅ Slash commands registered!');
@@ -58,8 +60,17 @@ client.on(Events.MessageCreate, async (message) => {
   }
 });
 
-// Handle interactions (slash commands, buttons)
-client.on(Events.InteractionCreate, handleInteraction);
+// Handle interactions (slash commands, buttons, autocomplete)
+client.on(Events.InteractionCreate, async (interaction) => {
+  // Handle autocomplete
+  if (interaction.isAutocomplete()) {
+    await handleAutocomplete(interaction);
+    return;
+  }
+
+  // Handle other interactions (slash commands, buttons)
+  await handleInteraction(interaction);
+});
 
 // Login to Discord
 client.login(process.env.DISCORD_BOT_TOKEN);

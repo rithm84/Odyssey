@@ -3,16 +3,21 @@ import { supabase } from '@/lib/supabase';
 import type { ParsedEventData } from '@/types/agent';
 import { getRecommendedModules } from '@/utils/smartDefaults';
 import { createModuleSelectionEmbed } from '@/utils/moduleSelectionEmbed';
+import { generateUniqueSessionId } from '@/utils/generateSessionId';
 
 // Declare global types for pending events, edit sessions, and module selection
 declare global {
   var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
   var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; confirmationId: string }>;
   var pendingModuleSelection: Map<string, {
-    eventData: ParsedEventData;
+    eventData: ParsedEventData | null; // Can be null for edits
     guildId: string | null;
     channelId: string;
     selectedModules: import('@odyssey/shared/types/database').EnabledModules;
+    eventId?: string; // Optional - only present when editing
+    // Metadata for debugging (not used in logic, just for logging)
+    userId: string;
+    timestamp: number;
   }>;
 }
 
@@ -50,12 +55,15 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
 
       // Create module selection session
       global.pendingModuleSelection = global.pendingModuleSelection || new Map();
-      const sessionId = `${interaction.user.id}_${Date.now()}`;
+      const sessionId = generateUniqueSessionId(global.pendingModuleSelection);
       global.pendingModuleSelection.set(sessionId, {
         eventData,
         guildId,
         channelId: interaction.channelId ?? '',
-        selectedModules
+        selectedModules,
+        // Metadata for debugging
+        userId: interaction.user.id,
+        timestamp: Date.now()
       });
 
       // Show module selection embed

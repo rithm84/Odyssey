@@ -1,5 +1,6 @@
 import type { Interaction } from 'discord.js';
 import { handleCreateEventCommand } from '@/handlers/slashCommandHandler';
+import { handleEditEventModules } from '@/handlers/editEventModulesHandler';
 import { handleEventConfirmationButton } from '@/handlers/buttonHandler';
 import { handleModuleToggle } from '@/handlers/moduleToggleHandler';
 
@@ -8,6 +9,11 @@ export async function handleInteraction(interaction: Interaction) {
   if (interaction.isChatInputCommand()) {
     if (interaction.commandName === 'create-event') {
       await handleCreateEventCommand(interaction);
+      return;
+    }
+
+    if (interaction.commandName === 'edit-event-modules') {
+      await handleEditEventModules(interaction);
       return;
     }
   }
