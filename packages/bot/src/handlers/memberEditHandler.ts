@@ -51,10 +51,10 @@ export async function handleMemberSelect(interaction: StringSelectMenuInteractio
     return;
   }
 
-  // Check if co-host is trying to edit an organizer
-  if (session.editorRole === 'co_host' && member.role === 'organizer') {
+  // Check if co-host is trying to edit an organizer or another co-host
+  if (session.editorRole === 'co_host' && (member.role === 'organizer' || member.role === 'co_host')) {
     await interaction.editReply({
-      content: 'Co-hosts cannot make changes to organizers. ⚠️',
+      content: 'Co-hosts can only manage members and viewers, not organizers or other co-hosts. ⚠️',
       embeds: [],
       components: []
     });
@@ -220,7 +220,7 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
   const currentRole = session.pendingChanges.role || session.originalRole;
   const currentRsvp = session.pendingChanges.rsvpStatus || session.originalRsvp;
 
-  // Process actions (co-hosts blocked from editing organizers at selection stage)
+  // Process actions (co-hosts blocked from editing organizers/co-hosts at selection stage)
   if (action === 'promote') {
     if (currentRole === 'viewer') {
       const newRole = 'member';
@@ -383,11 +383,16 @@ function createEditButtons(
 
   const isEditingSelf = editorUserId === targetUserId;
 
-  // Simple button enable/disable logic (co-hosts blocked from organizers at selection)
-  const canPromote = currentRole === 'viewer' || currentRole === 'member' ||
+  // Simple button enable/disable logic
+  // Co-hosts can only promote viewers to members (not members to co-hosts)
+  const canPromote = (currentRole === 'viewer') ||
+                     (currentRole === 'member' && editorRole === 'organizer') ||
                      (currentRole === 'co_host' && editorRole === 'organizer');
-  // Cannot demote yourself if you're the organizer
-  const canDemote = !isEditingSelf && (currentRole === 'co_host' || currentRole === 'member');
+  // Cannot demote yourself, and co-hosts can only demote members to viewers
+  const canDemote = !isEditingSelf &&
+                    ((currentRole === 'member' && editorRole === 'co_host') ||
+                     (currentRole === 'member' && editorRole === 'organizer') ||
+                     (currentRole === 'co_host' && editorRole === 'organizer'));
 
   if (!pendingChanges.remove) {
     row1.addComponents(
