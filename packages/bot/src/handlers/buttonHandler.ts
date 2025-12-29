@@ -86,7 +86,7 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
       if (existingSession && existingSession.confirmationId !== confirmationId) {
         // User is editing a DIFFERENT event - warn and replace
         await interaction.reply({
-          content: `⚠️ You were editing another event. Switching to edit **${eventData.name}** instead. Hit 'Edit' on the old event to revert back.`,
+          content: `You were editing another event. Switching to edit **${eventData.name}** instead. Hit 'Edit' on the old event to revert back. ⚠️`,
           ephemeral: true
         });
       } else {

@@ -1,6 +1,8 @@
 import { Client, GatewayIntentBits, REST, Routes, Events } from 'discord.js';
 import { createEventCommand } from '@/commands/createEvent';
 import { editEventModulesCommand } from '@/commands/editEventModules';
+import { rsvpCommand } from '@/commands/rsvp';
+import { manageMembersCommand } from '@/commands/manageMembers';
 import { handleInteraction } from '@/handlers/interactionHandler';
 import { handleAutocomplete } from '@/handlers/autocompleteHandler';
 import { handleMention } from '@/handlers/mentionHandler';
@@ -15,6 +17,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers, // Required to fetch guild members
   ],
 });
 
@@ -30,7 +33,14 @@ client.once(Events.ClientReady, async (readyClient) => {
 
     await rest.put(
       Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
-      { body: [createEventCommand.toJSON(), editEventModulesCommand.toJSON()] }
+      {
+        body: [
+          createEventCommand.toJSON(),
+          editEventModulesCommand.toJSON(),
+          rsvpCommand.toJSON(),
+          manageMembersCommand.toJSON()
+        ]
+      }
     );
 
     console.log('✅ Slash commands registered!');
