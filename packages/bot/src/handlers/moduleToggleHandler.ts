@@ -119,15 +119,27 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
           .eq('id', eventId)
           .single();
 
-        // Create success embed with enabled modules list
+        // Map module names to emojis
+        const moduleEmojis: Record<keyof EnabledModules, string> = {
+          schedule: '📅',
+          attendees: '👥',
+          group_dashboard: '📋',
+          individual_packing: '🎒',
+          transportation: '🚗',
+          budget: '💰',
+          weather: '🌤️'
+        };
+
+        // Create success embed with enabled modules list (with emojis)
         const enabledFeatures = Object.entries(selectedModules)
           .filter(([_, enabled]) => enabled)
           .map(([name, _]) => {
+            const emoji = moduleEmojis[name as keyof EnabledModules] || '•';
             const formatted = name
               .split('_')
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' ');
-            return `• ${formatted}`;
+            return `${emoji} ${formatted}`;
           })
           .join('\n');
 
@@ -180,15 +192,27 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
 
         if (error) throw error;
 
-        // Create success embed with enabled modules list
+        // Map module names to emojis
+        const moduleEmojis: Record<keyof EnabledModules, string> = {
+          schedule: '📅',
+          attendees: '👥',
+          group_dashboard: '📋',
+          individual_packing: '🎒',
+          transportation: '🚗',
+          budget: '💰',
+          weather: '🌤️'
+        };
+
+        // Create success embed with enabled modules list (with emojis)
         const enabledFeatures = Object.entries(selectedModules)
           .filter(([_, enabled]) => enabled)
           .map(([name, _]) => {
+            const emoji = moduleEmojis[name as keyof EnabledModules] || '•';
             const formatted = name
               .split('_')
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' ');
-            return `• ${formatted}`;
+            return `${emoji} ${formatted}`;
           })
           .join('\n');
 

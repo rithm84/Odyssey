@@ -1,6 +1,6 @@
 import { Message, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 import { eventAgentExecutor, SYSTEM_PROMPT } from '@/agents/eventAgent';
-import { createConfirmationEmbed } from '@/utils/embedBuilder';
+import { createConfirmationEmbed } from '@/utils/createEventConfirmationEmbed';
 import type { ParsedEventData } from '@/types/agent';
 
 // Store conversation history per user (in-memory for now)
@@ -30,13 +30,14 @@ export async function handleMention(message: Message) {
       return;
     }
 
+    // delegate to edit handler
     await handleEditRequest(message, userMessage, editSession);
     return;
   }
 
   // Normal event creation flow - remove bot mention
   const userMessage = message.content
-    .replace(/<@!?(\d+)>/g, '') // Remove bot mention
+    .replace(/<@!?(\d+)>/g, '') // Remove bot mention using regex & trim
     .trim();
 
   if (!userMessage) {
@@ -122,8 +123,7 @@ If it's clearly DIFFERENT (different activity, date, or purpose), create a new e
       // Show confirmation embed
       const eventData: ParsedEventData = toolOutput.data;
 
-      // LLM now handles duplicate detection via enhanced system prompt
-      // Just create/store the event normally
+      // Create/store the event normally
       global.pendingEvents = global.pendingEvents || new Map();
       const confirmationId = `${message.author.id}_${Date.now()}`;
       global.pendingEvents.set(confirmationId, { eventData, guildId: message.guildId });
@@ -180,7 +180,7 @@ async function handleEditRequest(
 - Location: ${editSession.eventData.location}
 - Type: ${editSession.eventData.eventType}
 
-The user wants to make this change: ${editRequest}
+I want to make this change: ${editRequest}
 
 Please update the event details accordingly and use the create_event tool with the updated information.`;
 

@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 import { eventAgentExecutor, SYSTEM_PROMPT } from '@/agents/eventAgent';
-import { createConfirmationEmbed } from '@/utils/embedBuilder';
+import { createConfirmationEmbed } from '@/utils/createEventConfirmationEmbed';
 import type { ParsedEventData } from '@/types/agent';
 
 // Declare global type for pending events

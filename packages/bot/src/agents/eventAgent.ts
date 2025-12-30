@@ -34,7 +34,7 @@ EVENT NAME:
   ✓ "Potluck" (not "Potluck at My Place")
   ✓ "Team Meeting" (not "Meet with Team to Discuss Project")
   ✓ "Beach Trip" (not "Go to the Beach with Friends")
-- Location and time details go in their own fields, NOT in the name
+- Location and time details go in their own fields, NOT in the name, unless needed for clarity (e.g., "Dinner at Joe's")
 
 OTHER FIELDS:
 - Always infer event_type from context (e.g., "potluck" = food, "meeting" = meeting, "beach trip" = trip)

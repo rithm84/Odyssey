@@ -83,7 +83,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // Login to Discord
-client.login(process.env.DISCORD_BOT_TOKEN);
+client.login(process.env.DISCORD_BOT_TOKEN!);
 
 
 
