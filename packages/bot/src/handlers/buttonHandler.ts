@@ -24,11 +24,19 @@ declare global {
 export async function handleEventConfirmationButton(interaction: ButtonInteraction) {
   const customIdParts = interaction.customId.split('_');
 
-  // Expected format: event_confirm_yes_userId_timestamp or event_confirm_edit_userId_timestamp
+  // Expected format: event_confirm_yes_<sessionId> or event_confirm_edit_<sessionId>
   if (customIdParts[0] !== 'event' || customIdParts[1] !== 'confirm') return;
 
   const action = customIdParts[2]; // 'yes', 'edit', or 'cancel'
-  const confirmationId = `${customIdParts[3]}_${customIdParts[4]}`; // Reconstruct userId_timestamp
+  const confirmationId = customIdParts[3]; // Session ID (8-char hash)
+
+  if (!confirmationId) {
+    await interaction.reply({
+      content: 'Invalid confirmation ID. Please create the event again.',
+      ephemeral: true
+    });
+    return;
+  }
 
   // Retrieve pending event data
   global.pendingEvents = global.pendingEvents || new Map();

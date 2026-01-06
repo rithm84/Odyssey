@@ -1,11 +1,15 @@
-import { ChatInputCommandInteraction, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
+import { ChatInputCommandInteraction, ButtonBuilder, ActionRowBuilder, ButtonStyle, MessageFlags } from 'discord.js';
 import { eventAgentExecutor, SYSTEM_PROMPT } from '@/agents/eventAgent';
+import { pollAgentExecutor, POLL_SYSTEM_PROMPT } from '@/agents/pollAgent';
 import { createConfirmationEmbed } from '@/utils/createEventConfirmationEmbed';
-import type { ParsedEventData } from '@/types/agent';
+import { createPollConfirmationEmbed } from '@/utils/createPollConfirmationEmbed';
+import { generateUniqueSessionId } from '@/utils/generateSessionId';
+import type { ParsedEventData, ParsedPollData } from '@/types/agent';
 
-// Declare global type for pending events
+// Declare global type for pending events and polls
 declare global {
   var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
+  var pendingPolls: Map<string, { pollData: ParsedPollData; guildId: string | null; channelId: string }>;
 }
 
 export async function handleCreateEventCommand(interaction: ChatInputCommandInteraction) {
@@ -45,7 +49,7 @@ export async function handleCreateEventCommand(interaction: ChatInputCommandInte
 
       // Store event data temporarily (for button handler)
       global.pendingEvents = global.pendingEvents || new Map();
-      const confirmationId = `${interaction.user.id}_${Date.now()}`;
+      const confirmationId = generateUniqueSessionId(global.pendingEvents);
       global.pendingEvents.set(confirmationId, { eventData, guildId: interaction.guildId });
 
       // Create buttons with confirmation ID (production-safe approach)
@@ -74,6 +78,75 @@ export async function handleCreateEventCommand(interaction: ChatInputCommandInte
   } catch (error) {
     console.error('Error in slash command handler:', error);
     await interaction.editReply("Sorry, I encountered an error. Please try again.");
+  }
+}
+
+export async function handleCreatePollCommand(interaction: ChatInputCommandInteraction) {
+  const userMessage = interaction.options.getString('description', true);
+
+  try {
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+    // Build messages array with poll system prompt
+    const messages = [
+      { role: 'system', content: POLL_SYSTEM_PROMPT },
+      { role: 'user', content: userMessage }
+    ];
+
+    // Run the poll agent
+    const result = await pollAgentExecutor.invoke({
+      messages
+    });
+
+    // Extract the last message from result
+    if (!result.messages || result.messages.length === 0) {
+      throw new Error('No response from agent');
+    }
+
+    const lastMessage = result.messages[result.messages.length - 1];
+    const responseContent = typeof lastMessage?.content === 'string'
+      ? lastMessage.content
+      : JSON.stringify(lastMessage?.content);
+
+    // Check if agent called create_poll tool
+    const toolOutput = findToolOutput(result);
+
+    if (toolOutput?.action === 'show_poll_confirmation') {
+      // Show poll confirmation embed
+      const pollData: ParsedPollData = toolOutput.data;
+      const embed = createPollConfirmationEmbed(pollData);
+
+      // Store poll data temporarily (for button handler)
+      global.pendingPolls = global.pendingPolls || new Map();
+      const confirmationId = generateUniqueSessionId(global.pendingPolls);
+      global.pendingPolls.set(confirmationId, {
+        pollData,
+        guildId: interaction.guildId,
+        channelId: interaction.channelId
+      });
+
+      // Create confirmation buttons
+      const buttons = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(
+          new ButtonBuilder()
+            .setCustomId(`poll_confirm_yes_${confirmationId}`)
+            .setLabel('Create Poll')
+            .setStyle(ButtonStyle.Success),
+          new ButtonBuilder()
+            .setCustomId(`poll_confirm_cancel_${confirmationId}`)
+            .setLabel('Cancel')
+            .setStyle(ButtonStyle.Danger)
+        );
+
+      await interaction.editReply({ embeds: [embed], components: [buttons] });
+    } else {
+      // Agent is asking clarifying questions
+      await interaction.editReply(responseContent);
+    }
+
+  } catch (error) {
+    console.error('Error in create-poll command handler:', error);
+    await interaction.editReply("Sorry, I encountered an error creating the poll. Please try again.");
   }
 }
 

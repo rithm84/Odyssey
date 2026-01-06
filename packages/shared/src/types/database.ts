@@ -234,7 +234,7 @@ export interface Poll {
 
     is_anonymous: boolean;
 
-    allow_maybe: boolean;
+    allow_necessary: boolean;
 
     deadline?: string;
 

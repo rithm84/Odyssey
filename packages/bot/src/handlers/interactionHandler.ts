@@ -1,9 +1,10 @@
 import type { Interaction } from 'discord.js';
-import { handleCreateEventCommand } from '@/handlers/slashCommandHandler';
+import { handleCreateEventCommand, handleCreatePollCommand } from '@/handlers/slashCommandHandler';
 import { handleEditEventModules } from '@/handlers/editEventModulesHandler';
 import { handleRsvp } from '@/handlers/rsvpHandler';
 import { handleManageMembers } from '@/handlers/manageMembersHandler';
 import { handleEventConfirmationButton } from '@/handlers/buttonHandler';
+import { handlePollConfirmationButton, handlePollVoteButton } from '@/handlers/pollHandler';
 import { handleModuleToggle } from '@/handlers/moduleToggleHandler';
 import { handleMemberSelect, handleMemberAction } from '@/handlers/memberEditHandler';
 import { handleAddMemberButton, handleAddMemberSelect, handleAddMemberConfirm } from '@/handlers/addMemberHandler';
@@ -13,6 +14,11 @@ export async function handleInteraction(interaction: Interaction) {
   if (interaction.isChatInputCommand()) {
     if (interaction.commandName === 'create-event') {
       await handleCreateEventCommand(interaction);
+      return;
+    }
+
+    if (interaction.commandName === 'create-poll') {
+      await handleCreatePollCommand(interaction);
       return;
     }
 
@@ -49,6 +55,16 @@ export async function handleInteraction(interaction: Interaction) {
   if (interaction.isButton()) {
     if (interaction.customId.startsWith('event_confirm')) {
       await handleEventConfirmationButton(interaction);
+      return;
+    }
+
+    if (interaction.customId.startsWith('poll_confirm')) {
+      await handlePollConfirmationButton(interaction);
+      return;
+    }
+
+    if (interaction.customId.startsWith('poll_vote')) {
+      await handlePollVoteButton(interaction);
       return;
     }
 

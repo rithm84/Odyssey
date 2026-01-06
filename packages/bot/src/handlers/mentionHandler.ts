@@ -1,14 +1,18 @@
 import { Message, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 import { eventAgentExecutor, SYSTEM_PROMPT } from '@/agents/eventAgent';
+import { pollAgentExecutor, POLL_SYSTEM_PROMPT } from '@/agents/pollAgent';
 import { createConfirmationEmbed } from '@/utils/createEventConfirmationEmbed';
-import type { ParsedEventData } from '@/types/agent';
+import { createPollConfirmationEmbed } from '@/utils/createPollConfirmationEmbed';
+import { generateUniqueSessionId } from '@/utils/generateSessionId';
+import type { ParsedEventData, ParsedPollData } from '@/types/agent';
 
 // Store conversation history per user (in-memory for now)
 const conversationHistory = new Map<string, { role: string; content: string }[]>();
 
-// Declare global types for pending events and edit sessions
+// Declare global types for pending events, polls, and edit sessions
 declare global {
   var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
+  var pendingPolls: Map<string, { pollData: ParsedPollData; guildId: string | null; channelId: string }>;
   var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; confirmationId: string }>;
 }
 
@@ -41,11 +45,48 @@ export async function handleMention(message: Message) {
     .trim();
 
   if (!userMessage) {
-    await message.reply("Hi! How can I help you create an event?"); // if user just mentions bot without intent
+    await message.reply("Hi! How can I help you create an event or poll?");
     return;
   }
 
+  // Get conversation history for context-aware routing
   const history = conversationHistory.get(userId) || [];
+
+  // Detect if message is poll-related (hybrid: keywords + context)
+  const pollKeywords = [
+    'poll',
+    'vote',
+    'when can',
+    'when are',
+    'what time',
+    'availability',
+    'available',
+    'schedule',
+    'find time',
+    'best time'
+  ];
+
+  // Fast path: obvious poll keywords
+  const hasObviousPollKeyword = pollKeywords.some(keyword =>
+    userMessage.toLowerCase().includes(keyword)
+  );
+
+  if (hasObviousPollKeyword) {
+    await handlePollMention(message, userMessage);
+    return;
+  }
+
+  // Context-aware routing: check if previous message had options
+  const previousUserMessage = history.filter(msg => msg.role === 'user').slice(-1)[0]?.content || '';
+  const hasListOfOptions = previousUserMessage.includes(',') && previousUserMessage.split(',').length >= 2;
+  const isFollowUpPollRequest = userMessage.toLowerCase().match(/create|make|poll/);
+
+  if (hasListOfOptions && isFollowUpPollRequest) {
+    // Enrich message with previous context
+    const enrichedMessage = `Create a poll with these options: ${previousUserMessage}`;
+    await handlePollMention(message, enrichedMessage);
+    return;
+  }
   
   try {
     // Send typing indicator (check if channel supports it)
@@ -125,7 +166,7 @@ If it's clearly DIFFERENT (different activity, date, or purpose), create a new e
 
       // Create/store the event normally
       global.pendingEvents = global.pendingEvents || new Map();
-      const confirmationId = `${message.author.id}_${Date.now()}`;
+      const confirmationId = generateUniqueSessionId(global.pendingEvents);
       global.pendingEvents.set(confirmationId, { eventData, guildId: message.guildId });
 
       const embed = createConfirmationEmbed(eventData);
@@ -242,6 +283,77 @@ Please update the event details accordingly and use the create_event tool with t
     await message.reply("Sorry, I encountered an error processing your edit. Please try again.");
     // Clear edit session on error
     global.editSessions.delete(message.author.id);
+  }
+}
+
+async function handlePollMention(message: Message, userMessage: string) {
+  const userId = message.author.id;
+
+  try {
+    if ('sendTyping' in message.channel) {
+      await message.channel.sendTyping();
+    }
+
+    // Build messages array with poll system prompt
+    const messages = [
+      { role: 'system', content: POLL_SYSTEM_PROMPT },
+      { role: 'user', content: userMessage }
+    ];
+
+    // Run the poll agent
+    const result = await pollAgentExecutor.invoke({
+      messages
+    });
+
+    // Extract the last message
+    if (!result.messages || result.messages.length === 0) {
+      throw new Error('No response from agent');
+    }
+
+    const lastMessage = result.messages[result.messages.length - 1];
+    const responseContent = typeof lastMessage?.content === 'string'
+      ? lastMessage.content
+      : JSON.stringify(lastMessage?.content);
+
+    // Check if agent called create_poll tool
+    const toolOutput = findToolOutput(result);
+
+    if (toolOutput?.action === 'show_poll_confirmation') {
+      // Show poll confirmation embed
+      const pollData: ParsedPollData = toolOutput.data;
+      const embed = createPollConfirmationEmbed(pollData);
+
+      // Store poll data temporarily
+      global.pendingPolls = global.pendingPolls || new Map();
+      const confirmationId = generateUniqueSessionId(global.pendingPolls);
+      global.pendingPolls.set(confirmationId, {
+        pollData,
+        guildId: message.guildId,
+        channelId: message.channelId
+      });
+
+      // Create confirmation buttons
+      const buttons = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(
+          new ButtonBuilder()
+            .setCustomId(`poll_confirm_yes_${confirmationId}`)
+            .setLabel('Create Poll')
+            .setStyle(ButtonStyle.Success),
+          new ButtonBuilder()
+            .setCustomId(`poll_confirm_cancel_${confirmationId}`)
+            .setLabel('Cancel')
+            .setStyle(ButtonStyle.Danger)
+        );
+
+      await message.reply({ embeds: [embed], components: [buttons] });
+    } else {
+      // Agent is asking clarifying questions
+      await message.reply(responseContent);
+    }
+
+  } catch (error) {
+    console.error('Error in poll mention handler:', error);
+    await message.reply("Sorry, I encountered an error creating the poll. Please try again.");
   }
 }
 

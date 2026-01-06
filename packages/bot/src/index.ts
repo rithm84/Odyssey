@@ -1,5 +1,6 @@
 import { Client, GatewayIntentBits, REST, Routes, Events } from 'discord.js';
 import { createEventCommand } from '@/commands/createEvent';
+import { createPollCommand } from '@/commands/createPoll';
 import { editEventModulesCommand } from '@/commands/editEventModules';
 import { rsvpCommand } from '@/commands/rsvp';
 import { manageMembersCommand } from '@/commands/manageMembers';
@@ -36,6 +37,7 @@ client.once(Events.ClientReady, async (readyClient) => {
       {
         body: [
           createEventCommand.toJSON(),
+          createPollCommand.toJSON(),
           editEventModulesCommand.toJSON(),
           rsvpCommand.toJSON(),
           manageMembersCommand.toJSON()

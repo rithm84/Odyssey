@@ -139,7 +139,7 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
               .split('_')
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' ');
-            return `${emoji} ${formatted}`;
+            return `• ${emoji}  ${formatted}`;
           })
           .join('\n');
 
@@ -212,7 +212,7 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
               .split('_')
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' ');
-            return `${emoji} ${formatted}`;
+            return `• ${emoji}  ${formatted}`;
           })
           .join('\n');
 

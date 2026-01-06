@@ -48,6 +48,11 @@
     --accent-purple: 260 70% 55%;  /* Used in BudgetModule and AttendeesModule */
     --accent-green: 160 70% 42%;  /* Used in AttendeesModule */
 
+    /* Poll availability colors - Day theme */
+    --poll-available: 18 100% 50%;  /* Dark orange for available (#FF6B00) */
+    --poll-maybe: 45 92% 58%;  /* Warm yellow for if necessary */
+    --poll-unavailable: 18 80% 88%;  /* Light orange for not available (background) */
+
     /* Muted colors - Backgrounds and de-emphasized text */
     --muted: 210 25% 88%;  /* Subtle gray-blue for muted backgrounds */
     --muted-foreground: 220 30% 35%;  /* Muted text color */
@@ -119,6 +124,11 @@
     --accent-blue: 225 90% 68%;
     --accent-purple: 270 85% 68%;
     --accent-green: 160 70% 50%;
+
+    /* Poll availability colors - Night theme */
+    --poll-available: 18 95% 62%;  /* Bright orange for available */
+    --poll-maybe: 50 95% 65%;  /* Bright yellow for if necessary */
+    --poll-unavailable: 238 40% 25%;  /* Dark indigo for not available (background) */
 
     /* Muted colors */
     --muted: 238 35% 12%;  /* Dark muted backgrounds */
