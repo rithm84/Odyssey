@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import { AvailabilityGrid } from '@/components/poll/AvailabilityGrid';
 import { AvailabilityHeatmap } from '@/components/poll/AvailabilityHeatmap';
-import { HeatmapDetailView } from '@/components/poll/HeatmapDetailView';
+import { HoverInfo } from '@/components/poll/HoverInfo';
 import { PollHeader } from '@/components/poll/PollHeader';
 import { BestTimes } from '@/components/poll/BestTimes';
 import type { Poll, PollResponse, AvailabilityResponse } from '@odyssey/shared/types/database';
@@ -268,7 +268,7 @@ export default function PollPage({ params }: PollPageProps) {
 
                   {/* Right: Hover Details */}
                   <div className="mt-8">
-                    <HeatmapDetailView
+                    <HoverInfo
                       hoveredCell={hoveredCell}
                       dateOptions={poll.date_options as string[]}
                       timeSlots={poll.time_slots}

@@ -9,3 +9,4 @@ dbSchema.sql
 dbTriggers.sql
 dbIndexes.sql
 dbPolicies.sql
+ERROR_LOG.md

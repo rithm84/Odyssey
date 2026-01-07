@@ -160,17 +160,15 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
           throw new Error('Event data is required for creating new events');
         }
 
-        // Format date as YYYY-MM-DD in local timezone
-        const formatLocalDate = (d: Date) => {
-          const year = d.getFullYear();
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
-          return `${year}-${month}-${day}`;
+        // Format time as HH:MM AM/PM
+        const formatTime = (timeStr: string | null) => {
+          if (!timeStr) return null;
+          const [hour, min] = timeStr.split(':');
+          const hourNum = parseInt(hour ?? '0', 10);
+          const period = hourNum >= 12 ? 'PM' : 'AM';
+          const displayHour = hourNum > 12 ? hourNum - 12 : hourNum === 0 ? 12 : hourNum;
+          return `${displayHour}:${min} ${period}`;
         };
-
-        // Convert string dates back to Date objects if needed
-        const date = eventData.date ? new Date(eventData.date) : null;
-        const startTime = eventData.startTime ? new Date(eventData.startTime) : null;
 
         const { data, error } = await supabase
           .from('events')
@@ -178,8 +176,10 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
             guild_id: guildId ?? '',
             channel_id: interaction.channelId ?? '',
             name: eventData.name,
-            date: date ? formatLocalDate(date) : null,
-            time: startTime?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            start_date: eventData.startDate,
+            end_date: eventData.endDate,
+            start_time: formatTime(eventData.startTime),
+            end_time: formatTime(eventData.endTime),
             location: eventData.location,
             event_type: eventData.eventType,
             creation_method: 'nlp',

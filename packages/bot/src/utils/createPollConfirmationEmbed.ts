@@ -49,8 +49,9 @@ export function createPollConfirmationEmbed(pollData: ParsedPollData): EmbedBuil
       if (!firstDateStr || !lastDateStr) {
         return embed;
       }
-      const firstDate = new Date(firstDateStr);
-      const lastDate = new Date(lastDateStr);
+      // Add time component to force local midnight interpretation (avoids timezone shift)
+      const firstDate = new Date(firstDateStr + 'T12:00:00');
+      const lastDate = new Date(lastDateStr + 'T12:00:00');
 
       embed.addFields({
         name: '📅 Dates',
@@ -62,11 +63,29 @@ export function createPollConfirmationEmbed(pollData: ParsedPollData): EmbedBuil
     // Show time slots
     if (pollData.timeSlots && pollData.timeSlots.length > 0) {
       const firstSlot = pollData.timeSlots[0]?.label ?? pollData.timeSlots[0]?.time;
-      const lastSlot = pollData.timeSlots[pollData.timeSlots.length - 1]?.label ?? pollData.timeSlots[pollData.timeSlots.length - 1]?.time;
+
+      // Calculate end time (last slot start time + 1 hour)
+      const lastSlotData = pollData.timeSlots[pollData.timeSlots.length - 1];
+      const lastSlotTime = lastSlotData?.time ?? '17:00';
+      const [hoursStr] = lastSlotTime.split(':');
+      const hours = parseInt(hoursStr ?? '17', 10);
+      const endHour = hours + 1;
+
+      // Format end hour in 12-hour format
+      let endLabel: string;
+      if (endHour === 0 || endHour === 24) {
+        endLabel = '12 AM';
+      } else if (endHour === 12) {
+        endLabel = '12 PM';
+      } else if (endHour < 12) {
+        endLabel = `${endHour} AM`;
+      } else {
+        endLabel = `${endHour - 12} PM`;
+      }
 
       embed.addFields({
         name: '🕐 Time Slots',
-        value: `${firstSlot} - ${lastSlot} (${pollData.timeSlots.length} slots, 1-hour blocks)`,
+        value: `${firstSlot} - ${endLabel} (${pollData.timeSlots.length} slots, 1-hour blocks)`,
         inline: false
       });
     }

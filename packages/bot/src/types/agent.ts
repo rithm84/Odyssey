@@ -12,12 +12,13 @@ export const CreateEventSchema = z.object({
 
 export type CreateEventParams = z.infer<typeof CreateEventSchema>;
 
-// Parsed event data (after chrono-node processing)
+// Parsed event data (after LLM agent processing)
 export interface ParsedEventData {
   name: string;
-  date: Date | null;
-  startTime: Date | null;
-  endTime: Date | null;
+  startDate: string | null;  // YYYY-MM-DD format
+  endDate: string | null;    // YYYY-MM-DD format (same as startDate for single-day events)
+  startTime: string | null;  // HH:MM in 24-hour format
+  endTime: string | null;    // HH:MM in 24-hour format
   location: string;
   eventType: 'social' | 'trip' | 'meeting' | 'food' | 'other';
   rawDateString: string;
@@ -30,7 +31,7 @@ export const CreatePollSchema = z.object({
   pollType: z.enum(['simple', 'availability']).describe("Type: 'simple' for yes/no or choice polls, 'availability' for scheduling/time finding"),
   options: z.array(z.string()).optional().describe("For simple polls: array of choice options (e.g., ['Pizza', 'Burgers', 'Tacos'])"),
   dateRange: z.string().optional().describe("For availability polls: when to find time (e.g., 'next week', 'this weekend', 'Dec 20-25')"),
-  timeRange: z.string().optional().describe("For availability polls: what times (e.g., '9 AM - 5 PM', 'evenings', 'afternoons')"),
+  timeRange: z.string().optional().describe("For availability polls: what times (e.g., '9 AM - 5 PM', 'evenings', 'afternoons'). IMPORTANT: Use '11:59 PM' or 'midnight' instead of '12 AM' for end-of-day times to avoid parsing issues."),
   duration: z.string().optional().describe("For availability polls: how long the meeting is (e.g., '2 hours', '30 minutes')"),
   isAnonymous: z.boolean().optional().describe("Whether votes should be anonymous"),
   allowMaybe: z.boolean().optional().describe("Whether to allow 'maybe' or 'if needed' responses"),

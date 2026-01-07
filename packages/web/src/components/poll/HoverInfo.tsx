@@ -2,7 +2,7 @@
 
 import type { TimeSlot, PollResponse, AvailabilityResponse } from '@odyssey/shared/types/database';
 
-interface HeatmapDetailViewProps {
+interface HoverInfoProps {
   hoveredCell: string | null;
   dateOptions: string[];
   timeSlots: TimeSlot[];
@@ -10,13 +10,13 @@ interface HeatmapDetailViewProps {
   isAnonymous: boolean;
 }
 
-export function HeatmapDetailView({
+export function HoverInfo({
   hoveredCell,
   dateOptions,
   timeSlots,
   responses,
   isAnonymous
-}: HeatmapDetailViewProps) {
+}: HoverInfoProps) {
   if (!hoveredCell) {
     return (
       <div className="bg-muted rounded-lg p-6 text-center flex items-center justify-center min-h-[200px]">
@@ -57,11 +57,18 @@ export function HeatmapDetailView({
     const [hours, minutes] = startTime.split(':').map(Number);
     const nextHour = hours + 1;
 
+    // Handle midnight (24:00 or 0:00)
+    if (nextHour === 24 || nextHour === 0) {
+      const startPeriod = hours >= 12 ? 'PM' : 'AM';
+      const startDisplayHour = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+      return `${startDisplayHour} ${startPeriod} - 12 AM`;
+    }
+
     const startPeriod = hours >= 12 ? 'PM' : 'AM';
     const endPeriod = nextHour >= 12 ? 'PM' : 'AM';
 
     const startDisplayHour = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
-    const endDisplayHour = nextHour > 12 ? nextHour - 12 : nextHour === 0 ? 12 : nextHour;
+    const endDisplayHour = nextHour > 12 ? nextHour - 12 : nextHour;
 
     return `${startDisplayHour} ${startPeriod} - ${endDisplayHour} ${endPeriod}`;
   };

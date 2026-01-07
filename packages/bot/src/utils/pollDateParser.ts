@@ -1,5 +1,6 @@
 import * as chrono from 'chrono-node';
 import type { TimeSlot } from '@odyssey/shared/types/database';
+import { parseDateWithAgent } from '../agents/pollDateParserAgent';
 
 interface ParsedPollDates {
   dateOptions: string[];  // ISO date strings
@@ -8,108 +9,84 @@ interface ParsedPollDates {
 }
 
 /**
+ * Formats a Date object as YYYY-MM-DD in local timezone (not UTC)
+ * Avoids timezone issues with toISOString()
+ */
+function formatDateLocal(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * Parses natural language date and time ranges for availability polls
+ * Uses LLM agent for all date parsing to avoid chrono-node edge cases
  * Always generates 1-hour time slot blocks
  */
-export function parsePollDates(
+export async function parsePollDates(
   dateRange?: string,
   timeRange?: string
-): ParsedPollDates {
+): Promise<ParsedPollDates> {
   const result: ParsedPollDates = {
     dateOptions: [],
     timeSlots: []
   };
 
-  // Parse date range
-  if (dateRange) {
-    const parsedDates = chrono.parse(dateRange);
-
-    if (parsedDates.length === 0) {
-      result.error = "Could not parse date range. Please use phrases like 'next week', 'this weekend', or specific dates.";
-      return result;
-    }
-
-    // Handle date ranges
-    if (parsedDates.length === 1 && parsedDates[0]?.start) {
-      const start = parsedDates[0].start.date();
-      const end = parsedDates[0].end?.date() ?? start;
-
-      // Generate all dates between start and end (max 30 days)
-      const currentDate = new Date(start);
-      const maxDays = 30;
-      let dayCount = 0;
-      while (currentDate <= end && dayCount < maxDays) {
-        const dateStr = currentDate.toISOString().split('T')[0];
-        if (dateStr) {
-          result.dateOptions.push(dateStr);
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-        dayCount++;
-      }
-    } else if (parsedDates.length > 1) {
-      // Multiple specific dates mentioned
-      parsedDates.forEach(parsed => {
-        if (parsed?.start) {
-          const dateStr = parsed.start.date().toISOString().split('T')[0];
-          if (dateStr) {
-            result.dateOptions.push(dateStr);
-          }
-        }
-      });
-    }
-
-    // Handle special keywords
-    if (dateRange.toLowerCase().includes('next week')) {
-      const today = new Date();
-      const nextMonday = new Date(today);
-      nextMonday.setDate(today.getDate() + ((1 + 7 - today.getDay()) % 7) + 7);
-
-      result.dateOptions = [];
-      for (let i = 0; i < 5; i++) {  // Mon-Fri
-        const date = new Date(nextMonday);
-        date.setDate(nextMonday.getDate() + i);
-        const dateStr = date.toISOString().split('T')[0];
-        if (dateStr) result.dateOptions.push(dateStr);
-      }
-    } else if (dateRange.toLowerCase().includes('this week')) {
-      const today = new Date();
-      const monday = new Date(today);
-      monday.setDate(today.getDay() - today.getDay() + 1);
-
-      result.dateOptions = [];
-      for (let i = 0; i < 5; i++) {  // Mon-Fri
-        const date = new Date(monday);
-        date.setDate(monday.getDate() + i);
-        if (date >= today) {  // Only include future dates
-          const dateStr = date.toISOString().split('T')[0];
-          if (dateStr) result.dateOptions.push(dateStr);
-        }
-      }
-    } else if (dateRange.toLowerCase().includes('weekend')) {
-      const today = new Date();
-      const nextSaturday = new Date(today);
-      const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
-      nextSaturday.setDate(today.getDate() + daysUntilSaturday);
-
-      const satStr = nextSaturday.toISOString().split('T')[0];
-      const sunStr = new Date(nextSaturday.getTime() + 86400000).toISOString().split('T')[0];
-      if (satStr) result.dateOptions.push(satStr);
-      if (sunStr) result.dateOptions.push(sunStr);
-    }
+  // Parse date range using LLM agent
+  if (!dateRange) {
+    result.error = "Please specify a date range (e.g., 'next week', 'next weekdays', 'this weekend', 'january 15 to 20').";
+    return result;
   }
 
-  // Default to next 7 days if no date range specified
+  // Use LLM agent for ALL date parsing
+  const agentResult = await parseDateWithAgent(dateRange);
+
+  if (agentResult.error) {
+    result.error = agentResult.error;
+    return result;
+  }
+
+  // Generate all dates between start and end
+  const start = new Date(agentResult.startDate + 'T00:00:00');
+  const end = new Date(agentResult.endDate + 'T00:00:00');
+
+  const currentDate = new Date(start);
+  while (currentDate <= end) {
+    const dateStr = formatDateLocal(currentDate);
+    if (dateStr) {
+      result.dateOptions.push(dateStr);
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // Filter out past dates (extra safety check)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const originalDateCount = result.dateOptions.length;
+  result.dateOptions = result.dateOptions.filter(dateStr => {
+    const date = new Date(dateStr + 'T00:00:00');
+    return date >= today;
+  });
+
+  // Check if all dates were filtered out because they're in the past
+  const hadPastDates = originalDateCount > 0 && result.dateOptions.length === 0;
+
+  // Remove duplicates (safety check)
+  result.dateOptions = Array.from(new Set(result.dateOptions)).sort();
+
+  // If no valid dates found, return error
   if (result.dateOptions.length === 0) {
-    const today = new Date();
-    for (let i = 1; i <= 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      const dateStr = date.toISOString().split('T')[0];
-      if (dateStr) result.dateOptions.push(dateStr);
+    if (hadPastDates) {
+      result.error = "Cannot create polls for past dates. Please specify future dates (e.g., 'tomorrow', 'this weekend', 'next week').";
+    } else {
+      result.error = "Could not determine date range. Please be more specific (e.g., 'next week', 'this weekend', 'january 15 to 20').";
     }
+    return result;
   }
 
-  // Enforce 30-day maximum
+  // Enforce 30-day maximum (should already be enforced by agent, but double-check)
   if (result.dateOptions.length > 30) {
     result.dateOptions = result.dateOptions.slice(0, 30);
     result.error = 'Date range limited to 30 days maximum.';
@@ -135,7 +112,7 @@ export function parsePollDates(
       startHour = 8;
       endHour = 20;
     } else {
-      // Try to parse specific times
+      // Try to parse specific times using chrono (still useful for time parsing)
       const times = chrono.parse(timeRange);
       if (times.length > 0 && times[0]) {
         const startTime = times[0].start;
@@ -146,8 +123,26 @@ export function parsePollDates(
         const endTime = times[0].end ?? (times.length > 1 ? times[1]?.start : null);
         if (endTime) {
           endHour = endTime.get('hour') ?? 17;
+
+          // Special handling: If time range includes "11:59" or "midnight", treat as end of day (24:00)
+          // This is because LLM extracts "11:59 PM" to avoid "12 AM" parsing issues
+          if (lowerTimeRange.includes('11:59') || lowerTimeRange.includes('midnight')) {
+            endHour = 24;
+          }
         }
       }
+    }
+  }
+
+  // Validate time range for backwards ranges (except 12 AM midnight exception)
+  if (endHour <= startHour) {
+    // Special case: Allow 12 AM (midnight) as end time
+    if (endHour === 0) {
+      endHour = 24; // Treat 12 AM as midnight (end of day)
+    } else {
+      // Invalid: backwards time range (e.g., "8 AM to 1 AM")
+      result.error = `Invalid time range: end time (${endHour}:00) is before start time (${startHour}:00). Please specify a time range within the same day, or use "12 AM" / "midnight" for end-of-day.`;
+      return result;
     }
   }
 

@@ -114,12 +114,15 @@ export function AvailabilityHeatmap({
   const shouldScroll = dateOptions.length > 7;
 
   return (
-    <div className={shouldScroll ? "overflow-x-auto" : ""}>
+    <div
+      className={shouldScroll ? "overflow-x-auto" : ""}
+      style={shouldScroll ? { maxWidth: 'calc(80px + 7 * 56px)' } : {}}
+    >
       <div className={shouldScroll ? "min-w-max" : ""}>
         {/* Header Row - Dates */}
         <div className="flex mb-0.5">
           {/* Empty corner cell */}
-          <div className="w-20 flex-shrink-0" />
+          <div className="w-20 flex-shrink-0 sticky left-0 bg-background z-10" />
 
           {/* Date headers */}
           {dateOptions.map(date => (
@@ -136,7 +139,7 @@ export function AvailabilityHeatmap({
         {timeSlots.map((slot, index) => (
           <div key={slot.id} className="flex">
             {/* Time label - positioned at top of row */}
-            <div className="w-20 flex-shrink-0 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
+            <div className="w-20 flex-shrink-0 sticky left-0 bg-background z-10 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
               {slot.label || slot.time}
             </div>
 
@@ -168,14 +171,20 @@ export function AvailabilityHeatmap({
         {/* Final time label at the bottom */}
         {timeSlots.length > 0 && (
           <div className="flex">
-            <div className="w-20 flex-shrink-0 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
+            <div className="w-20 flex-shrink-0 sticky left-0 bg-background z-10 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
               {(() => {
                 const lastSlot = timeSlots[timeSlots.length - 1];
                 const time = lastSlot.time;
                 const [hours, minutes] = time.split(':').map(Number);
                 const nextHour = hours + 1;
+
+                // Handle midnight (24:00 or 0:00)
+                if (nextHour === 24 || nextHour === 0) {
+                  return '12 AM';
+                }
+
                 const period = nextHour >= 12 ? 'PM' : 'AM';
-                const displayHour = nextHour > 12 ? nextHour - 12 : nextHour === 0 ? 12 : nextHour;
+                const displayHour = nextHour > 12 ? nextHour - 12 : nextHour;
                 return `${displayHour} ${period}`;
               })()}
             </div>

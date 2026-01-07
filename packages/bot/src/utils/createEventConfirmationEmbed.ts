@@ -2,42 +2,84 @@ import { EmbedBuilder } from 'discord.js';
 import type { ParsedEventData } from '@/types/agent';
 
 export function createConfirmationEmbed(eventData: ParsedEventData) {
-  // Convert string dates back to Date objects if needed (from JSON parsing)
-  const date = eventData.date ? new Date(eventData.date) : null;
-  const startTime = eventData.startTime ? new Date(eventData.startTime) : null;
-  const endTime = eventData.endTime ? new Date(eventData.endTime) : null;
-
   const embed = new EmbedBuilder()
     .setColor('#5865F2')
     .setTitle('🤖 I understood:')
-    .addFields(
-      { name: '📅 Event', value: eventData.name, inline: true },
-      {
-        name: '📆 Date',
-        value: date
-          ? date.toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'short',
-              day: 'numeric'
-            })
-          : 'Unknown',
-        inline: true
-      },
-      {
-        name: '🕐 Time',
-        value: startTime
-          ? `${startTime.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit'
-            })}${endTime ? ` - ${endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : ''}`
-          : 'All day',
-        inline: true
-      },
-      { name: '📍 Location', value: eventData.location, inline: true },
-      { name: '🏷️ Type', value: capitalizeFirst(eventData.eventType), inline: true }
-    )
     .setDescription('Would you like me to create this event?')
     .setTimestamp();
+
+  // Event name
+  embed.addFields({ name: '📅 Event', value: eventData.name, inline: true });
+
+  // Date range
+  let dateDisplay = 'Unknown';
+  if (eventData.startDate && eventData.endDate) {
+    const start = new Date(eventData.startDate + 'T00:00:00');
+    const end = new Date(eventData.endDate + 'T00:00:00');
+
+    // Check if single-day or multi-day event
+    if (eventData.startDate === eventData.endDate) {
+      // Single-day event
+      dateDisplay = start.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric'
+      });
+    } else {
+      // Multi-day event - show date range
+      const sameYear = start.getFullYear() === end.getFullYear();
+
+      const startFormatted = start.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: sameYear ? undefined : 'numeric'  // Show year on both if different years
+      });
+
+      const endFormatted = end.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: sameYear ? undefined : 'numeric'  // Show year on both if different years
+      });
+
+      dateDisplay = `${startFormatted} - ${endFormatted}`;
+    }
+  }
+  embed.addFields({ name: '📆 Date', value: dateDisplay, inline: true });
+
+  // Time
+  let timeDisplay = 'All day';
+
+  // Check if multi-day event
+  const isMultiDay = eventData.startDate !== eventData.endDate;
+
+  if (isMultiDay) {
+    // Multi-day events always show "All day"
+    timeDisplay = 'All day';
+  } else if (eventData.startTime) {
+    // Single-day event with time
+    const [startHour, startMin] = eventData.startTime.split(':');
+    const startHourNum = parseInt(startHour ?? '0', 10);
+    const startPeriod = startHourNum >= 12 ? 'PM' : 'AM';
+    const startDisplayHour = startHourNum > 12 ? startHourNum - 12 : startHourNum === 0 ? 12 : startHourNum;
+
+    if (eventData.endTime) {
+      const [endHour, endMin] = eventData.endTime.split(':');
+      const endHourNum = parseInt(endHour ?? '0', 10);
+      const endPeriod = endHourNum >= 12 ? 'PM' : 'AM';
+      const endDisplayHour = endHourNum > 12 ? endHourNum - 12 : endHourNum === 0 ? 12 : endHourNum;
+
+      timeDisplay = `${startDisplayHour}:${startMin} ${startPeriod} - ${endDisplayHour}:${endMin} ${endPeriod}`;
+    } else {
+      timeDisplay = `${startDisplayHour}:${startMin} ${startPeriod}`;
+    }
+  }
+  embed.addFields({ name: '🕐 Time', value: timeDisplay, inline: true });
+
+  // Location
+  embed.addFields({ name: '📍 Location', value: eventData.location, inline: true });
+
+  // Event type
+  embed.addFields({ name: '🏷️ Type', value: capitalizeFirst(eventData.eventType), inline: true });
 
   return embed;
 }

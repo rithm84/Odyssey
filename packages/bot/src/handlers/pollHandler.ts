@@ -201,8 +201,9 @@ async function postWebPoll(interaction: ButtonInteraction, poll: Poll) {
     if (!firstDateStr || !lastDateStr) {
       throw new Error('Invalid date options');
     }
-    const firstDate = new Date(firstDateStr);
-    const lastDate = new Date(lastDateStr);
+    // Fix: Add T12:00:00 to force noon interpretation (timezone-safe)
+    const firstDate = new Date(firstDateStr + 'T12:00:00');
+    const lastDate = new Date(lastDateStr + 'T12:00:00');
 
     embed.addFields({
       name: '📅 Dates',
@@ -213,11 +214,29 @@ async function postWebPoll(interaction: ButtonInteraction, poll: Poll) {
 
   if (poll.time_slots && poll.time_slots.length > 0) {
     const firstSlot = poll.time_slots[0]?.label ?? poll.time_slots[0]?.time;
-    const lastSlot = poll.time_slots[poll.time_slots.length - 1]?.label ?? poll.time_slots[poll.time_slots.length - 1]?.time;
+
+    // Calculate end time (last slot start time + 1 hour)
+    const lastSlotData = poll.time_slots[poll.time_slots.length - 1];
+    const lastSlotTime = lastSlotData?.time ?? '17:00';
+    const [hoursStr] = lastSlotTime.split(':');
+    const hours = parseInt(hoursStr ?? '17', 10);
+    const endHour = hours + 1;
+
+    // Format end hour in 12-hour format
+    let endLabel: string;
+    if (endHour === 0 || endHour === 24) {
+      endLabel = '12 AM';
+    } else if (endHour === 12) {
+      endLabel = '12 PM';
+    } else if (endHour < 12) {
+      endLabel = `${endHour} AM`;
+    } else {
+      endLabel = `${endHour - 12} PM`;
+    }
 
     embed.addFields({
       name: '🕐 Time Slots',
-      value: `${firstSlot} - ${lastSlot}`,
+      value: `${firstSlot} - ${endLabel}`,
       inline: true
     });
   }

@@ -1,6 +1,7 @@
 import { Message, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 import { eventAgentExecutor, SYSTEM_PROMPT } from '@/agents/eventAgent';
 import { pollAgentExecutor, POLL_SYSTEM_PROMPT } from '@/agents/pollAgent';
+import { routeToAgent } from '@/agents/routerAgent';
 import { createConfirmationEmbed } from '@/utils/createEventConfirmationEmbed';
 import { createPollConfirmationEmbed } from '@/utils/createPollConfirmationEmbed';
 import { generateUniqueSessionId } from '@/utils/generateSessionId';
@@ -52,40 +53,76 @@ export async function handleMention(message: Message) {
   // Get conversation history for context-aware routing
   const history = conversationHistory.get(userId) || [];
 
-  // Detect if message is poll-related (hybrid: keywords + context)
+  // Hybrid routing approach: Fast keyword checks first, then AI router for ambiguous cases
+
+  // Define keyword lists with specificity scoring
   const pollKeywords = [
     'poll',
     'vote',
     'when can',
     'when are',
     'what time',
-    'availability',
-    'available',
-    'schedule',
     'find time',
     'best time'
   ];
 
-  // Fast path: obvious poll keywords
-  const hasObviousPollKeyword = pollKeywords.some(keyword =>
-    userMessage.toLowerCase().includes(keyword)
-  );
+  const eventKeywords = [
+    'create event',
+    'plan a',
+    'organize a',
+    'organize an',
+    'trip',
+    'party',
+    'meeting at',
+    'gathering'
+  ];
 
-  if (hasObviousPollKeyword) {
+  // Count keyword matches for both categories
+  const lowerMessage = userMessage.toLowerCase();
+  const pollMatches = pollKeywords.filter(keyword => lowerMessage.includes(keyword)).length;
+  const eventMatches = eventKeywords.filter(keyword => lowerMessage.includes(keyword)).length;
+
+  // Fast path: Clear single-category match (no ambiguity)
+  if (pollMatches > 0 && eventMatches === 0) {
     await handlePollMention(message, userMessage);
     return;
   }
 
-  // Context-aware routing: check if previous message had options
-  const previousUserMessage = history.filter(msg => msg.role === 'user').slice(-1)[0]?.content || '';
-  const hasListOfOptions = previousUserMessage.includes(',') && previousUserMessage.split(',').length >= 2;
-  const isFollowUpPollRequest = userMessage.toLowerCase().match(/create|make|poll/);
+  if (eventMatches > 0 && pollMatches === 0) {
+    // Fall through to event handler below
+  } else if (pollMatches > 0 && eventMatches > 0) {
+    // Ambiguous: has keywords from BOTH categories
+    // Use AI router to disambiguate
+    try {
+      const routerResult = await routeToAgent(userMessage, history);
 
-  if (hasListOfOptions && isFollowUpPollRequest) {
-    // Enrich message with previous context
-    const enrichedMessage = `Create a poll with these options: ${previousUserMessage}`;
-    await handlePollMention(message, enrichedMessage);
-    return;
+      if (routerResult.agent === 'POLL') {
+        await handlePollMention(message, userMessage);
+        return;
+      } else if (routerResult.agent === 'EVENT') {
+        // Fall through to event handler below
+      }
+      // If UNKNOWN, fall through to default event handler
+    } catch (error) {
+      console.error('Router agent failed, falling back to event handler:', error);
+      // Fall through to default event handler
+    }
+  } else {
+    // No keyword matches: Use AI router for intent detection
+    try {
+      const routerResult = await routeToAgent(userMessage, history);
+
+      if (routerResult.agent === 'POLL') {
+        await handlePollMention(message, userMessage);
+        return;
+      } else if (routerResult.agent === 'EVENT') {
+        // Fall through to event handler below
+      }
+      // If UNKNOWN, fall through to default event handler
+    } catch (error) {
+      console.error('Router agent failed, falling back to event handler:', error);
+      // Fall through to default event handler
+    }
   }
   
   try {
@@ -294,9 +331,13 @@ async function handlePollMention(message: Message, userMessage: string) {
       await message.channel.sendTyping();
     }
 
-    // Build messages array with poll system prompt
+    // Get conversation history for multi-turn poll creation
+    const history = conversationHistory.get(userId) || [];
+
+    // Build messages array with poll system prompt and conversation history
     const messages = [
       { role: 'system', content: POLL_SYSTEM_PROMPT },
+      ...history,
       { role: 'user', content: userMessage }
     ];
 
@@ -314,6 +355,13 @@ async function handlePollMention(message: Message, userMessage: string) {
     const responseContent = typeof lastMessage?.content === 'string'
       ? lastMessage.content
       : JSON.stringify(lastMessage?.content);
+
+    // Update conversation history
+    history.push(
+      { role: 'user', content: userMessage },
+      { role: 'assistant', content: responseContent }
+    );
+    conversationHistory.set(userId, history);
 
     // Check if agent called create_poll tool
     const toolOutput = findToolOutput(result);

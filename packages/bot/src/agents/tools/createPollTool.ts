@@ -13,7 +13,8 @@ export const createPollTool = new DynamicStructuredTool({
     - pollType: 'simple' for choice/yes-no polls, 'availability' for scheduling/finding time
     - options: For simple polls, array of choices (e.g., ["Pizza", "Burgers", "Tacos"])
     - dateRange: For availability polls, when to find time (e.g., "next week", "this weekend")
-    - timeRange: For availability polls, what times (e.g., "9 AM - 5 PM", "evenings")
+    - timeRange: For availability polls, what times (e.g., "9 AM - 5 PM", "evenings", "8 AM - 11 PM")
+      CRITICAL: Always extract timeRange when user mentions times. Use "11 PM" or "11:59 PM" instead of "12 AM" for late night.
     - duration: How long the meeting is (NOTE: This doesn't affect time slot generation - always create 1-hour blocks)
     - isAnonymous: Whether votes should be hidden (default false)
     - allowMaybe: Whether to allow "maybe"/"if needed" responses (default true)
@@ -28,6 +29,9 @@ export const createPollTool = new DynamicStructuredTool({
 
     - "find time this weekend in the evening"
       → { title: "When can everyone meet?", pollType: "availability", dateRange: "this weekend", timeRange: "evening" }
+
+    - "when can we go to disneyland next month (8 am to 12 am for each day)"
+      → { title: "When can everyone go to Disneyland?", pollType: "availability", dateRange: "next month", timeRange: "8 AM - 11 PM" }
   `,
   schema: CreatePollSchema,
 
@@ -55,7 +59,7 @@ export const createPollTool = new DynamicStructuredTool({
 
     } else {
       // Availability grid poll (web-based)
-      const parsedDates = parsePollDates(params.dateRange, params.timeRange);
+      const parsedDates = await parsePollDates(params.dateRange, params.timeRange);
 
       if (parsedDates.error) {
         return JSON.stringify({
