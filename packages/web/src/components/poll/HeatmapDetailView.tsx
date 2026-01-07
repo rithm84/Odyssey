@@ -53,6 +53,19 @@ export function HeatmapDetailView({
     });
   };
 
+  const formatTimeRange = (startTime: string): string => {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const nextHour = hours + 1;
+
+    const startPeriod = hours >= 12 ? 'PM' : 'AM';
+    const endPeriod = nextHour >= 12 ? 'PM' : 'AM';
+
+    const startDisplayHour = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+    const endDisplayHour = nextHour > 12 ? nextHour - 12 : nextHour === 0 ? 12 : nextHour;
+
+    return `${startDisplayHour} ${startPeriod} - ${endDisplayHour} ${endPeriod}`;
+  };
+
   return (
     <div className="bg-muted rounded-lg p-6 min-h-[200px]">
       <div className="mb-4">
@@ -60,7 +73,7 @@ export function HeatmapDetailView({
           {formatDate(date)}
         </p>
         <p className="text-lg font-bold text-foreground">
-          {timeSlot?.label || time}
+          {formatTimeRange(time)}
         </p>
       </div>
 

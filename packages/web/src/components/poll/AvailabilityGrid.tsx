@@ -103,7 +103,7 @@ export function AvailabilityGrid({
     <div className={shouldScroll ? "overflow-x-auto" : ""} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
       <div className={shouldScroll ? "min-w-max" : ""}>
         {/* Header Row - Dates */}
-        <div className="flex mb-2">
+        <div className="flex mb-0.5">
           {/* Empty corner cell */}
           <div className="w-20 flex-shrink-0" />
 
@@ -119,10 +119,10 @@ export function AvailabilityGrid({
         </div>
 
         {/* Time slot rows */}
-        {timeSlots.map(slot => (
+        {timeSlots.map((slot, index) => (
           <div key={slot.id} className="flex">
-            {/* Time label */}
-            <div className="w-20 flex-shrink-0 flex items-center justify-end pr-3 text-xs font-medium">
+            {/* Time label - positioned at top of row */}
+            <div className="w-20 flex-shrink-0 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
               {slot.label || slot.time}
             </div>
 
@@ -148,6 +148,23 @@ export function AvailabilityGrid({
             })}
           </div>
         ))}
+
+        {/* Final time label at the bottom */}
+        {timeSlots.length > 0 && (
+          <div className="flex">
+            <div className="w-20 flex-shrink-0 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
+              {(() => {
+                const lastSlot = timeSlots[timeSlots.length - 1];
+                const time = lastSlot.time;
+                const [hours, minutes] = time.split(':').map(Number);
+                const nextHour = hours + 1;
+                const period = nextHour >= 12 ? 'PM' : 'AM';
+                const displayHour = nextHour > 12 ? nextHour - 12 : nextHour === 0 ? 12 : nextHour;
+                return `${displayHour} ${period}`;
+              })()}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
