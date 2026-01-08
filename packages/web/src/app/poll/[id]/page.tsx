@@ -157,7 +157,8 @@ export default function PollPage({ params }: PollPageProps) {
                 </h2>
                 <button
                   onClick={() => setViewMode(viewMode === 'standard' ? 'detail' : 'standard')}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all text-sm font-medium"
+                  disabled={viewMode === 'standard' && responses.length === 0}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
                 >
                   {viewMode === 'standard' ? 'View Details' : 'Go Back'}
                 </button>
@@ -311,6 +312,7 @@ export default function PollPage({ params }: PollPageProps) {
                 dateOptions={poll.date_options as string[]}
                 timeSlots={poll.time_slots}
                 responses={responses}
+                eventDuration={poll.event_duration}
               />
             )}
 

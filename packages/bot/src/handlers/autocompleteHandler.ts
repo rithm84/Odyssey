@@ -11,10 +11,10 @@ export async function handleAutocomplete(interaction: AutocompleteInteraction) {
     // Query user's events from database (where they're organizer or co-host)
     const { data: events, error } = await supabase
       .from('events')
-      .select('id, name, date, event_members!inner(role)')
+      .select('id, name, start_date, event_members!inner(role)')
       .eq('event_members.user_id', userId)
       .in('event_members.role', ['organizer', 'co_host'])
-      .order('date', { ascending: true })
+      .order('start_date', { ascending: true })
       .limit(25);
 
     if (error || !events) {
@@ -29,7 +29,7 @@ export async function handleAutocomplete(interaction: AutocompleteInteraction) {
 
     // Format choices for Discord
     const choices = filtered.map(event => ({
-      name: `${event.name} (${event.date || 'No date'})`,
+      name: `${event.name} (${event.start_date || 'No date'})`,
       value: event.id
     }));
 
@@ -41,9 +41,9 @@ export async function handleAutocomplete(interaction: AutocompleteInteraction) {
   if (interaction.commandName === 'rsvp') {
     const { data: events, error } = await supabase
       .from('events')
-      .select('id, name, date, event_members!inner(user_id)')
+      .select('id, name, start_date, event_members!inner(user_id)')
       .eq('event_members.user_id', userId)
-      .order('date', { ascending: true })
+      .order('start_date', { ascending: true })
       .limit(25);
 
     if (error || !events) {
@@ -58,7 +58,7 @@ export async function handleAutocomplete(interaction: AutocompleteInteraction) {
 
     // Format choices for Discord
     const choices = filtered.map(event => ({
-      name: `${event.name} (${event.date || 'No date'})`,
+      name: `${event.name} (${event.start_date || 'No date'})`,
       value: event.id
     }));
 

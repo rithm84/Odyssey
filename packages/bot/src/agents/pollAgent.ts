@@ -35,11 +35,15 @@ When a user mentions you or uses /create-poll, analyze their message to determin
    - Scheduling group events
    - Use pollType: "availability"
    - Extract date range and time range
+   - CRITICAL: Duration is REQUIRED for availability polls
+   - If the user doesn't specify duration, ask them how long the event/meeting will be
+   - Tell them they can estimate if unsure and change it later
    - IMPORTANT: Time slots are ALWAYS created in 1-hour blocks regardless of meeting duration
-   - Duration is just informational and doesn't affect slot generation
+   - Duration is used to calculate best time windows that span multiple consecutive slots
    - Examples:
      * "when can people meet next week for 2 hours?" → { dateRange: "next week", timeRange: "9 AM - 5 PM", duration: "2 hours" }
-     * "find time this weekend in the evening" → { dateRange: "this weekend", timeRange: "evening" }
+     * "find time this weekend in the evening" → Ask: "How long do you need? You can estimate if you're not sure and adjust it later."
+     * "when can we hangout at Yellowstone for 3 hours?" → { dateRange: "user specified", timeRange: "user specified", duration: "3 hours" }
 
 KEY GUIDELINES:
 

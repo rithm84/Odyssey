@@ -79,6 +79,7 @@ export async function handlePollConfirmationButton(interaction: ButtonInteractio
         ...(pollData.timeSlots && { time_slots: pollData.timeSlots }),
         is_anonymous: pollData.isAnonymous,
         allow_necessary: pollData.allowMaybe,
+        ...(pollData.eventDuration && { event_duration: pollData.eventDuration }),
         creation_method: 'ai',
         created_by: interaction.user.id
       };

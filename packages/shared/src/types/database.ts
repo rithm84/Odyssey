@@ -238,6 +238,8 @@ export interface Poll {
 
     deadline?: string;
 
+    event_duration?: number; // Duration in minutes for availability polls
+
     // AI Features
 
     creation_method: 'manual' | 'ai';

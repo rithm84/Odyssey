@@ -2,6 +2,27 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { CreatePollSchema, type CreatePollParams, type ParsedPollData } from '@/types/agent';
 import { parsePollDates, generatePollOptions } from '@/utils/pollDateParser';
 
+// Parse duration string to minutes (e.g., "2 hours" -> 120, "30 minutes" -> 30, "1.5 hours" -> 90)
+function parseDurationToMinutes(durationStr: string): number | null {
+  const normalized = durationStr.toLowerCase().trim();
+
+  // Match patterns like "2 hours", "30 minutes", "2.5 hours", "1 hour 30 minutes"
+  const hourMatch = normalized.match(/(\d+(?:\.\d+)?)\s*(?:hour|hr|h)(?:s)?/);
+  const minuteMatch = normalized.match(/(\d+)\s*(?:minute|min|m)(?:s)?/);
+
+  let totalMinutes = 0;
+
+  if (hourMatch && hourMatch[1]) {
+    totalMinutes += parseFloat(hourMatch[1]) * 60;
+  }
+
+  if (minuteMatch && minuteMatch[1]) {
+    totalMinutes += parseInt(minuteMatch[1], 10);
+  }
+
+  return totalMinutes > 0 ? Math.round(totalMinutes) : null;
+}
+
 export const createPollTool = new DynamicStructuredTool({
   name: "create_poll",
   description: `
@@ -15,7 +36,8 @@ export const createPollTool = new DynamicStructuredTool({
     - dateRange: For availability polls, when to find time (e.g., "next week", "this weekend")
     - timeRange: For availability polls, what times (e.g., "9 AM - 5 PM", "evenings", "8 AM - 11 PM")
       CRITICAL: Always extract timeRange when user mentions times. Use "11 PM" or "11:59 PM" instead of "12 AM" for late night.
-    - duration: How long the meeting is (NOTE: This doesn't affect time slot generation - always create 1-hour blocks)
+    - duration: REQUIRED for availability polls. How long the meeting/event is (e.g., "2 hours", "30 minutes", "3.5 hours")
+      If the user doesn't specify, ask them to provide it. Tell them they can estimate if unsure and change it later.
     - isAnonymous: Whether votes should be hidden (default false)
     - allowMaybe: Whether to allow "maybe"/"if needed" responses (default true)
     - attendeeSelection: 'ask' to prompt user for attendees, 'all_server' to include everyone
@@ -59,6 +81,24 @@ export const createPollTool = new DynamicStructuredTool({
 
     } else {
       // Availability grid poll (web-based)
+
+      // Validate duration is provided
+      if (!params.duration) {
+        return JSON.stringify({
+          success: false,
+          error: "Duration is required for availability polls. Please ask the user how long the event/meeting will be. Let them know they can estimate if unsure and change it later."
+        });
+      }
+
+      // Parse duration to minutes
+      const durationMinutes = parseDurationToMinutes(params.duration);
+      if (!durationMinutes) {
+        return JSON.stringify({
+          success: false,
+          error: `Could not parse duration "${params.duration}". Please ask the user to specify duration in a format like "2 hours", "30 minutes", or "1.5 hours".`
+        });
+      }
+
       const parsedDates = await parsePollDates(params.dateRange, params.timeRange);
 
       if (parsedDates.error) {
@@ -78,7 +118,8 @@ export const createPollTool = new DynamicStructuredTool({
         allowMaybe: true,  // Always true for availability grids
         needsAttendeeSelection: params.attendeeSelection === 'ask',
         rawDateRange: params.dateRange,
-        rawTimeRange: params.timeRange
+        rawTimeRange: params.timeRange,
+        eventDuration: durationMinutes
       };
     }
 
