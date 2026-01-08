@@ -65,4 +65,39 @@ export async function handleAutocomplete(interaction: AutocompleteInteraction) {
     await interaction.respond(choices);
     return;
   }
+
+  // Autocomplete for find-best-times - show only availability grid polls
+  if (interaction.commandName === 'find-best-times') {
+    const { data: polls, error } = await supabase
+      .from('polls')
+      .select('id, title, created_at')
+      .eq('vote_type', 'availability_grid')
+      .eq('poll_type', 'web')
+      .eq('guild_id', interaction.guildId || '')
+      .order('created_at', { ascending: false })
+      .limit(25);
+
+    if (error || !polls) {
+      await interaction.respond([]);
+      return;
+    }
+
+    // Filter by what user is typing
+    const filtered = polls.filter(poll =>
+      poll.title.toLowerCase().includes(focusedValue.toLowerCase())
+    );
+
+    // Format choices for Discord
+    const choices = filtered.map(poll => {
+      const date = new Date(poll.created_at);
+      const dateStr = date.toLocaleDateString();
+      return {
+        name: `${poll.title} (${dateStr})`,
+        value: poll.id
+      };
+    });
+
+    await interaction.respond(choices);
+    return;
+  }
 }

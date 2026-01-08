@@ -3,6 +3,7 @@ import { handleCreateEventCommand, handleCreatePollCommand } from '@/handlers/sl
 import { handleEditEventModules } from '@/handlers/editEventModulesHandler';
 import { handleRsvp } from '@/handlers/rsvpHandler';
 import { handleManageMembers } from '@/handlers/manageMembersHandler';
+import { handleFindBestTimes } from '@/handlers/findBestTimesHandler';
 import { handleEventConfirmationButton } from '@/handlers/buttonHandler';
 import { handlePollConfirmationButton, handlePollVoteButton } from '@/handlers/pollHandler';
 import { handleModuleToggle } from '@/handlers/moduleToggleHandler';
@@ -34,6 +35,11 @@ export async function handleInteraction(interaction: Interaction) {
 
     if (interaction.commandName === 'manage-members') {
       await handleManageMembers(interaction);
+      return;
+    }
+
+    if (interaction.commandName === 'find-best-times') {
+      await handleFindBestTimes(interaction);
       return;
     }
   }
