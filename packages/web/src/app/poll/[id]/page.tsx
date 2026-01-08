@@ -27,6 +27,28 @@ export default function PollPage({ params }: PollPageProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('standard');
   const [hoveredCell, setHoveredCell] = useState<string | null>(null);
 
+  // Helper function to ensure time_slots is in TimeSlot[] format
+  // (Database stores as objects but they're already in correct format)
+  const convertToTimeSlots = (slots: any): any => {
+    if (!Array.isArray(slots)) return slots;
+    if (slots.length === 0) return slots;
+
+    // Check if already proper TimeSlot objects
+    if (typeof slots[0] === 'object' && slots[0] !== null && slots[0].time) {
+      return slots;
+    }
+
+    // Convert string[] to TimeSlot[] if needed
+    return slots.map((slot: any) => {
+      const timeStr = typeof slot === 'string' ? slot : (slot?.time || slot?.toString());
+      return {
+        id: timeStr,
+        time: timeStr,
+        label: undefined
+      };
+    });
+  };
+
   // Generate temporary user ID
   useEffect(() => {
     const tempUserId = localStorage.getItem('tempUserId') || `user_${Math.random().toString(36).substr(2, 9)}`;
@@ -171,7 +193,7 @@ export default function PollPage({ params }: PollPageProps) {
                   <div className="flex flex-col items-center">
                     <AvailabilityGrid
                       dateOptions={poll.date_options as string[]}
-                      timeSlots={poll.time_slots}
+                      timeSlots={convertToTimeSlots(poll.time_slots)}
                       availability={userAvailability}
                       onChange={setUserAvailability}
                       readonly={isClosed}
@@ -208,7 +230,7 @@ export default function PollPage({ params }: PollPageProps) {
                       <>
                         <AvailabilityHeatmap
                           dateOptions={poll.date_options as string[]}
-                          timeSlots={poll.time_slots}
+                          timeSlots={convertToTimeSlots(poll.time_slots)}
                           responses={responses}
                         />
 
@@ -241,7 +263,7 @@ export default function PollPage({ params }: PollPageProps) {
                       <>
                         <AvailabilityHeatmap
                           dateOptions={poll.date_options as string[]}
-                          timeSlots={poll.time_slots}
+                          timeSlots={convertToTimeSlots(poll.time_slots)}
                           responses={responses}
                           onHoverCell={setHoveredCell}
                           hoveredCell={hoveredCell}
@@ -272,7 +294,7 @@ export default function PollPage({ params }: PollPageProps) {
                     <HoverInfo
                       hoveredCell={hoveredCell}
                       dateOptions={poll.date_options as string[]}
-                      timeSlots={poll.time_slots}
+                      timeSlots={convertToTimeSlots(poll.time_slots)}
                       responses={responses}
                       isAnonymous={poll.is_anonymous}
                     />
@@ -310,7 +332,7 @@ export default function PollPage({ params }: PollPageProps) {
             {responses.length > 0 && (
               <BestTimes
                 dateOptions={poll.date_options as string[]}
-                timeSlots={poll.time_slots}
+                timeSlots={convertToTimeSlots(poll.time_slots)}
                 responses={responses}
                 eventDuration={poll.event_duration}
               />

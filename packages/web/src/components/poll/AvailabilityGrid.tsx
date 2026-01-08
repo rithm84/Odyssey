@@ -110,7 +110,7 @@ export function AvailabilityGrid({
         {/* Header Row - Dates */}
         <div className="flex mb-0.5">
           {/* Empty corner cell */}
-          <div className="w-20 flex-shrink-0 sticky left-0 bg-background z-10" />
+          <div className="w-20 flex-shrink-0 sticky left-0 bg-card z-10" />
 
           {/* Date headers */}
           {dateOptions.map(date => (
@@ -127,7 +127,7 @@ export function AvailabilityGrid({
         {timeSlots.map((slot, index) => (
           <div key={slot.id} className="flex">
             {/* Time label - positioned at top of row */}
-            <div className="w-20 flex-shrink-0 sticky left-0 bg-background z-10 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
+            <div className="w-20 flex-shrink-0 sticky left-0 bg-card z-10 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
               {slot.label || slot.time}
             </div>
 
@@ -157,7 +157,7 @@ export function AvailabilityGrid({
         {/* Final time label at the bottom */}
         {timeSlots.length > 0 && (
           <div className="flex">
-            <div className="w-20 flex-shrink-0 sticky left-0 bg-background z-10 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
+            <div className="w-20 flex-shrink-0 sticky left-0 bg-card z-10 flex items-start justify-end pr-4 text-xs font-medium -mt-2">
               {(() => {
                 const lastSlot = timeSlots[timeSlots.length - 1];
                 const time = lastSlot.time;

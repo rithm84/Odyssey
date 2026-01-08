@@ -41,9 +41,10 @@ export function BestTimes({ dateOptions, timeSlots, responses, eventDuration }: 
 
   // Calculate the end time for a time slot (1 hour later)
   const getSlotEndTime = (timeStr: string): string => {
-    // Parse time like "17:00" or "5:00 PM"
+    // Parse time like "17:00" or "5:00 PM" or "12 PM"
     const match24h = timeStr.match(/^(\d{1,2}):(\d{2})$/);
     const match12h = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    const match12hNoMinutes = timeStr.match(/^(\d{1,2})\s*(AM|PM)$/i);
 
     let hours: number;
     let minutes: number;
@@ -55,6 +56,16 @@ export function BestTimes({ dateOptions, timeSlots, responses, eventDuration }: 
       hours = parseInt(match12h[1]);
       minutes = parseInt(match12h[2]);
       const period = match12h[3].toUpperCase();
+
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+    } else if (match12hNoMinutes) {
+      hours = parseInt(match12hNoMinutes[1]);
+      minutes = 0;
+      const period = match12hNoMinutes[2].toUpperCase();
 
       if (period === 'PM' && hours !== 12) {
         hours += 12;
@@ -73,7 +84,9 @@ export function BestTimes({ dateOptions, timeSlots, responses, eventDuration }: 
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
 
-    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+    return minutes === 0
+      ? `${displayHours} ${period}`
+      : `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
   // Calculate availability for a specific date/time slot
@@ -150,11 +163,10 @@ export function BestTimes({ dateOptions, timeSlots, responses, eventDuration }: 
 
     return { guaranteed, ifNecessary, missing };
   };
-
+  
   // Calculate best time windows using hybrid scoring
   const calculateBestTimeWindows = (): WindowScore[] => {
     if (!eventDuration || eventDuration <= 0) {
-      // Fallback to single-slot behavior if no duration specified
       return calculateBestSingleSlots();
     }
 
