@@ -1,14 +1,61 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { createClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function AuthButton() {
-  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [guildCount, setGuildCount] = useState(0);
+  const supabase = createClient();
 
-  if (status === "loading") {
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+
+      // Fetch guild count if logged in
+      if (session) {
+        fetch("/api/guilds")
+          .then(res => res.json())
+          .then(data => setGuildCount(data.guilds?.length || 0))
+          .catch(() => setGuildCount(0));
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+
+      // Fetch guild count when session changes
+      if (session) {
+        fetch("/api/guilds")
+          .then(res => res.json())
+          .then(data => setGuildCount(data.guilds?.length || 0))
+          .catch(() => setGuildCount(0));
+      } else {
+        setGuildCount(0);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/auth/signin");
+  };
+
+  if (loading) {
     return <Button variant="ghost" disabled>Loading...</Button>;
   }
 
@@ -20,24 +67,27 @@ export function AuthButton() {
     );
   }
 
+  const userName = session.user?.user_metadata?.full_name || session.user?.email || "User";
+  const avatarUrl = session.user?.user_metadata?.avatar_url;
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <Avatar className="h-8 w-8">
-          <AvatarImage src={session.user.image || undefined} alt={session.user.name || "User"} />
-          <AvatarFallback>{session.user.name?.charAt(0) || "U"}</AvatarFallback>
+          <AvatarImage src={avatarUrl || undefined} alt={userName} />
+          <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="hidden md:block">
-          <p className="text-sm font-medium">{session.user.name}</p>
+          <p className="text-sm font-medium">{userName}</p>
           <p className="text-xs text-muted-foreground">
-            {session.guilds?.length || 0} servers
+            {guildCount} servers
           </p>
         </div>
       </div>
       <Button
         variant="outline"
         size="sm"
-        onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+        onClick={handleSignOut}
         className="rounded-full transition-smooth shadow-soft hover:shadow-medium hover-scale"
       >
         Sign Out

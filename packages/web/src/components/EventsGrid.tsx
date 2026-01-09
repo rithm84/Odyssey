@@ -20,13 +20,15 @@ interface Event {
   type: string;
 }
 
+interface Guild {
+  id: string;
+  name: string;
+  icon: string | null;
+}
+
 interface EventsGridProps {
   events: Event[];
-  guilds: Array<{
-    id: string;
-    name: string;
-    icon: string | null;
-  }>;
+  guilds: Guild[];
 }
 
 export function EventsGrid({ events, guilds }: EventsGridProps) {

@@ -1,8 +1,5 @@
-import { NavBar } from "@/components/NavBar";
-import { EventsDashboard } from "@/components/EventsDashboard";
 import { createClient } from "@/lib/supabase-server";
-import { supabaseAdmin } from "@/lib/supabase";
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
 // Map event types to readable labels
 const eventTypeLabels: Record<string, string> = {
@@ -32,14 +29,14 @@ function getGuildGradient(guildName: string): string {
   return gradients[hash % gradients.length] || gradients[0];
 }
 
-export default async function Home() {
+export async function GET() {
   const supabase = await createClient();
 
   // Get the current user
   const { data: { user }, error: userError } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    redirect("/auth/signin");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Get guild IDs from user metadata
@@ -51,11 +48,15 @@ export default async function Home() {
     .select('guild_id, guild_name, guild_icon')
     .eq('user_id', user.id);
 
-  const guilds = (userGuilds || []).map((g) => ({
+  const guilds = (userGuilds || []).map((g: any) => ({
     id: g.guild_id,
     name: g.guild_name,
     icon: g.guild_icon,
   }));
+
+  if (userGuildIds.length === 0) {
+    return NextResponse.json({ events: [], totalAttendees: 0 });
+  }
 
   // Fetch events from user's guilds
   const { data: events, error } = await supabase
@@ -95,6 +96,7 @@ export default async function Home() {
 
   if (error) {
     console.error("Error fetching events:", error);
+    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
   }
 
   // Transform events for display
@@ -140,19 +142,7 @@ export default async function Home() {
     };
   });
 
-  return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      <div className="absolute inset-0 gradient-mesh" />
-      <div className="absolute inset-0 grid-overlay-dots" />
+  const totalAttendees = transformedEvents.reduce((sum, e) => sum + e.attendees, 0);
 
-      <NavBar />
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
-        <EventsDashboard
-          initialEvents={transformedEvents}
-          initialGuilds={guilds}
-        />
-      </div>
-    </div>
-  );
+  return NextResponse.json({ events: transformedEvents, totalAttendees });
 }
