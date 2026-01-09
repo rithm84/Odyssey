@@ -1,8 +1,59 @@
 import { Calendar, MapPin, Users, Tent } from "lucide-react";
 
-export function EventHeader() {
+interface EventHeaderProps {
+  event: {
+    name: string;
+    description?: string | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    location?: string | null;
+    attendee_count: number;
+  };
+}
+
+// Helper function to format date range
+function formatDateRange(startDate?: string | null, endDate?: string | null): string {
+  if (!startDate) return "Date TBD";
+
+  // Parse dates manually to avoid UTC timezone issues
+  // "2026-01-12" as new Date() → interprets as UTC midnight → shifts to previous day in PST
+  const [startYearNum, startMonthNum, startDayNum] = startDate.split('-').map(Number);
+  const start = new Date(startYearNum, startMonthNum - 1, startDayNum);
+
+  let end = start;
+  if (endDate) {
+    const [endYearNum, endMonthNum, endDayNum] = endDate.split('-').map(Number);
+    end = new Date(endYearNum, endMonthNum - 1, endDayNum);
+  }
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const startMonth = monthNames[start.getMonth()];
+  const startDay = start.getDate();
+  const year = start.getFullYear();
+
+  // Single day event or same start and end date
+  if (startDate === endDate || !endDate) {
+    return `${startMonth} ${startDay}, ${year}`;
+  }
+
+  const endMonth = monthNames[end.getMonth()];
+  const endDay = end.getDate();
+
+  // Same month
+  if (start.getMonth() === end.getMonth()) {
+    return `${startMonth} ${startDay}-${endDay}, ${year}`;
+  }
+
+  // Different months
+  return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
+}
+
+export function EventHeader({ event }: EventHeaderProps) {
+  const formattedDate = formatDateRange(event.start_date, event.end_date);
+  const attendeeText = event.attendee_count === 1 ? "1 Person" : `${event.attendee_count} People`;
+
   return (
-    <div className="relative overflow-hidden rounded-3xl p-12 mb-8 shadow-glow group">
+    <div className="relative overflow-hidden rounded-3xl px-12 py-8 mb-8 shadow-glow group">
       <div className="absolute inset-0 gradient-hero" />
       <div className="absolute inset-0 hero-grid" />
 
@@ -18,7 +69,7 @@ export function EventHeader() {
                 <span className="text-white/90 text-xs font-bold">ACTIVE EVENT</span>
               </div>
               <h1 className="text-5xl font-black text-white tracking-tight leading-tight">
-                Weekend Camping Trip
+                {event.name}
               </h1>
             </div>
           </div>
@@ -31,7 +82,7 @@ export function EventHeader() {
             </div>
             <div>
               <div className="text-white/70 text-xs font-semibold uppercase tracking-wide">Date</div>
-              <div className="text-white font-bold">Nov 15-17, 2024</div>
+              <div className="text-white font-bold">{formattedDate}</div>
             </div>
           </div>
 
@@ -41,7 +92,7 @@ export function EventHeader() {
             </div>
             <div>
               <div className="text-white/70 text-xs font-semibold uppercase tracking-wide">Location</div>
-              <div className="text-white font-bold">Yosemite National Park</div>
+              <div className="text-white font-bold">{event.location || "Location TBD"}</div>
             </div>
           </div>
 
@@ -51,13 +102,13 @@ export function EventHeader() {
             </div>
             <div>
               <div className="text-white/70 text-xs font-semibold uppercase tracking-wide">Attendees</div>
-              <div className="text-white font-bold">12 People</div>
+              <div className="text-white font-bold">{attendeeText}</div>
             </div>
           </div>
         </div>
 
         <p className="text-white/80 text-lg max-w-3xl leading-relaxed">
-          Join us for an amazing weekend in nature! We'll be camping, hiking, and enjoying quality time together under the stars.
+          {event.description || "No description available."}
         </p>
       </div>
     </div>

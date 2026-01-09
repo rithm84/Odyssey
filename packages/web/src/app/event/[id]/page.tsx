@@ -7,6 +7,8 @@ import { IndividualPackingList } from "@/components/IndividualPackingList";
 import { TransportationModule } from "@/components/TransportationModule";
 import { WeatherForecast } from "@/components/WeatherForecast";
 import { BudgetModule } from "@/components/BudgetModule";
+import { createClient } from "@/lib/supabase-server";
+import { redirect } from "next/navigation";
 
 export default async function EventDetail({
   params,
@@ -14,6 +16,36 @@ export default async function EventDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id: eventId } = await params;
+  const supabase = await createClient();
+
+  // Get the current user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    redirect("/");
+  }
+
+  // Fetch event details
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("*")
+    .eq("id", eventId)
+    .single();
+
+  if (eventError || !event) {
+    redirect("/");
+  }
+
+  // Count attendees
+  const { count: attendeeCount } = await supabase
+    .from("event_members")
+    .select("*", { count: "exact", head: true })
+    .eq("event_id", eventId);
+
+  const eventData = {
+    ...event,
+    attendee_count: attendeeCount || 0,
+  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -23,7 +55,7 @@ export default async function EventDetail({
       <NavBar />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
-        <EventHeader />
+        <EventHeader event={eventData} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">

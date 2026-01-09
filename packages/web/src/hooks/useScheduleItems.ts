@@ -17,7 +17,7 @@ export interface ScheduleItem {
 }
 
 // Helper to convert time string to minutes for sorting
-const timeToMinutes = (timeStr: string | null): number => {
+const timeToMinutes = (timeStr: string | null | undefined): number => {
   if (!timeStr) return Infinity; // Items without time sort last
 
   const match = timeStr.match(/(\d+):(\d+)/);

@@ -24,7 +24,14 @@ export function getGuildGradient(guildName: string): string {
     "from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-indigo-700",
   ];
 
-  const hash = guildName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  // Better hash function to reduce collisions (FNV-1a hash)
+  let hash = 2166136261;
+  for (let i = 0; i < guildName.length; i++) {
+    hash ^= guildName.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  // Make hash positive and get index
+  hash = Math.abs(hash);
   return gradients[hash % gradients.length] || gradients[0];
 }
 

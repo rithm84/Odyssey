@@ -32,13 +32,13 @@ interface EventsGridProps {
 }
 
 export function EventsGrid({ events, guilds }: EventsGridProps) {
-  const [selectedGuildId, setSelectedGuildId] = useState<string | null>(null);
+  const [selectedGuildIds, setSelectedGuildIds] = useState<string[]>([]);
 
-  // Filter events based on selected guild
+  // Filter events based on selected guilds
   const filteredEvents = useMemo(() => {
-    if (!selectedGuildId) return events;
-    return events.filter((event) => event.serverId === selectedGuildId);
-  }, [events, selectedGuildId]);
+    if (selectedGuildIds.length === 0) return events;
+    return events.filter((event) => selectedGuildIds.includes(event.serverId));
+  }, [events, selectedGuildIds]);
 
   // Calculate event counts per guild
   const eventCounts = useMemo(() => {
@@ -49,6 +49,24 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
     return counts;
   }, [events]);
 
+  // Generate subtitle text based on selected guilds
+  const subtitleText = useMemo(() => {
+    if (selectedGuildIds.length === 0) {
+      return "Events from all your servers";
+    }
+    if (selectedGuildIds.length === 1) {
+      const guildName = guilds.find((g) => g.id === selectedGuildIds[0])?.name || "selected server";
+      return `Events from ${guildName}`;
+    }
+    if (selectedGuildIds.length === 2) {
+      const names = selectedGuildIds
+        .map((id) => guilds.find((g) => g.id === id)?.name)
+        .filter(Boolean);
+      return `Events from ${names.join(" and ")}`;
+    }
+    return `Events from ${selectedGuildIds.length} servers`;
+  }, [selectedGuildIds, guilds]);
+
   return (
     <>
       <div className="flex items-start justify-between mb-6 gap-8">
@@ -57,16 +75,14 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
             Your Events <span className="text-gradient">({filteredEvents.length})</span>
           </h2>
           <p className="text-muted-foreground text-sm">
-            {selectedGuildId
-              ? `Events from ${guilds.find((g) => g.id === selectedGuildId)?.name || "selected server"}`
-              : "Events from all your servers"}
+            {subtitleText}
           </p>
         </div>
 
         <ServerFilter
           guilds={guilds}
-          selectedGuildId={selectedGuildId}
-          onSelectGuild={setSelectedGuildId}
+          selectedGuildIds={selectedGuildIds}
+          onSelectGuilds={setSelectedGuildIds}
           eventCounts={eventCounts}
         />
       </div>
@@ -78,8 +94,8 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
           </div>
           <h3 className="text-xl font-semibold mb-2">No events found</h3>
           <p className="text-muted-foreground">
-            {selectedGuildId
-              ? "No events in this server yet. Create one using the Discord bot!"
+            {selectedGuildIds.length > 0
+              ? "No events in the selected server(s). Create one using the Discord bot!"
               : "Create your first event using the Discord bot in any of your servers."}
           </p>
         </div>

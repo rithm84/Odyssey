@@ -301,14 +301,18 @@ export function ScheduleTimeline({ eventId }: ScheduleTimelineProps) {
           </div>
         ) : (
           <div className="relative">
-            <div className="absolute left-5 top-0 bottom-0 w-1 gradient-primary rounded-full" />
-
             <div className="space-y-6">
-              {scheduleItems.map((item) => (
+              {scheduleItems.map((item, index) => (
                 <div key={item.id} className="relative pl-14 group/item">
-                  <div className="absolute left-0 w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium group-hover/item:scale-110 transition-transform duration-300">
+                  {/* Icon */}
+                  <div className="absolute left-0 w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium group-hover/item:scale-110 transition-transform duration-300 z-10">
                     <div className="w-4 h-4 rounded-full bg-white shadow-soft" />
                   </div>
+
+                  {/* Connector bar to next item (not shown for last item) */}
+                  {index !== scheduleItems.length - 1 && (
+                    <div className="absolute left-5 top-10 w-1 h-[calc(100%+1.5rem)] gradient-primary" />
+                  )}
 
                   <div className="p-4 rounded-xl border border-border/60 hover:border-primary/40 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-medium group-hover/item:translate-x-2">
                     <div className="flex items-start justify-between gap-3 mb-2">
