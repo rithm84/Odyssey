@@ -8,8 +8,13 @@ import { TransportationModule } from "@/components/TransportationModule";
 import { WeatherForecast } from "@/components/WeatherForecast";
 import { BudgetModule } from "@/components/BudgetModule";
 
-export default function EventDetail() {
-  // Note: params.id would be used here for dynamic event data fetching
+export default async function EventDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: eventId } = await params;
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <div className="absolute inset-0 gradient-mesh" />
@@ -23,7 +28,7 @@ export default function EventDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <div className="animate-slide-up stagger-1">
-              <ScheduleTimeline />
+              <ScheduleTimeline eventId={eventId} />
             </div>
             <div className="animate-slide-up stagger-2">
               <WeatherForecast />
