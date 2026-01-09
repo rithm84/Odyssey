@@ -1,36 +1,8 @@
 import { NavBar } from "@/components/NavBar";
 import { EventsDashboard } from "@/components/EventsDashboard";
 import { createClient } from "@/lib/supabase-server";
-import { supabaseAdmin } from "@/lib/supabase";
 import { redirect } from "next/navigation";
-
-// Map event types to readable labels
-const eventTypeLabels: Record<string, string> = {
-  social: "Social",
-  trip: "Trip",
-  meeting: "Meeting",
-  sports: "Sports",
-  food: "Food & Dining",
-  gaming: "Gaming",
-  other: "Other",
-};
-
-// Generate gradient colors based on guild name hash
-function getGuildGradient(guildName: string): string {
-  const gradients = [
-    "from-emerald-500 to-teal-500 dark:from-emerald-600 dark:to-indigo-600",
-    "from-pink-500 to-orange-500 dark:from-fuchsia-600 dark:to-indigo-700",
-    "from-blue-500 to-indigo-500 dark:from-indigo-600 dark:to-blue-800",
-    "from-orange-500 to-amber-600 dark:from-orange-600 dark:to-indigo-700",
-    "from-green-500 to-emerald-500 dark:from-teal-600 dark:to-indigo-700",
-    "from-purple-500 to-pink-500 dark:from-purple-600 dark:to-indigo-700",
-    "from-red-500 to-rose-500 dark:from-red-600 dark:to-indigo-700",
-    "from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-indigo-700",
-  ];
-
-  const hash = guildName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return gradients[hash % gradients.length] || gradients[0];
-}
+import { eventTypeLabels, getGuildGradient, timeToMinutes } from "@/lib/event-utils";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -98,7 +70,7 @@ export default async function Home() {
   }
 
   // Transform events for display
-  const transformedEvents = (events || []).map((event) => {
+  const transformedEvents = ((events || []).map((event) => {
     // Look up guild name from user metadata if not in database
     const guildName = event.guild_name ||
       guilds.find((g: any) => g.id === event.guild_id)?.name ||
@@ -107,8 +79,16 @@ export default async function Home() {
     // Format date
     let dateDisplay = "Date TBD";
     if (event.start_date) {
-      const startDate = new Date(event.start_date);
-      const endDate = event.end_date ? new Date(event.end_date) : null;
+      // Parse date manually to avoid timezone issues
+      // new Date("2026-01-09") is interpreted as UTC, causing off-by-one errors
+      const [year, month, day] = event.start_date.split('-').map(Number);
+      const startDate = new Date(year, month - 1, day);
+
+      let endDate = null;
+      if (event.end_date) {
+        const [endYear, endMonth, endDay] = event.end_date.split('-').map(Number);
+        endDate = new Date(endYear, endMonth - 1, endDay);
+      }
 
       if (endDate && endDate.getTime() !== startDate.getTime()) {
         dateDisplay = `${startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}-${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
@@ -137,7 +117,25 @@ export default async function Home() {
       attendees: event.event_members?.length || 0,
       description: event.description || "No description provided",
       type: eventTypeLabels[event.event_type] || "Other",
+      // Keep raw values for sorting
+      _startDate: event.start_date,
+      _startTime: event.start_time,
     };
+  })).sort((a, b) => {
+    // Sort by date first
+    if (a._startDate && b._startDate) {
+      const dateComparison = a._startDate.localeCompare(b._startDate);
+      if (dateComparison !== 0) return dateComparison;
+    } else if (a._startDate) {
+      return -1;
+    } else if (b._startDate) {
+      return 1;
+    }
+
+    // Then sort by time (convert to minutes for proper chronological order)
+    const aTime = timeToMinutes(a._startTime);
+    const bTime = timeToMinutes(b._startTime);
+    return aTime - bTime;
   });
 
   return (
