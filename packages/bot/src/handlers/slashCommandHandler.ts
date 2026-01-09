@@ -8,7 +8,7 @@ import type { ParsedEventData, ParsedPollData } from '@/types/agent';
 
 // Declare global type for pending events and polls
 declare global {
-  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
+  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null }>;
   var pendingPolls: Map<string, { pollData: ParsedPollData; guildId: string | null; channelId: string }>;
 }
 
@@ -50,7 +50,11 @@ export async function handleCreateEventCommand(interaction: ChatInputCommandInte
       // Store event data temporarily (for button handler)
       global.pendingEvents = global.pendingEvents || new Map();
       const confirmationId = generateUniqueSessionId(global.pendingEvents);
-      global.pendingEvents.set(confirmationId, { eventData, guildId: interaction.guildId });
+      global.pendingEvents.set(confirmationId, {
+        eventData,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name ?? null
+      });
 
       // Create buttons with confirmation ID (production-safe approach)
       const buttons = new ActionRowBuilder<ButtonBuilder>()

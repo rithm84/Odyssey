@@ -9,6 +9,7 @@ declare global {
   var pendingModuleSelection: Map<string, {
     eventData: ParsedEventData | null; // Can be null for edits
     guildId: string | null;
+    guildName: string | null;
     channelId: string;
     selectedModules: EnabledModules;
     eventId?: string; // Optional - only present when editing
@@ -101,7 +102,7 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
       // Save event to database with selected modules
       await interaction.deferUpdate();
 
-      const { eventData, guildId, selectedModules, eventId } = pendingSelection;
+      const { eventData, guildId, guildName, selectedModules, eventId } = pendingSelection;
 
       if (eventId) {
         // EDITING existing event
@@ -174,6 +175,7 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
           .from('events')
           .insert({
             guild_id: guildId ?? '',
+            guild_name: guildName ?? null,
             channel_id: interaction.channelId ?? '',
             name: eventData.name,
             start_date: eventData.startDate,

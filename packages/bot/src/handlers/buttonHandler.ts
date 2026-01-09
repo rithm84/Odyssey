@@ -7,11 +7,12 @@ import { generateUniqueSessionId } from '@/utils/generateSessionId';
 
 // Declare global types for pending events, edit sessions, and module selection
 declare global {
-  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
-  var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; confirmationId: string }>;
+  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null }>;
+  var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null; confirmationId: string }>;
   var pendingModuleSelection: Map<string, {
     eventData: ParsedEventData | null; // Can be null for edits
     guildId: string | null;
+    guildName: string | null;
     channelId: string;
     selectedModules: import('@odyssey/shared/types/database').EnabledModules;
     eventId?: string; // Optional - only present when editing
@@ -50,7 +51,7 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
     return;
   }
 
-  const { eventData, guildId } = pendingEvent;
+  const { eventData, guildId, guildName } = pendingEvent;
 
   try {
     if (action === 'yes') {
@@ -67,6 +68,7 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
       global.pendingModuleSelection.set(sessionId, {
         eventData,
         guildId,
+        guildName,
         channelId: interaction.channelId ?? '',
         selectedModules,
         // Metadata for debugging
@@ -109,6 +111,7 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
       global.editSessions.set(interaction.user.id, {
         eventData,
         guildId,
+        guildName,
         confirmationId
       });
 

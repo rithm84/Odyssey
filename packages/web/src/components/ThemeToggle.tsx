@@ -19,11 +19,10 @@ export function ThemeToggle() {
     return (
       <Button
         variant="outline"
-        size="default"
-        className="rounded-full transition-smooth gap-2 px-4 shadow-soft hover:shadow-medium font-heading"
+        size="icon"
+        className="rounded-full transition-smooth shadow-soft hover:shadow-medium"
       >
         <Sun className="h-4 w-4" />
-        <span className="text-sm font-medium">Day</span>
       </Button>
     );
   }
@@ -31,20 +30,14 @@ export function ThemeToggle() {
   return (
     <Button
       variant="outline"
-      size="default"
+      size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="rounded-full transition-smooth gap-2 px-4 shadow-soft hover:shadow-medium hover-scale group font-heading"
+      className="rounded-full transition-smooth shadow-soft hover:shadow-medium hover-scale group"
     >
       {theme === "light" ? (
-        <>
-          <Moon className="h-4 w-4 transition-transform group-hover:rotate-12" />
-          <span className="text-sm font-medium">Night</span>
-        </>
+        <Moon className="h-4 w-4 transition-transform group-hover:rotate-12" />
       ) : (
-        <>
-          <Sun className="h-4 w-4 transition-transform group-hover:rotate-180" />
-          <span className="text-sm font-medium dark:lowercase">Day</span>
-        </>
+        <Sun className="h-4 w-4 transition-transform group-hover:rotate-180" />
       )}
     </Button>
   );

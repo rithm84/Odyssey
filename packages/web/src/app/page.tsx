@@ -1,68 +1,128 @@
 import { NavBar } from "@/components/NavBar";
-import { Calendar, MapPin, Users, Sparkles } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EventsGrid } from "@/components/EventsGrid";
+import { Users, Sparkles } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
+import { redirect } from "next/navigation";
 
-const events = [
-  {
-    id: 1,
-    name: "Weekend Camping Trip",
-    server: "Adventure Club",
-    serverColor: "from-emerald-500 to-teal-500 dark:from-emerald-600 dark:to-indigo-600",
-    date: "Nov 15-17, 2024",
-    location: "Yosemite National Park",
-    attendees: 12,
-    description: "Join us for an amazing weekend in nature!",
-    type: "Outdoor Adventure"
-  },
-  {
-    id: 2,
-    name: "Game Night",
-    server: "Friends Group",
-    serverColor: "from-pink-500 to-orange-500 dark:from-fuchsia-600 dark:to-indigo-700",
-    date: "Nov 20, 2024",
-    location: "Mike's Place",
-    attendees: 8,
-    description: "Board games, video games, and fun times!",
-    type: "Social"
-  },
-  {
-    id: 3,
-    name: "Hackathon 2024",
-    server: "UCLA Coding Club",
-    serverColor: "from-blue-500 to-indigo-500 dark:from-indigo-600 dark:to-blue-800",
-    date: "Dec 1-3, 2024",
-    location: "UCLA Campus",
-    attendees: 45,
-    description: "48-hour coding challenge with amazing prizes",
-    type: "Tech Event"
-  },
-  {
-    id: 4,
-    name: "Thanksgiving Dinner",
-    server: "Family",
-    serverColor: "from-orange-500 to-amber-600 dark:from-orange-600 dark:to-indigo-700",
-    date: "Nov 28, 2024",
-    location: "Mom's House",
-    attendees: 15,
-    description: "Annual family gathering and feast",
-    type: "Family"
-  },
-  {
-    id: 5,
-    name: "Beach Cleanup",
-    server: "Eco Warriors",
-    serverColor: "from-green-500 to-emerald-500 dark:from-teal-600 dark:to-indigo-700",
-    date: "Nov 25, 2024",
-    location: "Santa Monica Beach",
-    attendees: 32,
-    description: "Help keep our beaches clean!",
-    type: "Community Service"
+// Map event types to readable labels
+const eventTypeLabels: Record<string, string> = {
+  social: "Social",
+  trip: "Trip",
+  meeting: "Meeting",
+  sports: "Sports",
+  food: "Food & Dining",
+  gaming: "Gaming",
+  other: "Other",
+};
+
+// Generate gradient colors based on guild name hash
+function getGuildGradient(guildName: string): string {
+  const gradients = [
+    "from-emerald-500 to-teal-500 dark:from-emerald-600 dark:to-indigo-600",
+    "from-pink-500 to-orange-500 dark:from-fuchsia-600 dark:to-indigo-700",
+    "from-blue-500 to-indigo-500 dark:from-indigo-600 dark:to-blue-800",
+    "from-orange-500 to-amber-600 dark:from-orange-600 dark:to-indigo-700",
+    "from-green-500 to-emerald-500 dark:from-teal-600 dark:to-indigo-700",
+    "from-purple-500 to-pink-500 dark:from-purple-600 dark:to-indigo-700",
+    "from-red-500 to-rose-500 dark:from-red-600 dark:to-indigo-700",
+    "from-cyan-500 to-blue-500 dark:from-cyan-600 dark:to-indigo-700",
+  ];
+
+  const hash = guildName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return gradients[hash % gradients.length] || gradients[0];
+}
+
+export default async function Home() {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/auth/signin");
   }
-];
 
-export default function Home() {
+  // Get guild IDs from session
+  const userGuildIds = session.guilds?.map((g) => g.id) || [];
+
+  // Fetch events from user's guilds
+  const { data: events, error } = await supabase
+    .from("events")
+    .select(`
+      id,
+      name,
+      description,
+      start_date,
+      end_date,
+      start_time,
+      end_time,
+      location,
+      event_type,
+      guild_id,
+      guild_name,
+      event_members(user_id)
+    `)
+    .in("guild_id", userGuildIds)
+    .order("start_date", { ascending: true }) as {
+      data: Array<{
+        id: string;
+        name: string;
+        description: string | null;
+        start_date: string | null;
+        end_date: string | null;
+        start_time: string | null;
+        end_time: string | null;
+        location: string | null;
+        event_type: string;
+        guild_id: string;
+        guild_name: string | null;
+        event_members: Array<{ user_id: string }>;
+      }> | null;
+      error: any;
+    };
+
+  if (error) {
+    console.error("Error fetching events:", error);
+  }
+
+  // Transform events for display
+  const transformedEvents = (events || []).map((event) => {
+    // Format date
+    let dateDisplay = "Date TBD";
+    if (event.start_date) {
+      const startDate = new Date(event.start_date);
+      const endDate = event.end_date ? new Date(event.end_date) : null;
+
+      if (endDate && endDate.getTime() !== startDate.getTime()) {
+        dateDisplay = `${startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}-${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+      } else {
+        dateDisplay = startDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric"
+        });
+      }
+
+      // Add time if available
+      if (event.start_time) {
+        dateDisplay += ` at ${event.start_time}`;
+      }
+    }
+
+    return {
+      id: event.id,
+      name: event.name,
+      server: event.guild_name || "Unknown Server",
+      serverId: event.guild_id,
+      serverColor: getGuildGradient(event.guild_name || event.guild_id),
+      date: dateDisplay,
+      location: event.location || "Location TBD",
+      attendees: event.event_members?.length || 0,
+      description: event.description || "No description provided",
+      type: eventTypeLabels[event.event_type] || "Other",
+    };
+  });
+
+  const totalAttendees = transformedEvents.reduce((sum, e) => sum + e.attendees, 0);
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <div className="absolute inset-0 gradient-mesh" />
@@ -70,111 +130,44 @@ export default function Home() {
 
       <NavBar />
 
-      <div className="container mx-auto px-4 py-12 max-w-7xl relative z-10">
-
-        <div className="relative overflow-hidden rounded-3xl p-11 mb-16 shadow-glow group">
+      <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+        <div className="relative overflow-hidden rounded-2xl p-8 mb-8 shadow-glow group">
           <div className="absolute inset-0 gradient-hero" />
           <div className="absolute inset-0 hero-grid" />
 
           <div className="relative z-10 text-center">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
-              <Sparkles className="h-4 w-4 text-white animate-pulse-glow" />
-              <span className="text-white/90 text-sm font-medium">Unified Event Management</span>
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-4">
+              <Sparkles className="h-3.5 w-3.5 text-white animate-pulse-glow" />
+              <span className="text-white/90 text-xs font-medium">Unified Event Management</span>
             </div>
 
-            <h1 className="text-6xl md:text-7xl font-black text-white mb-6 tracking-tight" style={{ lineHeight: '1.4' }}>
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight" style={{ lineHeight: '1.3' }}>
               Your Events,
               <br />
-              <span className="text-white">
-                All in One Place
-              </span>
+              <span className="text-white">All in One Place</span>
             </h1>
 
-            <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
+            <p className="text-white/80 text-base max-w-3xl mx-auto mb-6 leading-relaxed">
               Manage events from all your Discord servers seamlessly. Plan, coordinate, and never miss a moment.
             </p>
 
-            <div className="flex items-center justify-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5">
                 <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse-glow" />
-                <span className="text-white/90 text-sm">{events.length} Active Events</span>
+                <span className="text-white/90 text-xs">{transformedEvents.length} Active Events</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
-                <Users className="h-4 w-4 text-white" />
-                <span className="text-white/90 text-sm">{events.reduce((sum, e) => sum + e.attendees, 0)} Total Attendees</span>
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5">
+                <Users className="h-3.5 w-3.5 text-white" />
+                <span className="text-white/90 text-xs">{totalAttendees} Total Attendees</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-4xl font-black mb-3 tracking-tight">
-            Your Events <span className="text-gradient">({events.length})</span>
-          </h2>
-          <p className="text-muted-foreground text-lg">Events from all your servers</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event, index) => (
-            <Link
-              key={event.id}
-              href={`/event/${event.id}`}
-              className={`block group animate-slide-up stagger-${(index % 6) + 1}`}
-            >
-              <Card className="h-full transition-all duration-500 hover:shadow-glow hover:scale-[1.02] border-border/60 backdrop-blur-sm bg-card/80 group-hover:border-primary/40 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                <CardHeader className="space-y-4 relative z-10">
-                  <div className="flex items-start justify-between gap-2">
-                    <Badge
-                      variant="secondary"
-                      className={`bg-gradient-to-r ${event.serverColor} text-white border-0 px-4 py-1.5 text-xs font-bold shadow-medium`}
-                    >
-                      {event.server}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="text-xs border-border/60 bg-background/60 backdrop-blur-sm font-semibold"
-                    >
-                      {event.type}
-                    </Badge>
-                  </div>
-
-                  <CardTitle className="text-2xl group-hover:text-primary transition-all duration-300 font-black tracking-tight leading-tight">
-                    {event.name}
-                  </CardTitle>
-
-                  <CardDescription className="line-clamp-2 text-base leading-relaxed">
-                    {event.description}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="space-y-3 relative z-10">
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Calendar className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="font-medium">{event.date}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <MapPin className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="font-medium">{event.location}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Users className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="font-medium">{event.attendees} attending</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        <EventsGrid
+          events={transformedEvents}
+          guilds={session.guilds || []}
+        />
       </div>
     </div>
   );

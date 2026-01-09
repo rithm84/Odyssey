@@ -1,4 +1,5 @@
 import { ThemeToggle } from "./ThemeToggle";
+import { AuthButton } from "./AuthButton";
 import Link from "next/link";
 import { Compass } from "lucide-react";
 
@@ -19,7 +20,10 @@ export function NavBar() {
             </span>
           </Link>
 
-          <ThemeToggle />
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <AuthButton />
+          </div>
         </div>
       </div>
     </nav>

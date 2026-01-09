@@ -12,9 +12,9 @@ const conversationHistory = new Map<string, { role: string; content: string }[]>
 
 // Declare global types for pending events, polls, and edit sessions
 declare global {
-  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null }>;
+  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null }>;
   var pendingPolls: Map<string, { pollData: ParsedPollData; guildId: string | null; channelId: string }>;
-  var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; confirmationId: string }>;
+  var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null; confirmationId: string }>;
 }
 
 export async function handleMention(message: Message) {
@@ -204,7 +204,11 @@ If it's clearly DIFFERENT (different activity, date, or purpose), create a new e
       // Create/store the event normally
       global.pendingEvents = global.pendingEvents || new Map();
       const confirmationId = generateUniqueSessionId(global.pendingEvents);
-      global.pendingEvents.set(confirmationId, { eventData, guildId: message.guildId });
+      global.pendingEvents.set(confirmationId, {
+        eventData,
+        guildId: message.guildId,
+        guildName: message.guild?.name ?? null
+      });
 
       const embed = createConfirmationEmbed(eventData);
 
@@ -243,7 +247,7 @@ If it's clearly DIFFERENT (different activity, date, or purpose), create a new e
 async function handleEditRequest(
   message: Message,
   editRequest: string,
-  editSession: { eventData: ParsedEventData; guildId: string | null; confirmationId: string }
+  editSession: { eventData: ParsedEventData; guildId: string | null; guildName: string | null; confirmationId: string }
 ) {
   try {
     if ('sendTyping' in message.channel) {
@@ -286,7 +290,8 @@ Please update the event details accordingly and use the create_event tool with t
       // Update the pending event with new data (keep same confirmationId)
       global.pendingEvents.set(editSession.confirmationId, {
         eventData: updatedEventData,
-        guildId: editSession.guildId
+        guildId: editSession.guildId,
+        guildName: editSession.guildName
       });
 
       // Clear edit session

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"; // type import, discarded after compilation, saves space
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 
 // metadata for page, important for SEO -> Next.js reads this and generates <head> tags with title and meta tags
 export const metadata: Metadata = {
@@ -19,18 +20,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         {/* head will be inserted above body by Next.js when user visits a route like '/ */}
-        <ThemeProvider
-          // tells the theme provider how to apply theme (in this case, class); it does <html class="dark"> or <html class="light"> (based on globals.css)
-          attribute="class"
-          // use system theme by default
-          defaultTheme="system"
-          // allows extraction of preferred theme from OS
-          enableSystem
-          // disables flickering when react re-renders theme
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            // tells the theme provider how to apply theme (in this case, class); it does <html class="dark"> or <html class="light"> (based on globals.css)
+            attribute="class"
+            // use system theme by default
+            defaultTheme="system"
+            // allows extraction of preferred theme from OS
+            enableSystem
+            // disables flickering when react re-renders theme
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -13,7 +13,7 @@ export async function handleEditEventModules(interaction: ChatInputCommandIntera
   // Fetch event from database
   const { data: event, error } = await supabase
     .from('events')
-    .select('id, name, guild_id, enabled_modules, event_members!inner(role)')
+    .select('id, name, guild_id, guild_name, enabled_modules, event_members!inner(role)')
     .eq('id', eventId)
     .eq('event_members.user_id', userId)
     .in('event_members.role', ['organizer', 'co_host'])
@@ -33,6 +33,7 @@ export async function handleEditEventModules(interaction: ChatInputCommandIntera
   global.pendingModuleSelection.set(sessionId, {
     eventData: null, // Not creating new event, editing existing
     guildId: event.guild_id,
+    guildName: event.guild_name,
     channelId: interaction.channelId ?? '',
     selectedModules: event.enabled_modules as EnabledModules,
     eventId, // Store eventId for UPDATE instead of INSERT

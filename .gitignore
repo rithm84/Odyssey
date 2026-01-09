@@ -10,3 +10,5 @@ dbTriggers.sql
 dbIndexes.sql
 dbPolicies.sql
 ERROR_LOG.md
+.claude
+.playwright-mcp
