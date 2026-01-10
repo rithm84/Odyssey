@@ -31,6 +31,39 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}/`);
     }
 
+    // Fetch user profile from Discord API
+    const userProfileResponse = await fetch('https://discord.com/api/users/@me', {
+      headers: {
+        Authorization: `Bearer ${providerToken}`,
+      },
+    });
+
+    if (userProfileResponse.ok) {
+      const discordUser = await userProfileResponse.json();
+      const discordUserId = discordUser.id;
+      const avatarHash = discordUser.avatar;
+      const avatarUrl = avatarHash
+        ? `https://cdn.discordapp.com/avatars/${discordUserId}/${avatarHash}.png?size=256`
+        : null;
+
+      // Upsert user data in users table
+      const { error: upsertError } = await supabaseAdmin
+        .from('users')
+        .upsert({
+          discord_id: discordUserId,
+          username: discordUser.username,
+          avatar_url: avatarUrl,
+          email: discordUser.email || null,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'discord_id'
+        });
+
+      if (upsertError) {
+        console.error('Error upserting user profile:', upsertError);
+      }
+    }
+
     // Fetch guilds from Discord API
     const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
       headers: {
