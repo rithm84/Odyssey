@@ -13,6 +13,8 @@ declare global {
     channelId: string;
     selectedModules: EnabledModules;
     eventId?: string; // Optional - only present when editing
+    visibility?: 'public' | 'private'; // Event visibility
+    accessList?: Array<{ type: 'role' | 'user'; id: string; name: string }>; // For private events
     // Metadata for debugging (not used in logic, just for logging)
     userId: string;
     timestamp: number;
@@ -102,7 +104,7 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
       // Save event to database with selected modules
       await interaction.deferUpdate();
 
-      const { eventData, guildId, guildName, selectedModules, eventId } = pendingSelection;
+      const { eventData, guildId, guildName, selectedModules, eventId, visibility, accessList } = pendingSelection;
 
       if (eventId) {
         // EDITING existing event
@@ -188,11 +190,31 @@ export async function handleModuleToggle(interaction: ButtonInteraction) {
             enabled_modules: selectedModules,
             synced_with_discord: false,
             created_by: interaction.user.id,
+            visibility: visibility ?? 'public', // Default to public
           })
           .select()
           .single();
 
         if (error) throw error;
+
+        // If private event, insert access records
+        if ((visibility === 'private') && accessList && accessList.length > 0) {
+          const accessRecords = accessList.map(access => ({
+            event_id: data.id,
+            access_type: access.type,
+            role_id: access.type === 'role' ? access.id : null,
+            user_id: access.type === 'user' ? access.id : null,
+          }));
+
+          const { error: accessError } = await supabase
+            .from('event_access')
+            .insert(accessRecords);
+
+          if (accessError) {
+            console.error('Error inserting event access records:', accessError);
+            // Continue anyway - event is created, just log the error
+          }
+        }
 
         // Map module names to emojis
         const moduleEmojis: Record<keyof EnabledModules, string> = {

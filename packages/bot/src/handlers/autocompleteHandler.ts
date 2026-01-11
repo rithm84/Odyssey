@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 export async function handleAutocomplete(interaction: AutocompleteInteraction) {
   const focusedValue = interaction.options.getFocused();
   const userId = interaction.user.id;
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
   // Autocomplete for commands that need organizer/co-host events
   if (interaction.commandName === 'edit-event-modules' ||
@@ -11,11 +12,12 @@ export async function handleAutocomplete(interaction: AutocompleteInteraction) {
     // Query user's events from database (where they're organizer or co-host)
     const { data: events, error } = await supabase
       .from('events')
-      .select('id, name, start_date, event_members!inner(role)')
+      .select('id, name, start_date, end_date, event_members!inner(role)')
       .eq('event_members.user_id', userId)
       .in('event_members.role', ['organizer', 'co_host'])
+      .or(`end_date.gte.${today},and(end_date.is.null,start_date.gte.${today})`)
       .order('start_date', { ascending: true })
-      .limit(25);
+      .limit(50);
 
     if (error || !events) {
       await interaction.respond([]);
@@ -37,32 +39,82 @@ export async function handleAutocomplete(interaction: AutocompleteInteraction) {
     return;
   }
 
-  // Autocomplete for RSVP - show all events user is a member of
+  // Autocomplete for RSVP - show all events in the guild
   if (interaction.commandName === 'rsvp') {
-    const { data: events, error } = await supabase
-      .from('events')
-      .select('id, name, start_date, event_members!inner(user_id)')
-      .eq('event_members.user_id', userId)
-      .order('start_date', { ascending: true })
-      .limit(25);
+    try {
+      const { data: events, error } = await supabase
+        .from('events')
+        .select('id, name, start_date, end_date')
+        .eq('guild_id', interaction.guildId || '')
+        .or(`end_date.gte.${today},and(end_date.is.null,start_date.gte.${today})`)
+        .order('start_date', { ascending: true })
+        .limit(50);
 
-    if (error || !events) {
+      if (error) {
+        await interaction.respond([]);
+        return;
+      }
+
+      if (!events || events.length === 0) {
+        await interaction.respond([]);
+        return;
+      }
+
+      // Filter by what user is typing
+      const filtered = events.filter(event =>
+        event.name.toLowerCase().includes(focusedValue.toLowerCase())
+      );
+
+      // Format choices for Discord
+      const choices = filtered.slice(0, 25).map(event => ({
+        name: `${event.name} (${event.start_date || 'No date'})`,
+        value: event.id
+      }));
+
+      await interaction.respond(choices);
+    } catch (error) {
       await interaction.respond([]);
-      return;
     }
+    return;
+  }
 
-    // Filter by what user is typing
-    const filtered = events.filter(event =>
-      event.name.toLowerCase().includes(focusedValue.toLowerCase())
-    );
+  // Autocomplete for leave-event - show all events where user is a member (including organizers)
+  // The handler will check and block organizers from actually leaving
+  if (interaction.commandName === 'leave-event') {
+    try {
+      const { data: events, error } = await supabase
+        .from('events')
+        .select('id, name, start_date, end_date, event_members!inner(user_id, role)')
+        .eq('event_members.user_id', userId)
+        .or(`end_date.gte.${today},and(end_date.is.null,start_date.gte.${today})`)
+        .order('start_date', { ascending: true })
+        .limit(50);
 
-    // Format choices for Discord
-    const choices = filtered.map(event => ({
-      name: `${event.name} (${event.start_date || 'No date'})`,
-      value: event.id
-    }));
+      if (error) {
+        await interaction.respond([]);
+        return;
+      }
 
-    await interaction.respond(choices);
+      if (!events || events.length === 0) {
+        await interaction.respond([]);
+        return;
+      }
+
+      // Filter by what user is typing
+      const filtered = events.filter(event =>
+        event.name.toLowerCase().includes(focusedValue.toLowerCase())
+      );
+
+      // Format choices for Discord
+      const choices = filtered.slice(0, 25).map(event => ({
+        name: `${event.name} (${event.start_date || 'No date'})`,
+        value: event.id
+      }));
+
+      await interaction.respond(choices);
+    } catch (error) {
+      await interaction.respond([]);
+    }
     return;
   }
 

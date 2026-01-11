@@ -20,6 +20,7 @@ declare global {
     selectedRole?: string;
     selectedRsvp?: string;
     originalSessionId: string;
+    cachedMembers?: Array<{ id: string; displayName: string; tag: string }>; // Cache to avoid timeout
   }>;
 }
 
@@ -70,6 +71,13 @@ export async function handleAddMemberButton(interaction: ButtonInteraction) {
       return;
     }
 
+    // Cache member data to avoid re-fetching (prevents timeout)
+    const cachedMembers = availableMembers.map(m => ({
+      id: m.id,
+      displayName: m.displayName,
+      tag: m.user.tag
+    }));
+
     // Create new add member session
     global.addMemberSessions = global.addMemberSessions || new Map();
     const addSessionId = generateUniqueSessionId(global.addMemberSessions);
@@ -78,8 +86,9 @@ export async function handleAddMemberButton(interaction: ButtonInteraction) {
       eventId: session.eventId,
       eventName: session.eventName,
       selectedRole: 'member',
-      selectedRsvp: 'no',
-      originalSessionId
+      selectedRsvp: 'yes', // Default to 'yes' (no 'no' option anymore)
+      originalSessionId,
+      cachedMembers // Store cached member list
     });
 
     // Create embed and select menus
@@ -111,13 +120,12 @@ export async function handleAddMemberButton(interaction: ButtonInteraction) {
         { label: 'Viewer', value: 'viewer', description: 'Read-only access' }
       ]);
 
-    // RSVP select menu
+    // RSVP select menu (only Yes/Maybe - viewers don't need RSVP)
     const rsvpSelect = new StringSelectMenuBuilder()
       .setCustomId(`add_member_rsvp_${addSessionId}`)
-      .setPlaceholder('Select RSVP status (default: no)')
+      .setPlaceholder('Select RSVP status (default: yes)')
       .addOptions([
-        { label: '✅ Yes - Attending', value: 'yes' },
-        { label: '❌ No - Not Attending', value: 'no', default: true },
+        { label: '✅ Yes - Attending', value: 'yes', default: true },
         { label: '❓ Maybe - Unsure', value: 'maybe' }
       ]);
 
@@ -174,13 +182,122 @@ export async function handleAddMemberSelect(interaction: StringSelectMenuInterac
   // Update session based on which select menu was used
   if (field === 'user' && selectedValue) {
     session.selectedUserId = selectedValue;
+    await interaction.deferUpdate();
   } else if (field === 'role' && selectedValue) {
     session.selectedRole = selectedValue;
+
+    // Defer update first to prevent timeout
+    await interaction.deferUpdate();
+
+    // Dynamically rebuild components based on role selection
+    await rebuildAddMemberComponents(interaction, session, sessionId);
   } else if (field === 'rsvp' && selectedValue) {
     session.selectedRsvp = selectedValue;
+    await interaction.deferUpdate();
   }
+}
 
-  await interaction.deferUpdate();
+// Helper function to rebuild add member components
+async function rebuildAddMemberComponents(
+  interaction: StringSelectMenuInteraction,
+  session: any,
+  sessionId: string
+) {
+  try {
+    const embed = new EmbedBuilder()
+      .setColor('#5865F2')
+      .setTitle(`➕ Add Member to ${session.eventName}`)
+      .setDescription(
+        session.selectedRole === 'viewer'
+          ? 'Select a member and configure their role. Viewers do not have RSVP status.'
+          : 'Select a member and configure their role and RSVP status.'
+      )
+      .setTimestamp();
+
+    // Use cached member list to avoid timeout
+    const availableMembers = session.cachedMembers || [];
+
+    if (availableMembers.length === 0) {
+      await interaction.editReply({
+        content: 'No available members found. Please try again.',
+        embeds: [],
+        components: []
+      });
+      return;
+    }
+
+    // Member select menu
+    const memberSelect = new StringSelectMenuBuilder()
+      .setCustomId(`add_member_user_${sessionId}`)
+      .setPlaceholder('Select a member to add...')
+      .addOptions(
+        availableMembers.map((member: any) => ({
+          label: member.displayName,
+          description: member.tag,
+          value: member.id,
+          default: member.id === session.selectedUserId
+        }))
+      );
+
+    // Role select menu
+    const roleSelect = new StringSelectMenuBuilder()
+      .setCustomId(`add_member_role_${sessionId}`)
+      .setPlaceholder('Select role (default: member)')
+      .addOptions([
+        { label: 'Member', value: 'member', description: 'Regular event participant', default: session.selectedRole === 'member' },
+        { label: 'Co-Host', value: 'co_host', description: 'Can manage event settings', default: session.selectedRole === 'co_host' },
+        { label: 'Viewer', value: 'viewer', description: 'Read-only access', default: session.selectedRole === 'viewer' }
+      ]);
+
+    // Confirm/Cancel buttons
+    const buttons = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId(`add_member_confirm_${sessionId}`)
+          .setLabel('✔️ Add Member')
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId(`add_member_cancel_${sessionId}`)
+          .setLabel('❌ Cancel')
+          .setStyle(ButtonStyle.Secondary)
+      );
+
+    const row1 = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(memberSelect);
+    const row2 = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(roleSelect);
+
+    // RSVP row - show actual options for non-viewers, disabled placeholder for viewers
+    let row3: ActionRowBuilder<StringSelectMenuBuilder>;
+
+    if (session.selectedRole !== 'viewer') {
+      const rsvpSelect = new StringSelectMenuBuilder()
+        .setCustomId(`add_member_rsvp_${sessionId}`)
+        .setPlaceholder('Select RSVP status (default: yes)')
+        .addOptions([
+          { label: '✅ Yes - Attending', value: 'yes', default: session.selectedRsvp === 'yes' },
+          { label: '❓ Maybe - Unsure', value: 'maybe', default: session.selectedRsvp === 'maybe' }
+        ]);
+
+      row3 = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(rsvpSelect);
+    } else {
+      // Viewer - show disabled placeholder
+      const rsvpPlaceholder = new StringSelectMenuBuilder()
+        .setCustomId(`add_member_rsvp_disabled_${sessionId}`)
+        .setPlaceholder('Viewers do not have RSVP status')
+        .setDisabled(true)
+        .addOptions([
+          { label: 'N/A - Viewer role', value: 'na' }
+        ]);
+
+      row3 = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(rsvpPlaceholder);
+    }
+
+    await interaction.editReply({
+      embeds: [embed],
+      components: [row1, row2, row3, buttons]
+    });
+  } catch (error) {
+    console.error('Error rebuilding add member components:', error);
+  }
 }
 
 // Handle confirm/cancel buttons for adding member
@@ -227,7 +344,7 @@ export async function handleAddMemberConfirm(interaction: ButtonInteraction) {
 
     const userId = session.selectedUserId;
     const role = session.selectedRole || 'member';
-    const rsvp = session.selectedRsvp || 'no';
+    const rsvp = session.selectedRsvp || 'yes';
 
     // Check if user is already a member (double-check)
     const { data: existingMember } = await supabase
@@ -248,21 +365,26 @@ export async function handleAddMemberConfirm(interaction: ButtonInteraction) {
     }
 
     // Add member to event
+    // Viewers don't have RSVP status (set to null)
     const { error } = await supabase
       .from('event_members')
       .insert({
         event_id: session.eventId,
         user_id: userId,
         role: role,
-        rsvp_status: rsvp
+        rsvp_status: role === 'viewer' ? null : rsvp
       });
 
     if (error) throw error;
 
     const guildMember = await interaction.guild!.members.fetch(userId);
 
+    const successMessage = role === 'viewer'
+      ? `Added **${guildMember.displayName}** as ${role}. ✅`
+      : `Added **${guildMember.displayName}** as ${role} with RSVP: ${rsvp}. ✅`;
+
     await interaction.editReply({
-      content: `Added **${guildMember.displayName}** as ${role} with RSVP: ${rsvp}. ✅`,
+      content: successMessage,
       embeds: [],
       components: []
     });

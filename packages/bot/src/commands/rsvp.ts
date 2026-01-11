@@ -17,7 +17,6 @@ export const rsvpCommand = new SlashCommandBuilder()
       .setRequired(true)
       .addChoices(
         { name: '✅ Yes - I\'m attending', value: 'yes' },
-        { name: '❌ No - I can\'t make it', value: 'no' },
         { name: '❓ Maybe - Not sure yet', value: 'maybe' }
       )
   );

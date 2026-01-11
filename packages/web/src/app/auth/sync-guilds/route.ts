@@ -82,11 +82,33 @@ export async function GET(request: Request) {
     // Extract only guild IDs (keep it small to avoid cookie size limits)
     const guildIds = guilds.map((g: any) => g.id);
 
-    // Update user metadata with ONLY guild IDs
-    // Don't store full guild objects - they make JWT too large
+    // Fetch user's roles for each guild
+    const guildRoles: Record<string, string[]> = {};
+
+    for (const guild of guilds) {
+      try {
+        // Fetch guild member to get roles
+        const memberResponse = await fetch(
+          `https://discord.com/api/guilds/${guild.id}/members/${discordUser.id}`,
+          { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` } }
+        );
+
+        if (memberResponse.ok) {
+          const member = await memberResponse.json();
+          guildRoles[guild.id] = member.roles; // Array of role IDs
+        }
+      } catch (err) {
+        console.error(`Failed to fetch roles for guild ${guild.id}:`, err);
+        // Continue with empty roles for this guild
+        guildRoles[guild.id] = [];
+      }
+    }
+
+    // Update user metadata with both guild_ids and role_ids
     const { error: updateError } = await supabase.auth.updateUser({
       data: {
         guild_ids: guildIds,
+        role_ids: guildRoles,
       },
     });
 

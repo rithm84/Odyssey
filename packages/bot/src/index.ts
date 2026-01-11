@@ -5,6 +5,7 @@ import { editEventModulesCommand } from '@/commands/editEventModules';
 import { rsvpCommand } from '@/commands/rsvp';
 import { manageMembersCommand } from '@/commands/manageMembers';
 import { findBestTimesCommand } from '@/commands/findBestTimes';
+import { leaveEventCommand } from '@/commands/leaveEvent';
 import { handleInteraction } from '@/handlers/interactionHandler';
 import { handleAutocomplete } from '@/handlers/autocompleteHandler';
 import { handleMention } from '@/handlers/mentionHandler';
@@ -42,7 +43,8 @@ client.once(Events.ClientReady, async (readyClient) => {
           editEventModulesCommand.toJSON(),
           rsvpCommand.toJSON(),
           manageMembersCommand.toJSON(),
-          findBestTimesCommand.toJSON()
+          findBestTimesCommand.toJSON(),
+          leaveEventCommand.toJSON()
         ]
       }
     );

@@ -12,7 +12,13 @@ const conversationHistory = new Map<string, { role: string; content: string }[]>
 
 // Declare global types for pending events, polls, and edit sessions
 declare global {
-  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null }>;
+  var pendingEvents: Map<string, {
+    eventData: ParsedEventData;
+    guildId: string | null;
+    guildName: string | null;
+    visibility: 'public' | 'private';
+    accessList: Array<{ type: 'role' | 'user'; id: string; name: string }>;
+  }>;
   var pendingPolls: Map<string, { pollData: ParsedPollData; guildId: string | null; channelId: string }>;
   var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null; confirmationId: string }>;
 }
@@ -207,7 +213,9 @@ If it's clearly DIFFERENT (different activity, date, or purpose), create a new e
       global.pendingEvents.set(confirmationId, {
         eventData,
         guildId: message.guildId,
-        guildName: message.guild?.name ?? null
+        guildName: message.guild?.name ?? null,
+        visibility: 'public',
+        accessList: []
       });
 
       const embed = createConfirmationEmbed(eventData);
@@ -291,7 +299,9 @@ Please update the event details accordingly and use the create_event tool with t
       global.pendingEvents.set(editSession.confirmationId, {
         eventData: updatedEventData,
         guildId: editSession.guildId,
-        guildName: editSession.guildName
+        guildName: editSession.guildName,
+        visibility: 'public',
+        accessList: []
       });
 
       // Clear edit session

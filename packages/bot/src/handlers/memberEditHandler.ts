@@ -154,9 +154,8 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
           throw new Error('Failed to demote current organizer: ' + demoteError.message);
         }
 
-        // Step 2: Promote target to organizer
-        const updates: any = { role: 'organizer' };
-        if (pendingChanges.rsvpStatus) updates.rsvp_status = pendingChanges.rsvpStatus;
+        // Step 2: Promote target to organizer (always RSVP as 'yes')
+        const updates: any = { role: 'organizer', rsvp_status: 'yes' };
 
         const { error: promoteError } = await supabase
           .from('event_members')
@@ -284,7 +283,7 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
     }
 
     session.pendingChanges.remove = true;
-  } else if (action === 'yes' || action === 'maybe' || action === 'no') {
+  } else if (action === 'yes' || action === 'maybe') {
     // If clicking the same RSVP as original, clear the pending change
     if (action === session.originalRsvp) {
       delete session.pendingChanges.rsvpStatus;
@@ -395,6 +394,7 @@ function createEditButtons(
                      (currentRole === 'co_host' && editorRole === 'organizer'));
 
   if (!pendingChanges.remove) {
+    // Row 1: Promote/Demote
     row1.addComponents(
       new ButtonBuilder()
         .setCustomId(`member_promote_${sessionId}`)
@@ -411,14 +411,7 @@ function createEditButtons(
         .setDisabled(!canDemote)
     );
 
-    row1.addComponents(
-      new ButtonBuilder()
-        .setCustomId(`member_remove_${sessionId}`)
-        .setLabel('❌ Remove')
-        .setStyle(ButtonStyle.Danger)
-    );
-
-    // Row 2: RSVP actions - highlight the currently selected option (blue = selected)
+    // Row 2: RSVP actions (Yes/Maybe) + Remove button
     const actualCurrentRsvp = pendingChanges.rsvpStatus !== undefined
       ? pendingChanges.rsvpStatus
       : originalRsvp;
@@ -433,9 +426,10 @@ function createEditButtons(
         .setLabel('❓ Maybe')
         .setStyle(actualCurrentRsvp === 'maybe' ? ButtonStyle.Primary : ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId(`member_no_${sessionId}`)
-        .setLabel('❌ No')
-        .setStyle(actualCurrentRsvp === 'no' ? ButtonStyle.Primary : ButtonStyle.Secondary)
+        .setCustomId(`member_remove_${sessionId}`)
+        .setLabel('🗑️ Remove')
+        .setStyle(ButtonStyle.Danger)
+        .setDisabled(currentRole === 'viewer')
     );
   }
 

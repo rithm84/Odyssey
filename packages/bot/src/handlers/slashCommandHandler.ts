@@ -8,7 +8,13 @@ import type { ParsedEventData, ParsedPollData } from '@/types/agent';
 
 // Declare global type for pending events and polls
 declare global {
-  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null }>;
+  var pendingEvents: Map<string, {
+    eventData: ParsedEventData;
+    guildId: string | null;
+    guildName: string | null;
+    visibility: 'public' | 'private';
+    accessList: Array<{ type: 'role' | 'user'; id: string; name: string }>;
+  }>;
   var pendingPolls: Map<string, { pollData: ParsedPollData; guildId: string | null; channelId: string }>;
 }
 
@@ -45,7 +51,10 @@ export async function handleCreateEventCommand(interaction: ChatInputCommandInte
     if (toolOutput?.action === 'show_confirmation') {
       // Show confirmation embed
       const eventData: ParsedEventData = toolOutput.data;
-      const embed = createConfirmationEmbed(eventData);
+
+      // Initialize with public visibility
+      const visibility = 'public';
+      const embed = createConfirmationEmbed(eventData, visibility);
 
       // Store event data temporarily (for button handler)
       global.pendingEvents = global.pendingEvents || new Map();
@@ -53,7 +62,9 @@ export async function handleCreateEventCommand(interaction: ChatInputCommandInte
       global.pendingEvents.set(confirmationId, {
         eventData,
         guildId: interaction.guildId,
-        guildName: interaction.guild?.name ?? null
+        guildName: interaction.guild?.name ?? null,
+        visibility: 'public',
+        accessList: []
       });
 
       // Create buttons with confirmation ID (production-safe approach)
@@ -61,15 +72,19 @@ export async function handleCreateEventCommand(interaction: ChatInputCommandInte
         .addComponents(
           new ButtonBuilder()
             .setCustomId(`event_confirm_yes_${confirmationId}`)
-            .setLabel('Yes')
+            .setLabel('✅ Yes')
             .setStyle(ButtonStyle.Success),
           new ButtonBuilder()
             .setCustomId(`event_confirm_edit_${confirmationId}`)
-            .setLabel('Edit')
+            .setLabel('✏️ Edit')
             .setStyle(ButtonStyle.Primary),
           new ButtonBuilder()
+            .setCustomId(`event_confirm_toggle_visibility_${confirmationId}`)
+            .setLabel('🔒 Make Private')
+            .setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder()
             .setCustomId(`event_confirm_cancel_${confirmationId}`)
-            .setLabel('Cancel')
+            .setLabel('❌ Cancel')
             .setStyle(ButtonStyle.Danger)
         );
 

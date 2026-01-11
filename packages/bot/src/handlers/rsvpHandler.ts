@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
 import { supabase } from '@/lib/supabase';
 
-type RsvpStatus = 'yes' | 'no' | 'maybe';
+type RsvpStatus = 'yes' | 'maybe';
 
 export async function handleRsvp(interaction: ChatInputCommandInteraction) {
   const eventId = interaction.options.getString('event', true);
@@ -25,25 +25,45 @@ export async function handleRsvp(interaction: ChatInputCommandInteraction) {
       return;
     }
 
-    // Upsert the event member record with RSVP status
-    // If user is not a member, they get added with role='member'
-    // If user is already a member, just update their rsvp_status
-    const { error: upsertError } = await supabase
+    // Check if user is currently a member
+    const { data: existingMember } = await supabase
       .from('event_members')
-      .upsert(
-        {
+      .select('role, rsvp_status')
+      .eq('event_id', eventId)
+      .eq('user_id', userId)
+      .single();
+
+    let isNewMember = false;
+    let alreadyHadStatus = false;
+
+    if (!existingMember) {
+      // User is a viewer (not in event_members table) - create member record
+      const { error: insertError } = await supabase
+        .from('event_members')
+        .insert({
           event_id: eventId,
           user_id: userId,
-          rsvp_status: status,
-          // role will default to 'member' on INSERT (not updated on conflict)
-        },
-        {
-          onConflict: 'event_id,user_id',
-          ignoreDuplicates: false
-        }
-      );
+          role: 'member',
+          rsvp_status: status
+        });
 
-    if (upsertError) throw upsertError;
+      if (insertError) throw insertError;
+      isNewMember = true;
+    } else {
+      // Check if they already have this exact RSVP status
+      if (existingMember.rsvp_status === status) {
+        alreadyHadStatus = true;
+      } else {
+        // User is already a member - update RSVP status
+        const { error: updateError } = await supabase
+          .from('event_members')
+          .update({ rsvp_status: status })
+          .eq('event_id', eventId)
+          .eq('user_id', userId);
+
+        if (updateError) throw updateError;
+      }
+    }
 
     // Get updated RSVP counts
     const { data: counts } = await supabase
@@ -57,22 +77,37 @@ export async function handleRsvp(interaction: ChatInputCommandInteraction) {
     // Create status emoji and message
     const statusEmoji = {
       yes: '✅',
-      no: '❌',
       maybe: '❓'
     };
 
     const statusText = {
       yes: 'attending',
-      no: 'not attending',
       maybe: 'maybe attending'
     };
 
+    // Determine title and description based on state
+    let title: string;
+    let description: string;
+
+    if (alreadyHadStatus) {
+      // User already has this RSVP status
+      const roleText = existingMember?.role === 'organizer' ? ' as the organizer' : '';
+      title = `${statusEmoji[status]} Already Marked`;
+      description = `You're already marked as **${statusText[status]}** for **${event.name}**${roleText}.`;
+    } else if (isNewMember) {
+      // User just joined the event
+      title = `${statusEmoji[status]} Joined Event!`;
+      description = `You've joined **${event.name}** and RSVP'd as **${statusText[status]}**!`;
+    } else {
+      // User updated their RSVP
+      title = `${statusEmoji[status]} RSVP Updated`;
+      description = `You're now marked as **${statusText[status]}** for **${event.name}**`;
+    }
+
     const embed = new EmbedBuilder()
-      .setColor(status === 'yes' ? '#57F287' : status === 'maybe' ? '#FEE75C' : '#ED4245')
-      .setTitle(`${statusEmoji[status]} RSVP Updated`)
-      .setDescription(
-        `You're now marked as **${statusText[status]}** for **${event.name}**`
-      )
+      .setColor(status === 'yes' ? '#57F287' : '#FEE75C') // Green for yes, yellow for maybe
+      .setTitle(title)
+      .setDescription(description)
       .addFields(
         {
           name: '📊 Current Attendance',

@@ -40,6 +40,20 @@ export function EventsDashboard({ initialEvents, initialGuilds }: EventsDashboar
   }, [events]);
 
   useEffect(() => {
+    // Auto-refresh user roles on mount to keep JWT current
+    const refreshRoles = async () => {
+      try {
+        await fetch("/api/auth/refresh-roles", {
+          method: "POST",
+        });
+      } catch (error) {
+        console.error("Error refreshing roles:", error);
+      }
+    };
+
+    // Refresh roles immediately on mount
+    refreshRoles();
+
     // Refresh guilds periodically (guilds come from Discord API, not realtime)
     const refreshGuilds = async () => {
       try {

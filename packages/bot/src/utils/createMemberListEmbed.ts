@@ -92,21 +92,21 @@ export async function createMemberListEmbed(
   }
 
   if (viewers.length > 0) {
-    const viewerList = viewers.map(m => {
-      const rsvpEmoji = m.rsvp_status === 'yes' ? '✅' : m.rsvp_status === 'maybe' ? '❓' : '❌';
-      return `• ${m.displayName} — ${rsvpEmoji}`;
-    }).join('\n');
-    embed.addFields({ name: '👁️ Viewers', value: viewerList, inline: false });
+    embed.addFields({
+      name: '👁️ Viewers',
+      value: `(${viewers.length})`,
+      inline: false
+    });
   }
 
-  // Create select menu for member selection
+  // Create select menu for member selection (include all members including viewers)
   const selectMenu = new StringSelectMenuBuilder()
     .setCustomId(`member_select_${sessionId}`)
     .setPlaceholder('Select a member to manage...')
     .addOptions(
       sortedMembers.map(member => ({
         label: member.displayName,
-        description: `${member.role} | RSVP: ${member.rsvp_status}`,
+        description: `${member.role}${member.rsvp_status ? ` | RSVP: ${member.rsvp_status}` : ''}`,
         value: member.user_id
       }))
     );

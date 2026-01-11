@@ -1,13 +1,21 @@
-import { ButtonInteraction, EmbedBuilder } from 'discord.js';
+import { ButtonInteraction, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 import { supabase } from '@/lib/supabase';
 import type { ParsedEventData } from '@/types/agent';
 import { getRecommendedModules } from '@/utils/smartDefaults';
 import { createModuleSelectionEmbed } from '@/utils/moduleSelectionEmbed';
 import { generateUniqueSessionId } from '@/utils/generateSessionId';
+import { createConfirmationEmbed } from '@/utils/createEventConfirmationEmbed';
+import { createAccessSelectionEmbed } from '@/utils/createAccessSelectionEmbed';
 
 // Declare global types for pending events, edit sessions, and module selection
 declare global {
-  var pendingEvents: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null }>;
+  var pendingEvents: Map<string, {
+    eventData: ParsedEventData;
+    guildId: string | null;
+    guildName: string | null;
+    visibility: 'public' | 'private';
+    accessList: Array<{ type: 'role' | 'user'; id: string; name: string }>;
+  }>;
   var editSessions: Map<string, { eventData: ParsedEventData; guildId: string | null; guildName: string | null; confirmationId: string }>;
   var pendingModuleSelection: Map<string, {
     eventData: ParsedEventData | null; // Can be null for edits
@@ -15,6 +23,8 @@ declare global {
     guildName: string | null;
     channelId: string;
     selectedModules: import('@odyssey/shared/types/database').EnabledModules;
+    visibility?: 'public' | 'private'; // Event visibility
+    accessList?: Array<{ type: 'role' | 'user'; id: string; name: string }>; // Access list for private events
     eventId?: string; // Optional - only present when editing
     // Metadata for debugging (not used in logic, just for logging)
     userId: string;
@@ -28,8 +38,17 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
   // Expected format: event_confirm_yes_<sessionId> or event_confirm_edit_<sessionId>
   if (customIdParts[0] !== 'event' || customIdParts[1] !== 'confirm') return;
 
-  const action = customIdParts[2]; // 'yes', 'edit', or 'cancel'
-  const confirmationId = customIdParts[3]; // Session ID (8-char hash)
+  const action = customIdParts[2]; // 'yes', 'edit', 'cancel', or 'toggle' (for toggle_visibility)
+
+  // Handle compound actions like 'toggle_visibility'
+  let confirmationId: string | undefined;
+  if (action === 'toggle' && customIdParts[3] === 'visibility') {
+    confirmationId = customIdParts[4]; // For event_confirm_toggle_visibility_<sessionId>
+  } else {
+    confirmationId = customIdParts[3]; // Session ID (8-char hash)
+  }
+
+  console.log(`Button action: ${action}, confirmationId: ${confirmationId}, customId: ${interaction.customId}`);
 
   if (!confirmationId) {
     await interaction.reply({
@@ -51,10 +70,66 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
     return;
   }
 
-  const { eventData, guildId, guildName } = pendingEvent;
+  const { eventData, guildId, guildName, visibility, accessList } = pendingEvent;
 
   try {
-    if (action === 'yes') {
+    if (action === 'toggle' && customIdParts[3] === 'visibility') {
+      // If currently public, show access selection embed for private event
+      if (visibility === 'public') {
+        // Fetch guild to get roles and members
+        if (!interaction.guild) {
+          await interaction.reply({
+            content: 'This command can only be used in a server.',
+            ephemeral: true
+          });
+          return;
+        }
+
+        // Show access selection embed
+        const { embed, components } = await createAccessSelectionEmbed(
+          eventData.name,
+          interaction.guild,
+          confirmationId,
+          accessList
+        );
+
+        await interaction.update({ embeds: [embed], components });
+        console.log(`Showing access selection for ${confirmationId}`);
+
+      } else {
+        // If currently private, toggle back to public
+        pendingEvent.visibility = 'public';
+
+        // Recreate the confirmation embed with public visibility
+        const embed = createConfirmationEmbed(eventData, 'public');
+
+        // Recreate buttons with "Make Private" label
+        const buttons = new ActionRowBuilder<ButtonBuilder>()
+          .addComponents(
+            new ButtonBuilder()
+              .setCustomId(`event_confirm_yes_${confirmationId}`)
+              .setLabel('✅ Yes')
+              .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+              .setCustomId(`event_confirm_edit_${confirmationId}`)
+              .setLabel('✏️ Edit')
+              .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+              .setCustomId(`event_confirm_toggle_visibility_${confirmationId}`)
+              .setLabel('🔒 Make Private')
+              .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+              .setCustomId(`event_confirm_cancel_${confirmationId}`)
+              .setLabel('❌ Cancel')
+              .setStyle(ButtonStyle.Danger)
+          );
+
+        // Update the message
+        await interaction.update({ embeds: [embed], components: [buttons] });
+        console.log(`Successfully toggled visibility to public for ${confirmationId}`);
+      }
+
+    } else if (action === 'yes') {
       // Instead of saving directly, show module selection
       await interaction.deferReply();
 
@@ -71,6 +146,8 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
         guildName,
         channelId: interaction.channelId ?? '',
         selectedModules,
+        visibility,
+        accessList,
         // Metadata for debugging
         userId: interaction.user.id,
         timestamp: Date.now()
@@ -116,26 +193,47 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
       });
 
     } else if (action === 'cancel') {
-      await interaction.update({
-        content: 'Event creation cancelled. ❌',
-        embeds: [],
-        components: []
-      });
-      global.pendingEvents.delete(confirmationId);
+      console.log(`Cancelling event confirmation ${confirmationId}`);
+      try {
+        await interaction.update({
+          content: 'Event creation cancelled. ❌',
+          embeds: [],
+          components: []
+        });
+        global.pendingEvents.delete(confirmationId);
+        console.log(`Successfully cancelled event confirmation ${confirmationId}`);
+      } catch (cancelError) {
+        console.error(`Error cancelling event ${confirmationId}:`, cancelError);
+        throw cancelError;
+      }
     }
 
   } catch (error) {
     console.error('Error handling confirmation button:', error);
 
-    if (interaction.deferred) {
-      await interaction.editReply({
-        content: 'Failed to create event. Please try again.'
-      });
-    } else {
-      await interaction.reply({
-        content: 'Failed to create event. Please try again.',
-        ephemeral: true
-      });
+    // Handle different interaction states
+    try {
+      if (interaction.replied || interaction.deferred) {
+        await interaction.editReply({
+          content: 'Failed to create event. Please try again.'
+        });
+      } else {
+        await interaction.reply({
+          content: 'Failed to create event. Please try again.',
+          ephemeral: true
+        });
+      }
+    } catch (followupError) {
+      console.error('Error sending error message:', followupError);
+      // If we can't reply, try followUp as last resort
+      try {
+        await interaction.followUp({
+          content: 'An error occurred. Please try again.',
+          ephemeral: true
+        });
+      } catch (finalError) {
+        console.error('Could not send any error message:', finalError);
+      }
     }
   }
 }

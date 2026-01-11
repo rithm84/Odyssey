@@ -1,7 +1,10 @@
 import { EmbedBuilder } from 'discord.js';
 import type { ParsedEventData } from '@/types/agent';
 
-export function createConfirmationEmbed(eventData: ParsedEventData) {
+export function createConfirmationEmbed(
+  eventData: ParsedEventData,
+  visibility: 'public' | 'private' = 'public'
+) {
   const embed = new EmbedBuilder()
     .setColor('#5865F2')
     .setTitle('🤖 I understood:')
@@ -80,6 +83,10 @@ export function createConfirmationEmbed(eventData: ParsedEventData) {
 
   // Event type
   embed.addFields({ name: '🏷️ Type', value: capitalizeFirst(eventData.eventType), inline: true });
+
+  // Visibility
+  const visibilityDisplay = visibility === 'public' ? 'Public ✓' : 'Private 🔒';
+  embed.addFields({ name: '📋 Visibility', value: visibilityDisplay, inline: true });
 
   return embed;
 }
