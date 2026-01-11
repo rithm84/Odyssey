@@ -30,7 +30,22 @@ export async function PATCH(
     .eq("user_id", discordUserId)
     .single();
 
-  if (!membership || !["organizer", "co_host"].includes(membership.role)) {
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to update schedule items." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot update schedule items
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot update schedule items. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  if (!["organizer", "co_host"].includes(membership.role)) {
     return NextResponse.json(
       { error: "Only organizers and co-hosts can update schedule items" },
       { status: 403 }
@@ -168,7 +183,22 @@ export async function DELETE(
     .eq("user_id", discordUserId)
     .single();
 
-  if (!membership || !["organizer", "co_host"].includes(membership.role)) {
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to delete schedule items." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot delete schedule items
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot delete schedule items. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  if (!["organizer", "co_host"].includes(membership.role)) {
     return NextResponse.json(
       { error: "Only organizers and co-hosts can delete schedule items" },
       { status: 403 }

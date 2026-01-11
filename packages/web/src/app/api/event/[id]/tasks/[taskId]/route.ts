@@ -50,7 +50,22 @@ export async function PATCH(
     .eq("user_id", discordUserId)
     .single();
 
-  const isOrganizerOrCoHost = membership && ["organizer", "co_host"].includes(membership.role);
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to update tasks." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot update tasks
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot update tasks. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  const isOrganizerOrCoHost = ["organizer", "co_host"].includes(membership.role);
 
   // Get the task to check assignment
   const { data: task } = await supabase
@@ -125,7 +140,22 @@ export async function DELETE(
     .eq("user_id", discordUserId)
     .single();
 
-  if (!membership || !["organizer", "co_host"].includes(membership.role)) {
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to delete tasks." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot delete tasks
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot delete tasks. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  if (!["organizer", "co_host"].includes(membership.role)) {
     return NextResponse.json(
       { error: "Only organizers and co-hosts can delete tasks" },
       { status: 403 }

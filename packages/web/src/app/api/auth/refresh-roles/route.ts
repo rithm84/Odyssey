@@ -13,70 +13,48 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get session to access provider token
-    const { data: { session } } = await supabase.auth.getSession();
-    const providerToken = session?.provider_token;
+    // Get Discord user ID from existing metadata
+    const discordUserId = user.user_metadata?.provider_id || user.user_metadata?.sub;
 
-    if (!providerToken) {
-      console.error('No provider token found - cannot fetch roles');
-      return NextResponse.json({ error: 'No provider token' }, { status: 400 });
+    if (!discordUserId) {
+      console.error('No Discord user ID found in metadata');
+      return NextResponse.json({ error: 'Discord user ID not found' }, { status: 400 });
     }
 
-    // Fetch user profile to get Discord ID
-    const userProfileResponse = await fetch('https://discord.com/api/users/@me', {
-      headers: {
-        Authorization: `Bearer ${providerToken}`,
-      },
-    });
+    // Get guild IDs from existing metadata
+    const guildIds = user.user_metadata?.guild_ids || [];
 
-    if (!userProfileResponse.ok) {
-      console.error('Failed to fetch Discord user profile');
-      return NextResponse.json({ error: 'Failed to fetch user profile' }, { status: 500 });
+    if (guildIds.length === 0) {
+      console.error('No guilds found in metadata');
+      return NextResponse.json({ error: 'No guilds found' }, { status: 400 });
     }
 
-    const discordUser = await userProfileResponse.json();
-    const discordUserId = discordUser.id;
-
-    // Fetch guilds
-    const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
-      headers: {
-        Authorization: `Bearer ${providerToken}`,
-      },
-    });
-
-    if (!guildsResponse.ok) {
-      console.error('Failed to fetch guilds from Discord');
-      return NextResponse.json({ error: 'Failed to fetch guilds' }, { status: 500 });
-    }
-
-    const guilds = await guildsResponse.json();
-    const guildIds = guilds.map((g: any) => g.id);
-
-    // Fetch user's roles for each guild
+    // Fetch user's roles for each guild using bot token
     const guildRoles: Record<string, string[]> = {};
 
-    for (const guild of guilds) {
+    for (const guildId of guildIds) {
       try {
-        // Fetch guild member to get roles
+        // Fetch guild member to get roles using bot token
         const memberResponse = await fetch(
-          `https://discord.com/api/guilds/${guild.id}/members/${discordUserId}`,
+          `https://discord.com/api/guilds/${guildId}/members/${discordUserId}`,
           { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` } }
         );
 
         if (memberResponse.ok) {
           const member = await memberResponse.json();
-          guildRoles[guild.id] = member.roles; // Array of role IDs
+          guildRoles[guildId] = member.roles; // Array of role IDs
+        } else {
+          guildRoles[guildId] = [];
         }
       } catch (err) {
-        console.error(`Failed to fetch roles for guild ${guild.id}:`, err);
-        guildRoles[guild.id] = [];
+        console.error(`Failed to fetch roles for guild ${guildId}:`, err);
+        guildRoles[guildId] = [];
       }
     }
 
-    // Update JWT with both guild_ids and role_ids
+    // Update JWT with refreshed role_ids (keep existing guild_ids)
     const { error: updateError } = await supabase.auth.updateUser({
       data: {
-        guild_ids: guildIds,
         role_ids: guildRoles,
       },
     });
@@ -86,7 +64,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to update user metadata' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, guild_ids: guildIds, role_ids: guildRoles });
+    return NextResponse.json({ success: true, role_ids: guildRoles });
   } catch (error) {
     console.error('Unexpected error in refresh-roles:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

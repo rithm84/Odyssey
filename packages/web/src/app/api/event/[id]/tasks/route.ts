@@ -60,7 +60,7 @@ export async function POST(
     return NextResponse.json({ error: "Discord user ID not found" }, { status: 400 });
   }
 
-  // Check if user has permission (only organizer or co_host can create tasks)
+  // Check if user is a member (not just a viewer)
   const { data: membership } = await supabase
     .from("event_members")
     .select("role")
@@ -68,7 +68,23 @@ export async function POST(
     .eq("user_id", discordUserId)
     .single();
 
-  if (!membership || !["organizer", "co_host"].includes(membership.role)) {
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to add tasks." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot create tasks
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot add tasks. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  // Check role permissions (only organizer or co_host can create tasks)
+  if (!["organizer", "co_host"].includes(membership.role)) {
     return NextResponse.json(
       { error: "Only organizers and co-hosts can create tasks" },
       { status: 403 }

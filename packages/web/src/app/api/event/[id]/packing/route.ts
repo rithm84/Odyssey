@@ -60,7 +60,7 @@ export async function POST(
     return NextResponse.json({ error: "Discord user ID not found" }, { status: 400 });
   }
 
-  // Check if user has permission (organizer or co_host can add without approval)
+  // Check if user is a member (not just a viewer)
   const { data: membership } = await supabase
     .from("event_members")
     .select("role")
@@ -68,8 +68,23 @@ export async function POST(
     .eq("user_id", discordUserId)
     .single();
 
-  // Determine if item needs approval
-  const needsApproval = !membership || !["organizer", "co_host"].includes(membership.role);
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to add packing items." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot add packing items
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot add packing items. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  // Determine if item needs approval (organizer or co_host can add without approval)
+  const needsApproval = !["organizer", "co_host"].includes(membership.role);
 
   // Insert new packing item
   const { data: newItem, error } = await supabase

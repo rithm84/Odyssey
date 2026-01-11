@@ -46,7 +46,22 @@ export async function PATCH(
     .eq("user_id", discordUserId)
     .single();
 
-  const isOrganizerOrCoHost = membership && ["organizer", "co_host"].includes(membership.role);
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to update packing items." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot update packing items
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot update packing items. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  const isOrganizerOrCoHost = ["organizer", "co_host"].includes(membership.role);
 
   // Get the item to check ownership
   const { data: item } = await supabase
@@ -113,7 +128,22 @@ export async function DELETE(
     .eq("user_id", discordUserId)
     .single();
 
-  const isOrganizerOrCoHost = membership && ["organizer", "co_host"].includes(membership.role);
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to delete packing items." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot delete packing items
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot delete packing items. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  const isOrganizerOrCoHost = ["organizer", "co_host"].includes(membership.role);
 
   // Get the item to check ownership
   const { data: item } = await supabase

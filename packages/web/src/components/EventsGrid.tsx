@@ -18,6 +18,7 @@ interface Event {
   attendees: number;
   description: string;
   type: string;
+  user_membership?: 'member' | 'viewer' | null;
 }
 
 interface Guild {
@@ -33,12 +34,32 @@ interface EventsGridProps {
 
 export function EventsGrid({ events, guilds }: EventsGridProps) {
   const [selectedGuildIds, setSelectedGuildIds] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState({ member: false, available: false });
 
-  // Filter events based on selected guilds
+  // Filter events based on selected guilds and status
   const filteredEvents = useMemo(() => {
-    if (selectedGuildIds.length === 0) return events;
-    return events.filter((event) => selectedGuildIds.includes(event.serverId));
-  }, [events, selectedGuildIds]);
+    let filtered = events;
+
+    // Filter by guild
+    if (selectedGuildIds.length > 0) {
+      filtered = filtered.filter((event) => selectedGuildIds.includes(event.serverId));
+    }
+
+    // Filter by membership status
+    // If both are unchecked or both are checked, show all events
+    const bothChecked = statusFilter.member && statusFilter.available;
+    const bothUnchecked = !statusFilter.member && !statusFilter.available;
+
+    if (!bothChecked && !bothUnchecked) {
+      filtered = filtered.filter((event) => {
+        if (event.user_membership === 'member' && !statusFilter.member) return false;
+        if (event.user_membership === 'viewer' && !statusFilter.available) return false;
+        return true;
+      });
+    }
+
+    return filtered;
+  }, [events, selectedGuildIds, statusFilter]);
 
   // Calculate event counts per guild
   const eventCounts = useMemo(() => {
@@ -84,6 +105,8 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
           selectedGuildIds={selectedGuildIds}
           onSelectGuilds={setSelectedGuildIds}
           eventCounts={eventCounts}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
         />
       </div>
 
@@ -111,19 +134,36 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <CardHeader className="space-y-4 relative z-10">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-2 flex-wrap">
                     <Badge
                       variant="secondary"
                       className={`bg-gradient-to-r ${event.serverColor} text-white border-0 px-4 py-1.5 text-xs font-bold shadow-medium`}
                     >
                       {event.server}
                     </Badge>
-                    <Badge
-                      variant="outline"
-                      className="text-xs border-border/60 bg-background/60 backdrop-blur-sm font-semibold"
-                    >
-                      {event.type}
-                    </Badge>
+                    <div className="flex gap-2">
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-border/60 bg-background/60 backdrop-blur-sm font-semibold"
+                      >
+                        {event.type}
+                      </Badge>
+                      {event.user_membership === 'member' && (
+                        <Badge
+                          className="gradient-primary text-white border-0 px-3 py-1 text-xs font-bold"
+                        >
+                          Member
+                        </Badge>
+                      )}
+                      {event.user_membership === 'viewer' && (
+                        <Badge
+                          variant="outline"
+                          className="text-xs border-muted-foreground/50 text-muted-foreground font-semibold"
+                        >
+                          Available
+                        </Badge>
+                      )}
+                    </div>
                   </div>
 
                   <CardTitle className="text-2xl group-hover:text-primary transition-all duration-300 font-black tracking-tight leading-tight">

@@ -48,8 +48,6 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
     confirmationId = customIdParts[3]; // Session ID (8-char hash)
   }
 
-  console.log(`Button action: ${action}, confirmationId: ${confirmationId}, customId: ${interaction.customId}`);
-
   if (!confirmationId) {
     await interaction.reply({
       content: 'Invalid confirmation ID. Please create the event again.',
@@ -94,7 +92,6 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
         );
 
         await interaction.update({ embeds: [embed], components });
-        console.log(`Showing access selection for ${confirmationId}`);
 
       } else {
         // If currently private, toggle back to public
@@ -126,7 +123,6 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
 
         // Update the message
         await interaction.update({ embeds: [embed], components: [buttons] });
-        console.log(`Successfully toggled visibility to public for ${confirmationId}`);
       }
 
     } else if (action === 'yes') {
@@ -193,7 +189,6 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
       });
 
     } else if (action === 'cancel') {
-      console.log(`Cancelling event confirmation ${confirmationId}`);
       try {
         await interaction.update({
           content: 'Event creation cancelled. ❌',
@@ -201,7 +196,6 @@ export async function handleEventConfirmationButton(interaction: ButtonInteracti
           components: []
         });
         global.pendingEvents.delete(confirmationId);
-        console.log(`Successfully cancelled event confirmation ${confirmationId}`);
       } catch (cancelError) {
         console.error(`Error cancelling event ${confirmationId}:`, cancelError);
         throw cancelError;

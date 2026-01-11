@@ -16,6 +16,7 @@ interface Event {
   attendees: number;
   description: string;
   type: string;
+  user_membership?: 'member' | 'viewer' | null;
 }
 
 interface Guild {

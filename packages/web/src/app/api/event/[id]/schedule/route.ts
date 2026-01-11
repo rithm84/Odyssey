@@ -68,7 +68,22 @@ export async function POST(
     .eq("user_id", discordUserId)
     .single();
 
-  if (!membership || !["organizer", "co_host"].includes(membership.role)) {
+  if (!membership) {
+    return NextResponse.json(
+      { error: "You must join the event to add schedule items." },
+      { status: 403 }
+    );
+  }
+
+  // Viewers cannot add schedule items
+  if (membership.role === 'viewer') {
+    return NextResponse.json(
+      { error: "Viewers cannot add schedule items. Join the event first." },
+      { status: 403 }
+    );
+  }
+
+  if (!["organizer", "co_host"].includes(membership.role)) {
     return NextResponse.json(
       { error: "Only organizers and co-hosts can add schedule items" },
       { status: 403 }

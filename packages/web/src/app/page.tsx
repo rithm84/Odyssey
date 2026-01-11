@@ -14,6 +14,9 @@ export default async function Home() {
     redirect("/auth/signin");
   }
 
+  // Get Discord user ID from metadata
+  const discordUserId = user.user_metadata?.provider_id || user.user_metadata?.sub;
+
   // Get guild IDs from user metadata
   const userGuildIds = user.user_metadata?.guild_ids || [];
 
@@ -44,7 +47,7 @@ export default async function Home() {
       event_type,
       guild_id,
       guild_name,
-      event_members(user_id)
+      event_members(user_id, role)
     `)
     .in("guild_id", userGuildIds)
     .order("start_date", { ascending: true }) as {
@@ -60,7 +63,7 @@ export default async function Home() {
         event_type: string;
         guild_id: string;
         guild_name: string | null;
-        event_members: Array<{ user_id: string }>;
+        event_members: Array<{ user_id: string; role: string }>;
       }> | null;
       error: any;
     };
@@ -71,6 +74,27 @@ export default async function Home() {
 
   // Transform events for display
   const transformedEvents = ((events || []).map((event) => {
+    // Determine user membership status
+    const userMembership = event.event_members?.find(m => m.user_id === discordUserId);
+    let membershipStatus: 'member' | 'viewer' | null = null;
+
+    if (userMembership) {
+      // User is in event_members table
+      if (['organizer', 'co_host', 'member'].includes(userMembership.role)) {
+        membershipStatus = 'member';
+      } else if (userMembership.role === 'viewer') {
+        membershipStatus = 'viewer';
+      }
+    } else {
+      // User can see the event (RLS passed) but hasn't joined yet
+      membershipStatus = 'viewer';
+    }
+
+    // Count only members (not viewers) for attendees
+    const memberCount = event.event_members?.filter(m =>
+      ['organizer', 'co_host', 'member'].includes(m.role)
+    ).length || 0;
+
     // Look up guild name from user metadata if not in database
     const guildName = event.guild_name ||
       guilds.find((g: any) => g.id === event.guild_id)?.name ||
@@ -114,14 +138,20 @@ export default async function Home() {
       serverColor: getGuildGradient(guildName),
       date: dateDisplay,
       location: event.location || "Location TBD",
-      attendees: event.event_members?.length || 0,
+      attendees: memberCount,
       description: event.description || "No description provided",
       type: eventTypeLabels[event.event_type] || "Other",
+      user_membership: membershipStatus,
       // Keep raw values for sorting
       _startDate: event.start_date,
       _startTime: event.start_time,
     };
   })).sort((a, b) => {
+    // Primary sort: Members before viewers
+    if (a.user_membership === 'member' && b.user_membership !== 'member') return -1;
+    if (a.user_membership !== 'member' && b.user_membership === 'member') return 1;
+
+    // Secondary sort: By date (within same membership status)
     // Sort by date first
     if (a._startDate && b._startDate) {
       const dateComparison = a._startDate.localeCompare(b._startDate);
