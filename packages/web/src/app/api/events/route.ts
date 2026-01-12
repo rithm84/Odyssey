@@ -49,6 +49,7 @@ export async function GET() {
       event_type,
       guild_id,
       guild_name,
+      visibility,
       event_members(user_id, role)
     `)
     .in("guild_id", userGuildIds)
@@ -65,6 +66,7 @@ export async function GET() {
         event_type: string;
         guild_id: string;
         guild_name: string | null;
+        visibility: string;
         event_members: Array<{ user_id: string; role: string }>;
       }> | null;
       error: any;
@@ -75,8 +77,30 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
   }
 
+  // Get event_access entries for private events
+  const eventIds = (events || []).map(e => e.id);
+  const { data: accessEntries } = await supabase
+    .from('event_access')
+    .select('event_id')
+    .in('event_id', eventIds)
+    .eq('user_id', discordUserId)
+    .eq('access_type', 'user');
+
+  const accessiblePrivateEventIds = new Set(accessEntries?.map(a => a.event_id) || []);
+
+  // Filter events: include all public events, and only private events user has access to
+  const filteredEvents = (events || []).filter((event) => {
+    if (event.visibility === 'public') {
+      return true; // All public events are visible
+    }
+
+    // For private events, check if user is in event_members or event_access
+    const userMembership = event.event_members?.find(m => m.user_id === discordUserId);
+    return userMembership || accessiblePrivateEventIds.has(event.id);
+  });
+
   // Transform events for display
-  const transformedEvents = ((events || []).map((event) => {
+  const transformedEvents = (filteredEvents.map((event) => {
     // Determine user membership status
     const userMembership = event.event_members?.find(m => m.user_id === discordUserId);
     let membershipStatus: 'member' | 'viewer' | null = null;

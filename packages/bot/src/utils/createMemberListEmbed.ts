@@ -46,23 +46,24 @@ export async function createMemberListEmbed(
     return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
   });
 
-  // Count RSVP statuses
-  const yesCount = members.filter(m => m.rsvp_status === 'yes').length;
-  const maybeCount = members.filter(m => m.rsvp_status === 'maybe').length;
-  const noCount = members.filter(m => m.rsvp_status === 'no').length;
-
   // Group members by role
   const organizers = sortedMembers.filter(m => m.role === 'organizer');
   const coHosts = sortedMembers.filter(m => m.role === 'co_host');
   const regularMembers = sortedMembers.filter(m => m.role === 'member');
   const viewers = sortedMembers.filter(m => m.role === 'viewer');
 
+  // Count RSVP statuses (only for actual members, not viewers)
+  const actualMembers = members.filter(m => m.role !== 'viewer');
+  const yesCount = actualMembers.filter(m => m.rsvp_status === 'yes').length;
+  const maybeCount = actualMembers.filter(m => m.rsvp_status === 'maybe').length;
+  const noCount = actualMembers.filter(m => m.rsvp_status === 'no').length;
+
   // Build embed
   const embed = new EmbedBuilder()
     .setColor('#5865F2')
     .setTitle(`👥 Managing Members - ${eventName}`)
     .setDescription(
-      `**Total Members:** ${members.length} | ✅ ${yesCount} | ❓ ${maybeCount} | ❌ ${noCount}`
+      `**Total Members:** ${actualMembers.length} | ✅ ${yesCount} | ❓ ${maybeCount} | ❌ ${noCount}`
     )
     .setTimestamp();
 
@@ -91,12 +92,9 @@ export async function createMemberListEmbed(
     embed.addFields({ name: '👤 Members', value: memberList, inline: false });
   }
 
+  // Add viewer count to footer instead of as a field to avoid extra spacing
   if (viewers.length > 0) {
-    embed.addFields({
-      name: '👁️ Viewers',
-      value: `(${viewers.length})`,
-      inline: false
-    });
+    embed.setFooter({ text: `👁️ ${viewers.length} Viewer${viewers.length !== 1 ? 's' : ''}` });
   }
 
   // Create select menu for member selection (include all members including viewers)

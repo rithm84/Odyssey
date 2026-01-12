@@ -35,6 +35,15 @@ export async function handleMemberSelect(interaction: StringSelectMenuInteractio
 
   await interaction.deferUpdate();
 
+  // Fetch event visibility
+  const { data: event } = await supabase
+    .from('events')
+    .select('visibility')
+    .eq('id', session.eventId)
+    .single();
+
+  const isPrivateEvent = event?.visibility === 'private';
+
   // Fetch selected member's current data
   const { data: member } = await supabase
     .from('event_members')
@@ -66,6 +75,7 @@ export async function handleMemberSelect(interaction: StringSelectMenuInteractio
   session.originalRole = member.role;
   session.originalRsvp = member.rsvp_status;
   session.pendingChanges = {};
+  (session as any).isPrivateEvent = isPrivateEvent;
 
   // Fetch member's Discord info
   const guildMember = await interaction.guild!.members.fetch(selectedUserId);
@@ -76,7 +86,8 @@ export async function handleMemberSelect(interaction: StringSelectMenuInteractio
     member.role,
     member.rsvp_status,
     {},
-    sessionId!
+    sessionId!,
+    isPrivateEvent
   );
 
   const components = createEditButtons(
@@ -86,7 +97,8 @@ export async function handleMemberSelect(interaction: StringSelectMenuInteractio
     session.editorRole,
     session.editorUserId,
     selectedUserId,
-    member.rsvp_status
+    member.rsvp_status,
+    isPrivateEvent
   );
 
   await interaction.editReply({ embeds: [embed], components });
@@ -135,12 +147,37 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
       const { pendingChanges, targetUserId, eventId, editorUserId } = session;
 
       if (pendingChanges.remove) {
-        // Remove member from event
-        await supabase
-          .from('event_members')
-          .delete()
-          .eq('event_id', eventId)
-          .eq('user_id', targetUserId);
+        const isPrivateEvent = (session as any).isPrivateEvent;
+
+        console.log('Removing user:', targetUserId, 'from event:', eventId, 'isPrivate:', isPrivateEvent);
+
+        if (isPrivateEvent) {
+          // Private event: fully remove from event_members and event_access
+          const { error: memberDeleteError } = await supabase
+            .from('event_members')
+            .delete()
+            .eq('event_id', eventId)
+            .eq('user_id', targetUserId);
+
+          console.log('Deleted from event_members, error:', memberDeleteError);
+
+          // Remove from event_access table as well
+          const { error: accessDeleteError } = await supabase
+            .from('event_access')
+            .delete()
+            .eq('event_id', eventId)
+            .eq('user_id', targetUserId)
+            .eq('access_type', 'user');
+
+          console.log('Deleted from event_access, error:', accessDeleteError);
+        } else {
+          // Public event: demote members/co-hosts to viewer (viewers can't be removed)
+          await supabase
+            .from('event_members')
+            .update({ role: 'viewer', rsvp_status: null })
+            .eq('event_id', eventId)
+            .eq('user_id', targetUserId);
+        }
       } else if (pendingChanges.transferOrganizer && pendingChanges.role === 'organizer') {
         // Handle organizer transfer atomically
         // Step 1: Demote current organizer (editor) to co_host
@@ -189,9 +226,21 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
       }
 
       // Success message (Screen 3 - replaces Screen 2)
-      const successMessage = pendingChanges.transferOrganizer
-        ? 'Organizer transferred successfully. You are now a Co-Host. ✅'
-        : 'Member updated successfully. ✅';
+      let successMessage = 'Member updated successfully. ✅';
+
+      if (pendingChanges.transferOrganizer) {
+        successMessage = 'Organizer transferred successfully. You are now a Co-Host. ✅';
+      } else if (pendingChanges.remove) {
+        const isPrivateEvent = (session as any).isPrivateEvent;
+        if (isPrivateEvent) {
+          successMessage = session.originalRole === 'viewer'
+            ? 'User removed and view access revoked. ✅'
+            : 'Member removed and view access revoked. ✅';
+        } else {
+          // Public event: only members/co-hosts can be removed (demoted to viewer)
+          successMessage = 'Member removed and demoted to viewer. ✅';
+        }
+      }
 
       await interaction.editReply({
         content: successMessage,
@@ -273,10 +322,26 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
       }
     }
   } else if (action === 'remove') {
-    // Cannot remove the organizer
+    // For organizers, show transfer flow
     if (currentRole === 'organizer') {
+      // Fetch co-hosts to show options
+      const { data: coHosts } = await supabase
+        .from('event_members')
+        .select('user_id, role')
+        .eq('event_id', session.eventId)
+        .eq('role', 'co_host');
+
+      if (!coHosts || coHosts.length === 0) {
+        await interaction.followUp({
+          content: '⚠️ **Cannot Remove Organizer**\n\nTo leave this event as organizer, you must first promote a co-host to organizer. There are currently no co-hosts to transfer to.\n\nPlease add and/or promote a member to co-host first, then promote them to organizer.',
+          flags: MessageFlags.Ephemeral
+        });
+        return;
+      }
+
+      // Show transfer warning similar to promote flow
       await interaction.followUp({
-        content: 'Cannot remove the organizer. Transfer organizer privileges to someone else first by promoting them to organizer. ⚠️',
+        content: `⚠️ **Warning: Organizer Transfer Required**\n\nTo remove yourself as organizer, you must first transfer organizer privileges to a co-host.\n\nPlease go back and promote a co-host to organizer; this will demote you to a co-host, and you can safely remove yourself.`,
         flags: MessageFlags.Ephemeral
       });
       return;
@@ -305,7 +370,8 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
     session.originalRole,
     session.originalRsvp,
     session.pendingChanges,
-    sessionId!
+    sessionId!,
+    (session as any).isPrivateEvent
   );
 
   const components = createEditButtons(
@@ -315,7 +381,8 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
     session.editorRole,
     session.editorUserId,
     session.targetUserId,
-    session.originalRsvp
+    session.originalRsvp,
+    (session as any).isPrivateEvent
   );
 
   await interaction.editReply({ embeds: [embed], components });
@@ -327,7 +394,8 @@ async function createMemberEditEmbed(
   originalRole: string,
   originalRsvp: string,
   pendingChanges: any,
-  sessionId: string
+  sessionId: string,
+  isPrivateEvent: boolean = false
 ) {
   const embed = new EmbedBuilder()
     .setColor('#5865F2')
@@ -346,15 +414,27 @@ async function createMemberEditEmbed(
   // Show RSVP changes
   if (pendingChanges.rsvpStatus) {
     const rsvpEmoji = pendingChanges.rsvpStatus === 'yes' ? '✅' : pendingChanges.rsvpStatus === 'maybe' ? '❓' : '❌';
-    const origRsvpEmoji = originalRsvp === 'yes' ? '✅' : originalRsvp === 'maybe' ? '❓' : '❌';
-    description += `RSVP: ${origRsvpEmoji} ${originalRsvp} → **${rsvpEmoji} ${pendingChanges.rsvpStatus}** ⚠️\n`;
+    const origRsvpEmoji = originalRsvp === 'yes' ? '✅' : originalRsvp === 'maybe' ? '❓' : originalRsvp === null ? '⏳' : '❌';
+    const origRsvpText = originalRsvp === null ? 'pending' : originalRsvp;
+    description += `RSVP: ${origRsvpEmoji} ${origRsvpText} → **${rsvpEmoji} ${pendingChanges.rsvpStatus}** ⚠️\n`;
   } else {
-    const rsvpEmoji = originalRsvp === 'yes' ? '✅' : originalRsvp === 'maybe' ? '❓' : '❌';
-    description += `RSVP: ${rsvpEmoji} ${originalRsvp}\n`;
+    const rsvpEmoji = originalRsvp === 'yes' ? '✅' : originalRsvp === 'maybe' ? '❓' : originalRsvp === null ? '⏳' : '❌';
+    const rsvpText = originalRsvp === null ? 'pending' : originalRsvp;
+    description += `RSVP: ${rsvpEmoji} ${rsvpText}\n`;
   }
 
   if (pendingChanges.remove) {
-    description += '\n⚠️ **This member will be REMOVED**';
+    if (isPrivateEvent) {
+      // Private event removal messages
+      if (originalRole === 'viewer') {
+        description += '\n⚠️ **This user will lose view access**';
+      } else {
+        description += '\n⚠️ **This member will be REMOVED and will lose view access**';
+      }
+    } else {
+      // Public event removal messages (viewers can't be removed from public events)
+      description += '\n⚠️ **This member will be REMOVED and become a viewer**';
+    }
   }
 
   if (Object.keys(pendingChanges).length > 0 && !pendingChanges.remove) {
@@ -374,7 +454,8 @@ function createEditButtons(
   editorRole: string,
   editorUserId: string,
   targetUserId: string,
-  originalRsvp: string
+  originalRsvp: string,
+  isPrivateEvent: boolean = false
 ) {
   const row1 = new ActionRowBuilder<ButtonBuilder>();
   const row2 = new ActionRowBuilder<ButtonBuilder>();
@@ -416,20 +497,25 @@ function createEditButtons(
       ? pendingChanges.rsvpStatus
       : originalRsvp;
 
+    // RSVP buttons should be disabled for viewers
+    const isViewer = currentRole === 'viewer';
+
     row2.addComponents(
       new ButtonBuilder()
         .setCustomId(`member_yes_${sessionId}`)
         .setLabel('✅ Yes')
-        .setStyle(actualCurrentRsvp === 'yes' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+        .setStyle(actualCurrentRsvp === 'yes' ? ButtonStyle.Primary : ButtonStyle.Secondary)
+        .setDisabled(isViewer),
       new ButtonBuilder()
         .setCustomId(`member_maybe_${sessionId}`)
         .setLabel('❓ Maybe')
-        .setStyle(actualCurrentRsvp === 'maybe' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+        .setStyle(actualCurrentRsvp === 'maybe' ? ButtonStyle.Primary : ButtonStyle.Secondary)
+        .setDisabled(isViewer),
       new ButtonBuilder()
         .setCustomId(`member_remove_${sessionId}`)
         .setLabel('🗑️ Remove')
         .setStyle(ButtonStyle.Danger)
-        .setDisabled(currentRole === 'viewer')
+        .setDisabled(currentRole === 'viewer' && !isPrivateEvent)
     );
   }
 
