@@ -20,9 +20,13 @@ interface GroupDashboardProps {
 }
 
 export function GroupDashboard({ eventId }: GroupDashboardProps) {
-  const { packingItems, loading: packingLoading, canAddTasks: canEditPacking, addItem: addPackingItem, updateItem: updatePackingItem, deleteItem: deletePackingItem } = usePackingItems(eventId);
+  const { packingItems, loading: packingLoading, userRole: packingUserRole, canAddTasks: canEditPacking, addItem: addPackingItem, updateItem: updatePackingItem, deleteItem: deletePackingItem } = usePackingItems(eventId);
   const { tasks, loading: tasksLoading, canAddTasks, addTask, updateTask, deleteTask } = useTasks(eventId);
   const { members, loading: membersLoading } = useEventMembers(eventId);
+
+  // Members, co-hosts, and organizers can add packing items (members with pending approval)
+  // Viewers cannot add packing items
+  const canAddPackingItems = packingUserRole && packingUserRole !== 'viewer';
 
   // Packing item dialog state
   const [isPackingDialogOpen, setIsPackingDialogOpen] = useState(false);
@@ -304,13 +308,15 @@ export function GroupDashboard({ eventId }: GroupDashboardProps) {
                 </div>
                 <Progress value={packingProgress} className="h-3" />
               </div>
-              <Button
-                size="icon"
-                className="h-[4.5rem] w-12 rounded-xl ml-0 gradient-primary text-white shadow-medium hover:shadow-glow"
-                onClick={() => handleOpenPackingDialog()}
-              >
-                <Plus className="h-5 w-5" />
-              </Button>
+              {canAddPackingItems && (
+                <Button
+                  size="icon"
+                  className="h-[4.5rem] w-12 rounded-xl ml-0 gradient-primary text-white shadow-medium hover:shadow-glow"
+                  onClick={() => handleOpenPackingDialog()}
+                >
+                  <Plus className="h-5 w-5" />
+                </Button>
+              )}
             </div>
 
             {packingLoading ? (
@@ -320,14 +326,14 @@ export function GroupDashboard({ eventId }: GroupDashboardProps) {
             ) : packingItems.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>No packing items yet. Add your first item!</p>
+                <p>{canAddPackingItems ? "No packing items yet. Add your first item!" : "No packing items yet."}</p>
               </div>
             ) : (
               packingItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-4 py-2 px-4 rounded-xl hover:bg-muted/50 transition-all border border-transparent hover:border-primary/20 group/item cursor-pointer"
-                  onClick={() => handleOpenPackingDialog(item.id)}
+                  className={`flex items-center gap-4 py-2 px-4 rounded-xl transition-all border border-transparent ${canAddPackingItems ? 'hover:bg-muted/50 hover:border-primary/20 cursor-pointer' : ''}`}
+                  onClick={() => canAddPackingItems && handleOpenPackingDialog(item.id)}
                 >
                   <Checkbox
                     checked={item.is_packed}
@@ -506,23 +512,22 @@ export function GroupDashboard({ eventId }: GroupDashboardProps) {
             {editingPackingItem && (
               <>
                 {canEditPacking && currentEditingPackingItem?.pending_approval && (
-                  <>
+                  <div className="flex gap-2 mr-auto">
                     <Button
-                      variant="outline"
+                      variant="destructive"
                       onClick={() => handleDeletePackingItem(editingPackingItem)}
                       disabled={isPackingSubmitting}
-                      className="mr-auto"
                     >
                       Reject
                     </Button>
                     <Button
                       onClick={() => handleApprovePackingItem(editingPackingItem)}
                       disabled={isPackingSubmitting}
-                      className="gradient-primary text-white"
+                      className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       {isPackingSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Accept"}
                     </Button>
-                  </>
+                  </div>
                 )}
                 {!currentEditingPackingItem?.pending_approval && (
                   <Button

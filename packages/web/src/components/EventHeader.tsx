@@ -1,7 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { Calendar, MapPin, Users, Tent } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { JoinEventDialog } from "@/components/JoinEventDialog";
+import { LeaveEventDialog } from "@/components/LeaveEventDialog";
+import { TransferOrganizerDialog } from "@/components/TransferOrganizerDialog";
 
 interface EventHeaderProps {
   event: {
+    id: string;
     name: string;
     description?: string | null;
     start_date?: string | null;
@@ -9,6 +17,8 @@ interface EventHeaderProps {
     location?: string | null;
     attendee_count: number;
   };
+  isMember: boolean;
+  isOrganizer: boolean;
 }
 
 // Helper function to format date range
@@ -48,32 +58,63 @@ function formatDateRange(startDate?: string | null, endDate?: string | null): st
   return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
 }
 
-export function EventHeader({ event }: EventHeaderProps) {
+export function EventHeader({ event, isMember, isOrganizer }: EventHeaderProps) {
+  const [showJoinDialog, setShowJoinDialog] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [showTransferDialog, setShowTransferDialog] = useState(false);
   const formattedDate = formatDateRange(event.start_date, event.end_date);
   const attendeeText = event.attendee_count === 1 ? "1 Person" : `${event.attendee_count} People`;
 
-  return (
-    <div className="relative overflow-hidden rounded-3xl px-12 py-8 mb-8 shadow-glow group">
-      <div className="absolute inset-0 gradient-hero" />
-      <div className="absolute inset-0 hero-grid" />
+  const handleLeaveClick = () => {
+    if (isOrganizer) {
+      setShowTransferDialog(true);
+    } else {
+      setShowLeaveDialog(true);
+    }
+  };
 
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center animate-float">
-              <Tent className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 mb-2">
-                <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse-glow" />
-                <span className="text-white/90 text-xs font-bold">ACTIVE EVENT</span>
+  return (
+    <>
+      <div className="relative overflow-hidden rounded-3xl px-12 py-8 mb-8 shadow-glow group">
+        <div className="absolute inset-0 gradient-hero" />
+        <div className="absolute inset-0 hero-grid" />
+
+        <div className="relative z-10">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center animate-float">
+                <Tent className="h-8 w-8 text-white" />
               </div>
-              <h1 className="text-5xl font-black text-white tracking-tight leading-tight">
-                {event.name}
-              </h1>
+              <div>
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 mb-2">
+                  <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse-glow" />
+                  <span className="text-white/90 text-xs font-bold">ACTIVE EVENT</span>
+                </div>
+                <h1 className="text-5xl font-black text-white tracking-tight leading-tight">
+                  {event.name}
+                </h1>
+              </div>
+            </div>
+
+            {/* Join/Leave Button */}
+            <div className="flex-shrink-0">
+              {!isMember ? (
+                <Button
+                  onClick={() => setShowJoinDialog(true)}
+                  className="bg-white text-primary hover:bg-white/90 font-bold px-6 py-3 text-base h-auto shadow-lg leading-tight"
+                >
+                  Join<br />Event
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleLeaveClick}
+                  className="bg-white text-destructive hover:bg-destructive hover:text-white font-bold px-6 py-3 text-base h-auto shadow-lg transition-colors leading-tight"
+                >
+                  Leave<br />Event
+                </Button>
+              )}
             </div>
           </div>
-        </div>
 
         <div className="flex flex-wrap gap-3 mb-6">
           <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 transition-all hover:bg-white/20">
@@ -112,5 +153,27 @@ export function EventHeader({ event }: EventHeaderProps) {
         </p>
       </div>
     </div>
+
+    <JoinEventDialog
+      eventId={event.id}
+      eventName={event.name}
+      open={showJoinDialog}
+      onOpenChange={setShowJoinDialog}
+    />
+
+    <LeaveEventDialog
+      eventId={event.id}
+      eventName={event.name}
+      open={showLeaveDialog}
+      onOpenChange={setShowLeaveDialog}
+    />
+
+    <TransferOrganizerDialog
+      eventId={event.id}
+      eventName={event.name}
+      open={showTransferDialog}
+      onOpenChange={setShowTransferDialog}
+    />
+    </>
   );
 }

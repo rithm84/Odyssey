@@ -36,11 +36,26 @@ export default async function EventDetail({
     redirect("/");
   }
 
-  // Count attendees
+  // Get Discord user ID from metadata
+  const discordUserId = user.user_metadata?.provider_id || user.user_metadata?.sub;
+
+  // Check if user is a member and their role
+  const { data: membership } = await supabase
+    .from("event_members")
+    .select("role")
+    .eq("event_id", eventId)
+    .eq("user_id", discordUserId)
+    .single();
+
+  const isMember = !!membership;
+  const isOrganizer = membership?.role === "organizer";
+
+  // Count attendees (only members, not viewers)
   const { count: attendeeCount } = await supabase
     .from("event_members")
     .select("*", { count: "exact", head: true })
-    .eq("event_id", eventId);
+    .eq("event_id", eventId)
+    .in("role", ["organizer", "co_host", "member"]);
 
   const eventData = {
     ...event,
@@ -55,7 +70,7 @@ export default async function EventDetail({
       <NavBar />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
-        <EventHeader event={eventData} />
+        <EventHeader event={eventData} isMember={isMember} isOrganizer={isOrganizer} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">

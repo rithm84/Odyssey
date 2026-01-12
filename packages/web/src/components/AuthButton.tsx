@@ -15,13 +15,15 @@ export function AuthButton() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Get initial user (secure - verifies JWT with auth server)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      // Convert user to session format for compatibility
+      const session = user ? { user } : null;
       setSession(session);
       setLoading(false);
 
       // Fetch guild count if logged in
-      if (session) {
+      if (user) {
         fetch("/api/guilds")
           .then(res => res.json())
           .then(data => setGuildCount(data.guilds?.length || 0))
