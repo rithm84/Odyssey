@@ -89,7 +89,7 @@ export function ServerFilter({
 
   return (
     <div className="text-right">
-      <h3 className="text-sm font-semibold mb-2 text-muted-foreground">Filter by Server</h3>
+      <h3 className="text-sm font-semibold mb-2 text-muted-foreground">Filter by Server & Status</h3>
       <div className="flex gap-2 justify-end">
         {/* All Servers Button */}
         <Button

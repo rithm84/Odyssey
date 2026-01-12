@@ -93,7 +93,7 @@ export default async function EventDetail({
               <GroupDashboard eventId={eventId} />
             </div>
             <div className="animate-slide-up stagger-4">
-              <IndividualPackingList />
+              <IndividualPackingList eventId={eventId} />
             </div>
             <div className="animate-slide-up stagger-5">
               <TransportationModule />
