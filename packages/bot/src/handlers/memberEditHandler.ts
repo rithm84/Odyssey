@@ -149,27 +149,21 @@ export async function handleMemberAction(interaction: ButtonInteraction) {
       if (pendingChanges.remove) {
         const isPrivateEvent = (session as any).isPrivateEvent;
 
-        console.log('Removing user:', targetUserId, 'from event:', eventId, 'isPrivate:', isPrivateEvent);
-
         if (isPrivateEvent) {
           // Private event: fully remove from event_members and event_access
-          const { error: memberDeleteError } = await supabase
+          await supabase
             .from('event_members')
             .delete()
             .eq('event_id', eventId)
             .eq('user_id', targetUserId);
 
-          console.log('Deleted from event_members, error:', memberDeleteError);
-
           // Remove from event_access table as well
-          const { error: accessDeleteError } = await supabase
+          await supabase
             .from('event_access')
             .delete()
             .eq('event_id', eventId)
             .eq('user_id', targetUserId)
             .eq('access_type', 'user');
-
-          console.log('Deleted from event_access, error:', accessDeleteError);
         } else {
           // Public event: demote members/co-hosts to viewer (viewers can't be removed)
           await supabase
