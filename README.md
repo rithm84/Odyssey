@@ -17,6 +17,7 @@
 [Features](#-features) • [Screenshots](#-screenshots) • [Tech Stack](#-tech-stack) • [Architecture](#-architecture) • [Roadmap](#-current-status--roadmap)
 
 </div>
+
 ---
 
 ## 📖 Table of Contents
@@ -421,14 +422,19 @@ odyssey-project/
 - [x] Dark/Light mode
 - [x] Server and status filtering
 
-### In Progress
+### Remaining MVP Features
 
 - [ ] Attendees module bug fixes (private event access edge cases)
 - [ ] Connect Transportation Module to backend
 - [ ] Connect Weather Module to backend
 - [ ] Connect Budget Module to backend
+- [ ] Clean up bot embed flow
+- [ ] Test realtime subscriptions for all modules
+- [ ] Comprehensive prod testing with multiple servers & users
+- [ ] Deploy web app on Vercel and host Discord Bot on Railway (supabase for DB)
 
-### Planned Features
+
+### Future Features
 
 - [ ] Automated reminders (event, packing, polls)
 - [ ] Calendar export (.ics for Google/Apple Calendar)
