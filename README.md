@@ -270,7 +270,7 @@ Every event can enable/disable features based on needs:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                          Discord User                            │
+│                          Discord User                           │
 └─────────┬───────────────────────────────────┬───────────────────┘
           │                                   │
           ▼                                   ▼
@@ -279,30 +279,25 @@ Every event can enable/disable features based on needs:
 │   (Discord.js)       │           │   (Next.js)          │
 │                      │           │                      │
 │  • Natural Language  │           │  • Event Management  │
-│  • Slash Commands    │           │  • Real-time Updates │
-│  • Event Creation    │◄─────────►│  • Discord OAuth     │
-│  • Polls & Voting    │  Supabase │  • Cross-Server View │
+│  • Slash Commands    │ ◄───────► │  • Real-time Updates │
+│  • Event Creation    │  Realtime │  • Discord OAuth     │
+│  • Polls & Voting    │   Sync    │  • Cross-Server View │
 │  • Member Mgmt       │           │  • All Modules       │
-└──────────┬───────────┘           └──────────┬───────────┘
-           │                                  │
-           │         ┌────────────────────┐   │
-           └────────►│  Supabase          │◄──┘
-                     │  (PostgreSQL)      │
-                     │                    │
-                     │  • Events DB       │
-                     │  • Realtime Sync   │
-                     │  • Row Level Sec.  │
-                     │  • Auth            │
-                     └─────────┬──────────┘
-                               │
-                     ┌─────────▼──────────┐
-                     │  Azure OpenAI      │
-                     │  (via LangChain)   │
-                     │                    │
-                     │  • Intent Parsing  │
-                     │  • Date Extraction │
-                     │  • Poll Generation │
-                     └────────────────────┘
+└──────────────────────┘           └──────────┬───────────┘
+           ▲           │                      │
+           │           │                      │
+           ▼           │                      ▼
+┌────────────────────┐ ├─────────► ┌────────────────────┐
+│  Azure OpenAI      │             │  Supabase          │
+│  (via LangChain)   │             │  (PostgreSQL)      │
+│                    │             │                    │
+│  • Intent Parsing  │             │  • Events DB       │
+│  • Date Extraction │             │  • Realtime Sync   │
+│  • Poll Generation │             │  • Row Level Sec.  │
+└────────────────────┘             │  • Auth            │
+                                   └────────────────────┘                    
+
+  
 ```
 
 ### Data Flow
@@ -428,6 +423,7 @@ odyssey-project/
 - [ ] Connect Weather Module to backend
 - [ ] Connect Budget Module to backend
 - [ ] Clean up bot embed flow
+- [ ] Add buttons linking to web app where needed (after creating events, rsvp-ing, etc.)
 - [ ] Enable users to view their web polls through dashboard
 - [ ] Finish fundamental web features and ensure consistency across bot and web options + actions
 - [ ] Test realtime subscriptions for all modules
