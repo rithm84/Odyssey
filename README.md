@@ -337,24 +337,32 @@ odyssey-project/
 ├── packages/
 │   ├── bot/                    # Discord bot (Node.js + Discord.js)
 │   │   ├── src/
+│   │   │   ├── agents/         # LangChain AI agent workflows
+│   │   │   │   └── tools/      # Custom LangChain tools
 │   │   │   ├── commands/       # Slash command handlers
 │   │   │   ├── handlers/       # Event/interaction handlers
-│   │   │   ├── lib/
-│   │   │   │   ├── agent/      # LangChain AI agents
-│   │   │   │   ├── permissions.ts
-│   │   │   │   └── supabase.ts
+│   │   │   ├── lib/            # Core libraries (Supabase client, etc.)
+│   │   │   ├── types/          # TypeScript type definitions
+│   │   │   ├── utils/          # Helper utilities
 │   │   │   └── index.ts        # Bot entry point
-│   │   └── package.json
+│   │   ├── package.json
+│   │   └── tsconfig.json
 │   │
 │   ├── web/                    # Web dashboard (Next.js)
+│   │   ├── public/             # Static assets
 │   │   ├── src/
 │   │   │   ├── app/            # Next.js App Router
 │   │   │   │   ├── page.tsx           # Dashboard homepage
 │   │   │   │   ├── event/[id]/        # Event detail pages
+│   │   │   │   ├── auth/              # Authentication pages
 │   │   │   │   └── api/               # API routes
 │   │   │   ├── components/     # React components
 │   │   │   │   ├── ui/                # shadcn/ui components
+│   │   │   │   ├── poll/              # Poll-specific components
+│   │   │   │   ├── providers/         # Context providers
 │   │   │   │   ├── EventHeader.tsx
+│   │   │   │   ├── EventsDashboard.tsx
+│   │   │   │   ├── EventsGrid.tsx
 │   │   │   │   ├── ScheduleTimeline.tsx
 │   │   │   │   ├── AttendeesModule.tsx
 │   │   │   │   ├── GroupDashboard.tsx
@@ -362,18 +370,34 @@ odyssey-project/
 │   │   │   │   ├── TransportationModule.tsx
 │   │   │   │   ├── BudgetModule.tsx
 │   │   │   │   └── WeatherForecast.tsx
-│   │   │   └── lib/            # Utilities
-│   │   └── package.json
+│   │   │   ├── hooks/          # Custom React hooks
+│   │   │   ├── lib/            # Utilities (Supabase, event utils, etc.)
+│   │   │   └── middleware.ts   # Next.js middleware
+│   │   ├── .gitignore
+│   │   ├── components.json
+│   │   ├── eslint.config.mjs
+│   │   ├── next.config.ts
+│   │   ├── package.json
+│   │   ├── postcss.config.mjs
+│   │   ├── tailwind.config.ts
+│   │   └── tsconfig.json
 │   │
 │   └── shared/                 # Shared TypeScript types
 │       ├── src/
 │       │   └── types/
 │       │       └── database.ts # Supabase type definitions
-│       └── package.json
+│       │   └── index.ts
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── tsconfig.tsbuildinfo
 │
 ├── odyssey-readme-screenshots/ # README assets
+├── LICENSE                     # MIT License
+├── .gitignore                  # Git ignore rules
 ├── package.json                # Root package.json
-└── pnpm-workspace.yaml         # Monorepo configuration
+├── pnpm-lock.yaml              # Dependency lock file
+├── pnpm-workspace.yaml         # Monorepo configuration
+└── README.md                   # This README
 ```
 
 ---
