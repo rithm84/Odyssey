@@ -372,13 +372,6 @@ odyssey-project/
 │       └── package.json
 │
 ├── odyssey-readme-screenshots/ # README assets
-├── dbSchema.sql                # Database schema
-├── dbIndexes.sql               # Database indexes
-├── dbTriggers.sql              # Database triggers
-├── setup-*.sql                 # Module-specific RLS policies
-├── odysseyV2.md                # Original design doc
-├── roadmap.md                  # Implementation roadmap
-├── ERROR_LOG.md                # Bug tracking log
 ├── package.json                # Root package.json
 └── pnpm-workspace.yaml         # Monorepo configuration
 ```
