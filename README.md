@@ -17,7 +17,6 @@
 [Features](#-features) • [Screenshots](#-screenshots) • [Tech Stack](#-tech-stack) • [Architecture](#-architecture) • [Roadmap](#-current-status--roadmap)
 
 </div>
-
 ---
 
 ## 📖 Table of Contents
@@ -30,27 +29,25 @@
 - [Project Structure](#-project-structure)
 - [Current Status & Roadmap](#-current-status--roadmap)
 - [License](#-license)
-
 ---
 
 ## 🎯 Overview
 
-**Odyssey** transforms Discord event planning from chaotic message threads into organized, collaborative experiences. Whether you're planning a gaming tournament, weekend trip, study session, or potluck dinner, Odyssey combines the conversational power of Discord with intelligent automation and a sleek web interface.
+**Odyssey** transforms event planning from chaotic message threads into organized, collaborative experiences. Whether you're planning a gaming tournament, weekend trip, study session, or potluck dinner, Odyssey combines the conversational power of Discord with intelligent automation and a sleek web interface.
 
 ### Why Odyssey?
 
-- **🤖 Natural Language First** – Create events by chatting: `@Odyssey potluck at my place this Saturday from 6 to 8 PM`
-- **🌐 Cross-Server Dashboard** – View all your events from every Discord server in one unified web app
-- **🧩 Modular & Flexible** – Enable only the features you need: packing lists, polls, transportation, budgets, weather
-- **🔒 Public & Private Events** – Fine-grained access control with role-based permissions
-- **⚡ Real-Time Sync** – Supabase-powered live updates across Discord and web
-- **🧠 AI-Powered** – Smart date parsing, poll creation, and time optimization using Azure OpenAI + LangChain
-
+- **Natural Language First** – Create events by chatting: `@Odyssey potluck at my place this Saturday from 6 to 8 PM`
+- **Cross-Server Dashboard** – View all your events from every Discord server in one unified web app
+- **Modular & Flexible** – Enable only the features you need: packing lists, polls, transportation, budgets, weather, etc.
+- **Public & Private Events** – Fine-grained access control with role-based permissions
+- **Real-Time Sync** – Supabase-powered live updates across Discord and web
+- **AI-Powered** – Smart date parsing, poll creation, and time optimization using Azure OpenAI + LangChain
 ---
 
 ## ✨ Features
 
-### 🎪 Event Management
+### Event Management
 
 <img src="odyssey-readme-screenshots/odyssey-event-page-1.png" alt="Event Detail Page" width="700">
 
@@ -58,9 +55,9 @@
 - **Slash Command Support** – Traditional `/create-event` for structured input
 - **Multi-Day Events** – Full support for trips, conferences, and extended activities
 - **Event Types** – Social, Trip, Meeting, Sports, Food, Gaming, and more
-- **Visibility Control** – Public (server-wide) or Private (invite-only) with role/user-based access
+- **Visibility Control** – Public (server-wide) or Private (custom role/user-based access)
 
-### 🤖 Discord Bot Commands
+### Discord Bot Commands
 
 <img src="odyssey-readme-screenshots/odyssey-bot-create-event-confirmation-embed.png" alt="Bot Event Creation" width="600">
 
@@ -88,9 +85,10 @@
 - `/create-poll` – Create polls for scheduling or voting
 - `/find-best-times` – AI-powered optimal meeting time finder
 - `/edit-event-modules` – Enable/disable event features
-- And more!
+- `/rsvp` – Join event
+- `/leave-event` – Leave event
 
-### 🎛️ Modular Dashboard
+### Modular Dashboard
 
 Every event can enable/disable features based on needs:
 
@@ -99,10 +97,8 @@ Every event can enable/disable features based on needs:
 
 <img src="odyssey-readme-screenshots/schedule-of-events-closeup.png" alt="Schedule Timeline" width="600">
 
-- Drag-and-drop itinerary builder
 - Start/end times for each activity
-- Real-time collaboration with live updates
-- Sortable timeline with order persistence
+- Chronologically ordered timeline with overlap constraints
 
 </details>
 
@@ -112,10 +108,9 @@ Every event can enable/disable features based on needs:
 <img src="odyssey-readme-screenshots/attendees-closeup.png" alt="Attendees Module" width="600">
 
 - Role-based membership: Organizer, Co-Host, Member, Viewer
-- RSVP tracking (Yes/Maybe/No)
+- RSVP tracking (Yes/Maybe) (No / Removing = leaving event and becoming a viewer (public event) or leaving event and losing access (private event))
 - Add members with conditional role permissions
 - Transfer organizer privileges with warnings
-- Remove/demote members with automatic viewer conversion (public events)
 
 </details>
 
@@ -128,14 +123,14 @@ Every event can enable/disable features based on needs:
 **Shared Packing List:**
 - Assign items to specific members
 - Quantity tracking
+- Pending indicator (items created by regular members need to be approved)
 - Checkbox to mark items as packed
-- Real-time sync across devices
 
 **Tasks Management:**
 - Priority levels (Low/Medium/High)
 - Due dates
 - Assignment to team members
-- Completion tracking with timestamps
+- Checkbox to mark items as packed
 
 </details>
 
@@ -185,11 +180,11 @@ Every event can enable/disable features based on needs:
 - Location-based weather for event dates
 - Temperature and conditions
 - Multi-day forecasts for trips
-- Automatic alerts for bad weather (coming soon)
+- Automatic alerts for bad weather
 
 </details>
 
-### 🗳️ Advanced Polling System
+### Advanced Polling System
 
 <img src="odyssey-readme-screenshots/odyssey-web-poll-normal-view.png" alt="Web Poll Grid View" width="600">
 
@@ -209,14 +204,14 @@ Every event can enable/disable features based on needs:
 
 <img src="odyssey-readme-screenshots/odyssey-web-poll-confirmation.png" alt="Poll Confirmation" width="600">
 
-### 🔐 Permissions & Roles
+### Permissions & Roles
 
 - **Organizer** – Full control, can transfer role
 - **Co-Host** – Manage members, edit all modules (except delete event)
 - **Member** – View, RSVP, contribute to shared lists
 - **Viewer** – Read-only access for private events
 
-### 🌍 Cross-Server Features
+### Cross-Server Features
 
 <img src="odyssey-readme-screenshots/odyssey-home-light.png" alt="Dashboard Light Mode" width="700">
 
@@ -255,7 +250,6 @@ Every event can enable/disable features based on needs:
 - **Runtime:** Node.js + TypeScript
 - **Bot Framework:** Discord.js v14
 - **AI/ML:** Azure OpenAI GPT-4 + LangChain
-- **Agent Framework:** LangChain for multi-step workflows
 - **Date Parsing:** AI-powered entity extraction
 - **Database:** Supabase (PostgreSQL)
 
@@ -404,14 +398,14 @@ odyssey-project/
 
 ## 📊 Current Status & Roadmap
 
-### ✅ Completed Features
+### Completed Features
 
 - [x] Natural language event creation with AI parsing
 - [x] Slash command event creation
 - [x] Multi-day event support with start/end times
 - [x] Public/Private event visibility with access control
 - [x] Modular dashboard (enable/disable features per event)
-- [x] Schedule timeline with drag-and-drop
+- [x] Schedule timeline
 - [x] Group packing list and tasks
 - [x] Individual packing lists
 - [x] Transportation/carpool coordination
@@ -427,14 +421,14 @@ odyssey-project/
 - [x] Dark/Light mode
 - [x] Server and status filtering
 
-### 🚧 In Progress
+### In Progress
 
 - [ ] Attendees module bug fixes (private event access edge cases)
-- [ ] Transportation module UI enhancements
-- [ ] Weather module API integration improvements
-- [ ] Budget module settlement algorithm refinement
+- [ ] Connect Transportation Module to backend
+- [ ] Connect Weather Module to backend
+- [ ] Connect Budget Module to backend
 
-### 🔮 Planned Features
+### Planned Features
 
 - [ ] Automated reminders (event, packing, polls)
 - [ ] Calendar export (.ics for Google/Apple Calendar)
@@ -443,10 +437,7 @@ odyssey-project/
 - [ ] Message digestion (`/digest-plan` to extract decisions from chat)
 - [ ] AI event summaries
 - [ ] Anonymous poll mode
-- [ ] Poll reminder automation
-- [ ] Mobile-optimized web app
-- [ ] Photo album integration (Google Photos)
-
+- [ ] Create mobile app and pair with iMessage / SMS
 ---
 
 ## 📄 License
