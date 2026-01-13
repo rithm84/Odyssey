@@ -34,14 +34,14 @@
 
 ## 🎯 Overview
 
-**Odyssey** transforms event planning from chaotic message threads into organized, collaborative experiences. Whether you're planning a gaming tournament, weekend trip, study session, or potluck dinner, Odyssey combines the conversational power of Discord with intelligent automation and a sleek web interface.
+**Odyssey** transforms event planning from chaotic message threads and cross-platform hell into organized, collaborative experiences. Whether you're planning a gaming tournament at a friend's house, weekend trip to Malibu, study session at a cafe, or potluck dinner with club members, Odyssey consolidates all your events by combining the conversational power of Discord with intelligent automation and a sleek web interface.
 
 ### Why Odyssey?
 
 - **Natural Language First** – Create events by chatting: `@Odyssey potluck at my place this Saturday from 6 to 8 PM`
 - **Cross-Server Dashboard** – View all your events from every Discord server in one unified web app
-- **Modular & Flexible** – Enable only the features you need: packing lists, polls, transportation, budgets, weather, etc.
-- **Public & Private Events** – Fine-grained access control with role-based permissions
+- **Modular & Flexible** – Enable only the features you need: packing lists, group tasks, transportation coordination, budget management, weather alerts, etc.
+- **Public & Private Events** – Fine-grained access control with role and user-based permissions
 - **Real-Time Sync** – Supabase-powered live updates across Discord and web
 - **AI-Powered** – Smart date parsing, poll creation, and time optimization using Azure OpenAI + LangChain
 ---
@@ -52,10 +52,10 @@
 
 <img src="odyssey-readme-screenshots/odyssey-event-page-1.png" alt="Event Detail Page" width="700">
 
-- **Natural Language Creation** – Mention `@Odyssey` with event details and AI extracts everything you need
-- **Slash Command Support** – Traditional `/create-event` for structured input
-- **Multi-Day Events** – Full support for trips, conferences, and extended activities
-- **Event Types** – Social, Trip, Meeting, Sports, Food, Gaming, and more
+- **Natural Language Creation** – Mention `@Odyssey` with event or poll details and AI extracts everything you need
+- **Slash Command Support** – `/create-event` or `/create-poll` if you prefer the discord command flow
+- **Multi-Day Events** – Full support for trips, retreats, and various extended activities
+- **Pre-Made Event Types & Defaults** – Social, Trip, Meeting, Sports, Food, Gaming, etc.
 - **Visibility Control** – Public (server-wide) or Private (custom role/user-based access)
 
 ### Discord Bot Commands
@@ -63,9 +63,9 @@
 <img src="odyssey-readme-screenshots/odyssey-bot-create-event-confirmation-embed.png" alt="Bot Event Creation" width="600">
 
 **Natural Language Event Creation:**
-- Mention `@Odyssey` with event details
-- AI extracts date, time, location, and description
-- Confirmation embed with editable fields
+- Mention `@Odyssey` or use `/create-event` with event details
+- AI extracts date, time, location, description
+- Confirmation embed with editable fields and privacy toggle
 - Module selection during creation
 
 <img src="odyssey-readme-screenshots/odyssey-bot-select-modules-embed.png" alt="Module Selection" width="600">
@@ -74,20 +74,20 @@
 
 <img src="odyssey-readme-screenshots/odyssey-bot-add-member.png" alt="Add Member" width="600">
 
-- Add members with role selection (Co-Host, Member, Viewer)
+- Add members with role selection (Organizer, Co-Host, Member, Viewer)
 - Edit member roles and RSVP status
 - Organizer transfer with confirmation flow
 
 <img src="odyssey-readme-screenshots/odyssey-bot-promote-and-transfer-organizer.png" alt="Transfer Organizer" width="600">
 
 **Available Commands:**
-- `/create-event` – Structured event creation
-- `/manage-members` – Add/edit/remove event members
-- `/create-poll` – Create polls for scheduling or voting
-- `/find-best-times` – AI-powered optimal meeting time finder
+- `/create-event` – AI-powered event creation
 - `/edit-event-modules` – Enable/disable event features
+- `/manage-members` – Add/edit/remove event members
 - `/rsvp` – Join event
 - `/leave-event` – Leave event
+- `/create-poll` – AI-powered poll creation (discord embed-based and web grid-based)
+- `/find-best-times` – AI-powered optimal time finder for availability (web) polls
 
 ### Modular Dashboard
 
@@ -109,7 +109,9 @@ Every event can enable/disable features based on needs:
 <img src="odyssey-readme-screenshots/attendees-closeup.png" alt="Attendees Module" width="600">
 
 - Role-based membership: Organizer, Co-Host, Member, Viewer
-- RSVP tracking (Yes/Maybe) (No / Removing = leaving event and becoming a viewer (public event) or leaving event and losing access (private event))
+- RSVP tracking (Yes/Maybe)
+- RSVP No || Removing someone (Public Event) = leaving/being removed from event and becoming a viewer 
+- RSVP No || Removing someone (Private Event) = leaving/being removed from event and losing access to join
 - Add members with conditional role permissions
 - Transfer organizer privileges with warnings
 
@@ -128,10 +130,10 @@ Every event can enable/disable features based on needs:
 - Checkbox to mark items as packed
 
 **Tasks Management:**
+- Assign tasks to specific members
 - Priority levels (Low/Medium/High)
 - Due dates
-- Assignment to team members
-- Checkbox to mark items as packed
+- Checkbox to mark tasks as completed
 
 </details>
 
@@ -142,7 +144,7 @@ Every event can enable/disable features based on needs:
 
 - Private packing lists for each attendee
 - Quantity tracking
-- Progress percentage
+- Progress bar
 - Fully isolated from group lists
 
 </details>
@@ -153,10 +155,9 @@ Every event can enable/disable features based on needs:
 <img src="odyssey-readme-screenshots/transportation-closeup.png" alt="Transportation" width="600">
 
 - Register as driver (with available seats)
-- Request rides
-- Auto-matching algorithm
-- Pickup location and time coordination
-- Vehicle descriptions and notes
+- Request rides / Join a car
+- Pickup / Arrival locations and time coordination
+- Addresses, vehicle descriptions, etc.
 
 </details>
 
@@ -190,35 +191,33 @@ Every event can enable/disable features based on needs:
 <img src="odyssey-readme-screenshots/odyssey-web-poll-normal-view.png" alt="Web Poll Grid View" width="600">
 
 - **Embed Polls** – Quick yes/no or single-choice polls in Discord
-- **Web Polls** – Timeful-style availability grids for complex scheduling
+- **Web Polls** – Drag and select availability grids for complex scheduling
 - **AI Poll Creation** – `@Odyssey when can people meet next week for 2 hours?`
 - **Anonymous Voting** – Hide results until you vote
-- **Find Best Times** – AI analyzes poll responses and suggests optimal meeting times with scoring
+- **Find Best Times** – AI analyzes poll responses and suggests optimal meeting times with scoring algorithm
 
 <img src="odyssey-readme-screenshots/odyssey-web-poll-detail-view.png" alt="Poll Detail View" width="600">
 
 **Poll Features:**
-- Grid-based time slot selection
-- Participant availability tracking
-- AI-powered best time recommendations
-- Discord embed notifications with confirmation
+- Automatic result display in Discord through embed after poll deadline
+- Participant availability tracking for each 1-hour time slot
 
 <img src="odyssey-readme-screenshots/odyssey-web-poll-confirmation.png" alt="Poll Confirmation" width="600">
 
 ### Permissions & Roles
 
-- **Organizer** – Full control, can transfer role
-- **Co-Host** – Manage members, edit all modules (except delete event)
-- **Member** – View, RSVP, contribute to shared lists
-- **Viewer** – Read-only access for private events
+- **Organizer** – Full control, can transfer role to co-host or member
+- **Co-Host** – Manage members, edit all modules (cannot delete event)
+- **Member** – View, RSVP, contribute to group packing list
+- **Viewer** – Read-only access for public and private events
 
 ### Cross-Server Features
 
 <img src="odyssey-readme-screenshots/odyssey-home-light.png" alt="Dashboard Light Mode" width="700">
 
 - **Unified Dashboard** – See events from all your Discord servers
-- **Server Filtering** – Filter by server and status (attending/organizing/viewing)
-- **Status Badges** – Visual indicators for your role in each event
+- **Server Filtering** – Filter by server and status (server names / events you're a member in vs. can join)
+- **Status Badges** – Visual indicators for event membership or lack of
 - **Dark/Light Mode** – Beautiful themes with smooth transitions
 
 ---
@@ -314,8 +313,8 @@ Every event can enable/disable features based on needs:
    - Web dashboard updates in real-time via Supabase subscriptions
 
 2. **Event Creation (Slash Command)**
-   - User: `/create-event Beach Party | next Saturday at 3pm`
-   - Bot → Same AI pipeline → Confirm → Store
+   - User: `/create-event beach party next Saturday at 3pm`
+   - Bot → Same AI pipeline but short circuit tool selection → Confirm → Store
    - Immediate sync to web
 
 3. **Web Interaction**
@@ -422,14 +421,15 @@ odyssey-project/
 - [x] Dark/Light mode
 - [x] Server and status filtering
 
-### Remaining MVP Features
+### Remaining MVP Tasks
 
 - [ ] Attendees module bug fixes (private event access edge cases)
 - [ ] Connect Transportation Module to backend
 - [ ] Connect Weather Module to backend
 - [ ] Connect Budget Module to backend
 - [ ] Clean up bot embed flow
-- [ ] Enable users to view their own polls + fine tune fundamental web app features
+- [ ] Enable users to view their web polls through dashboard
+- [ ] Finish fundamental web features and ensure consistency across bot and web options + actions
 - [ ] Test realtime subscriptions for all modules
 - [ ] Comprehensive prod testing with multiple servers & users
 - [ ] Deploy web app on Vercel and host Discord Bot on Railway (supabase for DB)
