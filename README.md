@@ -429,6 +429,7 @@ odyssey-project/
 - [ ] Connect Weather Module to backend
 - [ ] Connect Budget Module to backend
 - [ ] Clean up bot embed flow
+- [ ] Enable users to view their own polls + fine tune fundamental web app features
 - [ ] Test realtime subscriptions for all modules
 - [ ] Comprehensive prod testing with multiple servers & users
 - [ ] Deploy web app on Vercel and host Discord Bot on Railway (supabase for DB)
