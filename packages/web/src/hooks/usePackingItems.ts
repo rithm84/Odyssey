@@ -84,7 +84,6 @@ export function usePackingItems(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("INSERT received:", payload);
           setPackingItems((current) => {
             if (current.some((item) => item.id === payload.new.id)) {
               return current;
@@ -102,7 +101,6 @@ export function usePackingItems(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("UPDATE received:", payload);
           setPackingItems((current) =>
             current.map((item) =>
               item.id === payload.new.id ? (payload.new as PackingItem) : item
@@ -119,7 +117,6 @@ export function usePackingItems(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("DELETE received:", payload);
           const deletedId = (payload.old as any).id;
           setPackingItems((current) => current.filter((item) => item.id !== deletedId));
         }

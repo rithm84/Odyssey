@@ -85,7 +85,6 @@ export function useTasks(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("INSERT received:", payload);
           setTasks((current) => {
             if (current.some((task) => task.id === payload.new.id)) {
               return current;
@@ -103,7 +102,6 @@ export function useTasks(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("UPDATE received:", payload);
           setTasks((current) =>
             current.map((task) =>
               task.id === payload.new.id ? (payload.new as Task) : task
@@ -120,7 +118,6 @@ export function useTasks(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("DELETE received:", payload);
           const deletedId = (payload.old as any).id;
           setTasks((current) => current.filter((task) => task.id !== deletedId));
         }

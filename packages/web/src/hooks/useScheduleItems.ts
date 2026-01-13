@@ -105,7 +105,6 @@ export function useScheduleItems(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("INSERT received:", payload);
           setScheduleItems((current) => {
             // Check if item already exists (avoid duplicates)
             if (current.some((item) => item.id === payload.new.id)) {
@@ -124,7 +123,6 @@ export function useScheduleItems(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("UPDATE received:", payload);
           setScheduleItems((current) =>
             sortByTime(
               current.map((item) =>
@@ -143,13 +141,10 @@ export function useScheduleItems(eventId: string) {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("DELETE received:", payload);
           // For DELETE events, payload.old contains the deleted row
           const deletedId = (payload.old as any).id;
-          console.log("Deleting item with id:", deletedId);
           setScheduleItems((current) => {
             const filtered = current.filter((item) => item.id !== deletedId);
-            console.log("Items after filter:", filtered.length);
             return filtered;
           });
         }
