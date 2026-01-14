@@ -428,6 +428,7 @@ odyssey-project/
 - [ ] Finish fundamental web features and ensure consistency across bot and web options + actions
 - [ ] Test realtime subscriptions for all modules
 - [ ] Comprehensive prod testing with multiple servers & users
+- [ ] Implement bug fixes after testing
 - [ ] Deploy web app on Vercel and host Discord Bot on Railway (supabase for DB)
 
 

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const weatherData = [
   {
-    date: "Friday, Nov 15",
+    date: "Friday, Jan 23",
     high: 68,
     low: 52,
     condition: "Sunny",
