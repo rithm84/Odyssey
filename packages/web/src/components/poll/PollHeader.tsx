@@ -11,28 +11,28 @@ export function PollHeader({ poll, responseCount }: PollHeaderProps) {
   const isClosed = !!poll.closed_at;
 
   return (
-    <div className="mb-8">
-      <h1 className="text-4xl font-bold mb-2">{poll.title}</h1>
+    <div className="mb-8 border-brutal bg-card p-6 shadow-brutal">
+      <h1 className="text-4xl font-black mb-2 uppercase tracking-tight">{poll.title}</h1>
       {poll.description && (
-        <p className="text-lg text-muted-foreground mb-4">{poll.description}</p>
+        <p className="text-lg text-muted-foreground mb-4 font-medium">{poll.description}</p>
       )}
 
       <div className="flex flex-wrap gap-3 text-sm">
         {isClosed && (
-          <span className="px-3 py-1 bg-destructive/20 text-destructive rounded-full font-medium">
+          <span className="px-3 py-1 bg-destructive text-white dark:text-black border-2 border-black dark:border-white font-bold uppercase">
             Poll Closed
           </span>
         )}
         {poll.is_anonymous && (
-          <span className="px-3 py-1 bg-secondary/20 text-secondary-foreground rounded-full font-medium">
+          <span className="px-3 py-1 bg-secondary text-white dark:text-black border-2 border-black dark:border-white font-bold uppercase">
             Anonymous
           </span>
         )}
-        <span className="px-3 py-1 bg-muted rounded-full font-medium">
+        <span className="px-3 py-1 bg-muted border-2 border-border font-bold uppercase">
           {responseCount} response{responseCount !== 1 ? 's' : ''}
         </span>
         {poll.deadline && !isClosed && (
-          <span className="px-3 py-1 bg-primary/10 text-primary rounded-full font-medium">
+          <span className="px-3 py-1 bg-primary text-white dark:text-black border-2 border-black dark:border-white font-bold uppercase">
             Deadline: {new Date(poll.deadline).toLocaleDateString()}
           </span>
         )}

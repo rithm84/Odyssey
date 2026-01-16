@@ -303,12 +303,12 @@ export function BestTimes({ dateOptions, timeSlots, responses, eventDuration }: 
   const isLongEvent = eventDuration && eventDuration > 300;
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-soft">
+    <div className="bg-card border-brutal p-6 shadow-brutal">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-semibold">Best Times</h3>
+        <h3 className="text-xl font-black uppercase tracking-tight">Best Times</h3>
         <button
           onClick={() => setShowExplanation(!showExplanation)}
-          className="text-sm text-primary hover:underline flex items-center gap-1"
+          className="text-sm text-primary hover:underline flex items-center gap-1 font-bold"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -318,7 +318,7 @@ export function BestTimes({ dateOptions, timeSlots, responses, eventDuration }: 
       </div>
 
       {showExplanation && (
-        <div className="mb-4 p-4 bg-muted rounded-lg text-sm space-y-2">
+        <div className="mb-4 p-4 bg-muted border-2 border-border text-sm space-y-2 font-medium">
           <p className="font-medium">🧮 Scoring System:</p>
           <p>
             We calculate a <strong>composite score</strong> for each time window by combining:

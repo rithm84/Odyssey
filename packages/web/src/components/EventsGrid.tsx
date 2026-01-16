@@ -93,7 +93,7 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
       <div className="flex items-start justify-between mb-6 gap-8">
         <div className="flex-shrink-0">
           <h2 className="text-3xl font-black mb-2 tracking-tight">
-            Your Events <span className="text-gradient">({filteredEvents.length})</span>
+            Your Events <span className="text-primary">({filteredEvents.length})</span>
           </h2>
           <p className="text-muted-foreground text-sm">
             {subtitleText}
@@ -124,33 +124,37 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event, index) => (
-            <Link
-              key={event.id}
-              href={`/event/${event.id}`}
-              className={`block group animate-slide-up stagger-${(index % 6) + 1}`}
-            >
-              <Card className="h-full transition-all duration-500 hover:shadow-glow hover:scale-[1.02] border-border/60 backdrop-blur-sm bg-card/80 group-hover:border-primary/40 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {filteredEvents.map((event, index) => {
+            // Uniform grid with alternating border colors
+            const borderColors = ['border-brutal-indigo', 'border-brutal-orange', 'border-brutal'];
+            const shadowColors = ['shadow-brutal-indigo', 'shadow-brutal-orange', 'shadow-brutal'];
+
+            return (
+              <Link
+                key={event.id}
+                href={`/event/${event.id}`}
+                className="block group animate-slide-up"
+              >
+                <Card className={`h-full transition-all duration-200 shadow-brutal-hover hover-border bg-card overflow-hidden ${borderColors[index % 3]} ${shadowColors[index % 3]}`}>
 
                 <CardHeader className="space-y-4 relative z-10">
                   <div className="flex items-start justify-between gap-2 flex-wrap">
                     <Badge
                       variant="secondary"
-                      className={`bg-gradient-to-r ${event.serverColor} text-white border-0 px-4 py-1.5 text-xs font-bold shadow-medium`}
+                      className="bg-secondary text-white dark:text-black border-0 px-4 py-1.5 text-xs font-bold shadow-medium"
                     >
                       {event.server}
                     </Badge>
                     <div className="flex gap-2">
                       <Badge
                         variant="outline"
-                        className="text-xs border-border/60 bg-background/60 backdrop-blur-sm font-semibold"
+                        className="text-xs border-2 border-border bg-background font-semibold"
                       >
                         {event.type}
                       </Badge>
                       {event.user_membership === 'member' && (
                         <Badge
-                          className="gradient-primary text-white border-0 px-3 py-1 text-xs font-bold"
+                          className="bg-primary text-white dark:text-black border-0 px-3 py-1 text-xs font-bold shadow-medium"
                         >
                           Member
                         </Badge>
@@ -158,7 +162,7 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
                       {event.user_membership === 'viewer' && (
                         <Badge
                           variant="outline"
-                          className="text-xs border-muted-foreground/50 text-muted-foreground font-semibold"
+                          className="text-xs border-2 border-muted-foreground text-muted-foreground font-semibold"
                         >
                           Available
                         </Badge>
@@ -199,7 +203,8 @@ export function EventsGrid({ events, guilds }: EventsGridProps) {
                 </CardContent>
               </Card>
             </Link>
-          ))}
+          );
+          })}
         </div>
       )}
     </>

@@ -221,8 +221,8 @@ export function IndividualPackingList({ eventId }: IndividualPackingListProps) {
       <div className="relative z-10">
         <div className="mb-6">
           <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
-              <Backpack className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 bg-primary flex items-center justify-center border-2 border-black dark:border-white">
+              <Backpack className="h-5 w-5 text-white dark:text-black" />
             </div>
             <span>My Packing List</span>
           </h2>

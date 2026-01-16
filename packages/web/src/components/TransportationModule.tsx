@@ -30,8 +30,8 @@ export function TransportationModule() {
 
       <div className="relative z-10">
         <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
-            <Car className="h-5 w-5 text-white" />
+          <div className="h-10 w-10 bg-primary flex items-center justify-center border-2 border-black dark:border-white">
+            <Car className="h-5 w-5 text-white dark:text-black" />
           </div>
           <span>Transportation</span>
         </h2>
@@ -43,9 +43,8 @@ export function TransportationModule() {
               <div key={index} className="p-5 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/60 hover:border-primary/30 transition-all group/carpool">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="relative">
-                    <div className="absolute inset-0 gradient-primary rounded-full blur-sm opacity-60" />
-                    <Avatar className="relative gradient-primary text-white shadow-medium">
-                      <AvatarFallback className="gradient-primary font-bold">
+                    <Avatar className="relative bg-primary text-white dark:text-black border-2 border-black dark:border-white">
+                      <AvatarFallback className="bg-primary text-white dark:text-black font-bold">
                         {carpool.driver.initials}
                       </AvatarFallback>
                     </Avatar>
@@ -68,8 +67,8 @@ export function TransportationModule() {
                   <div className="pl-14 space-y-3">
                     {carpool.riders.map((rider, riderIndex) => (
                       <div key={riderIndex} className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/40">
-                        <Avatar className="h-8 w-8 bg-[hsl(var(--accent-blue))] text-white shadow-medium">
-                          <AvatarFallback className="bg-[hsl(var(--accent-blue))] font-bold text-xs">
+                        <Avatar className="h-8 w-8 bg-secondary text-white dark:text-black border-2 border-black dark:border-white">
+                          <AvatarFallback className="bg-secondary text-white dark:text-black font-bold text-xs">
                             {rider.initials}
                           </AvatarFallback>
                         </Avatar>
@@ -85,8 +84,8 @@ export function TransportationModule() {
           {needRide.length > 0 && (
             <div className="p-5 rounded-xl bg-gradient-to-br from-destructive/10 to-destructive/5 border-2 border-destructive/30 shadow-medium">
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-xl bg-destructive flex items-center justify-center shadow-medium">
-                  <AlertCircle className="h-5 w-5 text-white" />
+                <div className="h-10 w-10 bg-destructive flex items-center justify-center border-2 border-black dark:border-white">
+                  <AlertCircle className="h-5 w-5 text-white dark:text-black" />
                 </div>
                 <p className="font-black text-xl text-destructive">Need a Ride</p>
               </div>
@@ -94,8 +93,8 @@ export function TransportationModule() {
               <div className="space-y-3">
                 {needRide.map((person, index) => (
                   <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-destructive/30">
-                    <Avatar className="h-8 w-8 bg-destructive text-white shadow-medium">
-                      <AvatarFallback className="bg-destructive font-bold text-xs">
+                    <Avatar className="h-8 w-8 bg-destructive text-white dark:text-black border-2 border-black dark:border-white">
+                      <AvatarFallback className="bg-destructive text-white dark:text-black font-bold text-xs">
                         {person.initials}
                       </AvatarFallback>
                     </Avatar>

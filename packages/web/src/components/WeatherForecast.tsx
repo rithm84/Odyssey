@@ -45,8 +45,8 @@ export function WeatherForecast() {
 
       <div className="relative z-10">
         <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
-            <Wind className="h-5 w-5 text-white" />
+          <div className="h-10 w-10 bg-primary flex items-center justify-center border-2 border-black dark:border-white">
+            <Wind className="h-5 w-5 text-white dark:text-black" />
           </div>
           <span>Weather Forecast</span>
         </h2>
@@ -100,10 +100,10 @@ export function WeatherForecast() {
                   <button
                     key={index}
                     onClick={() => setCurrentDay(index)}
-                    className={`h-2.5 rounded-full transition-all duration-300 ${
+                    className={`h-2.5 rounded-full transition-all duration-300 border-2 ${
                       index === currentDay
-                        ? "w-10 gradient-primary shadow-medium"
-                        : "w-2.5 bg-muted hover:bg-primary/30"
+                        ? "w-10 bg-primary border-black dark:border-white shadow-brutal"
+                        : "w-2.5 bg-muted border-border hover:bg-primary/30"
                     }`}
                   />
                 ))}

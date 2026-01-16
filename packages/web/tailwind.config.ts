@@ -9,34 +9,26 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   safelist: [
-    // Guild badge gradient colors - needed for dynamic class generation
-    "from-emerald-500",
-    "to-teal-500",
-    "dark:from-emerald-600",
-    "dark:to-indigo-600",
-    "from-pink-500",
-    "to-orange-500",
-    "dark:from-fuchsia-600",
-    "dark:to-indigo-700",
-    "from-blue-500",
-    "to-indigo-500",
-    "dark:from-indigo-600",
-    "dark:to-blue-800",
-    "from-orange-500",
-    "to-amber-600",
-    "dark:from-orange-600",
-    "from-green-500",
-    "to-emerald-500",
-    "dark:from-teal-600",
-    "from-purple-500",
-    "to-pink-500",
-    "dark:from-purple-600",
-    "from-red-500",
-    "to-rose-500",
-    "dark:from-red-600",
-    "from-cyan-500",
-    "to-blue-500",
-    "dark:from-cyan-600",
+    // Guild badge solid colors - needed for dynamic class generation
+    "bg-emerald-500",
+    "bg-teal-500",
+    "bg-pink-500",
+    "bg-orange-500",
+    "bg-blue-500",
+    "bg-indigo-500",
+    "bg-green-500",
+    "bg-purple-500",
+    "bg-red-500",
+    "bg-cyan-500",
+    "dark:bg-emerald-600",
+    "dark:bg-indigo-600",
+    "dark:bg-fuchsia-600",
+    "dark:bg-orange-600",
+    "dark:bg-blue-800",
+    "dark:bg-teal-600",
+    "dark:bg-purple-600",
+    "dark:bg-red-600",
+    "dark:bg-cyan-600",
   ],
   prefix: "",
   theme: {
@@ -93,9 +85,29 @@ const config: Config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        none: '0',
+        sm: '0.125rem',  // 2px - minimal
+        md: '0.25rem',   // 4px
+        lg: '0.25rem',   // 4px (same as md for brutalist consistency)
+        xl: '0.25rem',   // 4px
+        '2xl': '0.25rem', // 4px
+        '3xl': '0.25rem', // 4px
+      },
+      borderWidth: {
+        DEFAULT: '1px',
+        '0': '0',
+        '2': '2px',
+        '3': '3px',
+        '4': '4px',
+      },
+      boxShadow: {
+        brutal: '4px 4px 0px black',
+        'brutal-lg': '6px 6px 0px black',
+        'brutal-white': '4px 4px 0px white',
+        'brutal-white-lg': '6px 6px 0px white',
+        'brutal-indigo': '4px 4px 0px #4F46E5',
+        'brutal-orange': '4px 4px 0px #F97316',
+        'brutal-hover': '6px 6px 0px black',
       },
       keyframes: {
         "accordion-down": {

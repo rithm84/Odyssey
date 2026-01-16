@@ -175,8 +175,8 @@ export function ScheduleTimeline({ eventId }: ScheduleTimelineProps) {
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-6 gap-4">
           <h2 className="text-3xl font-black tracking-tight flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium flex-shrink-0">
-              <Clock className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 bg-primary flex items-center justify-center border-2 border-black dark:border-white flex-shrink-0">
+              <Clock className="h-5 w-5 text-white dark:text-black" />
             </div>
             <span className="break-words">Schedule of Events</span>
           </h2>
@@ -305,13 +305,13 @@ export function ScheduleTimeline({ eventId }: ScheduleTimelineProps) {
               {scheduleItems.map((item, index) => (
                 <div key={item.id} className="relative pl-14 group/item">
                   {/* Icon */}
-                  <div className="absolute left-0 w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium group-hover/item:scale-110 transition-transform duration-300 z-10">
-                    <div className="w-4 h-4 rounded-full bg-white shadow-soft" />
+                  <div className="absolute left-0 w-10 h-10 bg-primary flex items-center justify-center border-2 border-black dark:border-white group-hover/item:scale-110 transition-transform duration-300 z-10">
+                    <div className="w-4 h-4 rounded-full bg-white dark:bg-black border-2 border-black dark:border-white" />
                   </div>
 
                   {/* Connector bar to next item (not shown for last item) */}
                   {index !== scheduleItems.length - 1 && (
-                    <div className="absolute left-5 top-10 w-1 h-[calc(100%+1.5rem)] gradient-primary" />
+                    <div className="absolute left-5 top-10 w-1 h-[calc(100%+1.5rem)] bg-primary" />
                   )}
 
                   <div className="p-4 rounded-xl border border-border/60 hover:border-primary/40 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-medium group-hover/item:translate-x-2">

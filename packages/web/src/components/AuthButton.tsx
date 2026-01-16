@@ -87,10 +87,10 @@ export function AuthButton() {
         </div>
       </div>
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
         onClick={handleSignOut}
-        className="rounded-full transition-smooth shadow-soft hover:shadow-medium hover-scale"
+        className="rounded-full transition-smooth hover-scale"
       >
         Sign Out
       </Button>

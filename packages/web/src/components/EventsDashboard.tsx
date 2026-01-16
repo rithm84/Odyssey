@@ -144,35 +144,29 @@ export function EventsDashboard({ initialEvents, initialGuilds }: EventsDashboar
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-2xl p-8 mb-8 shadow-glow group">
-        <div className="absolute inset-0 gradient-hero" />
-        <div className="absolute inset-0 hero-grid" />
-
-        <div className="relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-4">
-            <Sparkles className="h-3.5 w-3.5 text-white animate-pulse-glow" />
-            <span className="text-white/90 text-xs font-medium">Unified Event Management</span>
+      {/* Asymmetric Brutalist Hero */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-12">
+        {/* Left: Large text block */}
+        <div className="lg:col-span-3 border-brutal bg-card p-8 shadow-brutal">
+          <div className="mb-6">
+            <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight">
+              COORDINATE. COLLABORATE. CONNECT.
+            </h1>
+            <p className="text-lg text-secondary font-medium">
+              One dashboard for all your Discord events. Plan together, anywhere.
+            </p>
           </div>
+        </div>
 
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight" style={{ lineHeight: '1.3' }}>
-            Your Events,
-            <br />
-            <span className="text-white">All in One Place</span>
-          </h1>
-
-          <p className="text-white/80 text-base max-w-3xl mx-auto mb-6 leading-relaxed">
-            Manage events from all your Discord servers seamlessly. Plan, coordinate, and never miss a moment.
-          </p>
-
-          <div className="flex items-center justify-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5">
-              <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse-glow" />
-              <span className="text-white/90 text-xs">{events.length} Active Events</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5">
-              <Users className="h-3.5 w-3.5 text-white" />
-              <span className="text-white/90 text-xs">{totalAttendees} Total Attendees</span>
-            </div>
+        {/* Right: Stat cards */}
+        <div className="lg:col-span-2 flex flex-col gap-4">
+          <div className="border-brutal-indigo bg-card p-6 shadow-brutal-indigo flex-1">
+            <div className="text-5xl font-black mb-2">{events.length}</div>
+            <div className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Active Events</div>
+          </div>
+          <div className="border-brutal-orange bg-card p-6 shadow-brutal-orange flex-1">
+            <div className="text-5xl font-black mb-2">{totalAttendees}</div>
+            <div className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Total Attendees</div>
           </div>
         </div>
       </div>

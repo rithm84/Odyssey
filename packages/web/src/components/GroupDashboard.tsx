@@ -277,19 +277,19 @@ export function GroupDashboard({ eventId }: GroupDashboardProps) {
 
       <div className="relative z-10">
         <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
-            <ListTodo className="h-5 w-5 text-white" />
+          <div className="h-10 w-10 bg-primary flex items-center justify-center border-2 border-black dark:border-white">
+            <ListTodo className="h-5 w-5 text-white dark:text-black" />
           </div>
           <span>Group Dashboard</span>
         </h2>
 
         <Tabs defaultValue="packing" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1 rounded-xl">
-            <TabsTrigger value="packing" className="rounded-lg font-bold data-[state=active]:gradient-primary data-[state=active]:text-white data-[state=active]:shadow-medium">
+          <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
+            <TabsTrigger value="packing" className="font-bold data-[state=active]:!bg-primary data-[state=active]:text-white dark:data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black dark:data-[state=active]:border-white">
               <Package className="h-4 w-4 mr-2" />
               Shared Packing
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="rounded-lg font-bold data-[state=active]:gradient-primary data-[state=active]:text-white data-[state=active]:shadow-medium">
+            <TabsTrigger value="tasks" className="font-bold data-[state=active]:!bg-primary data-[state=active]:text-white dark:data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black dark:data-[state=active]:border-white">
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Group Tasks
             </TabsTrigger>

@@ -75,25 +75,18 @@ export function EventHeader({ event, isMember, isOrganizer }: EventHeaderProps) 
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl px-12 py-8 mb-8 shadow-glow group">
-        <div className="absolute inset-0 gradient-hero" />
-        <div className="absolute inset-0 hero-grid" />
-
-        <div className="relative z-10">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center animate-float">
-                <Tent className="h-8 w-8 text-white" />
+      <div className="border-brutal-indigo shadow-brutal-indigo mb-8 overflow-hidden">
+        {/* Color-blocked header */}
+        <div className="bg-primary px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-black dark:bg-white px-3 py-1 mb-3 border-0">
+                <div className="h-2 w-2 bg-secondary rounded-full" />
+                <span className="text-white dark:text-black text-xs font-bold uppercase tracking-wide">ACTIVE EVENT</span>
               </div>
-              <div>
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 mb-2">
-                  <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse-glow" />
-                  <span className="text-white/90 text-xs font-bold">ACTIVE EVENT</span>
-                </div>
-                <h1 className="text-5xl font-black text-white tracking-tight leading-tight">
-                  {event.name}
-                </h1>
-              </div>
+              <h1 className="text-4xl md:text-5xl font-black text-white dark:text-black uppercase tracking-tight leading-none">
+                {event.name}
+              </h1>
             </div>
 
             {/* Join/Leave Button */}
@@ -101,58 +94,65 @@ export function EventHeader({ event, isMember, isOrganizer }: EventHeaderProps) 
               {!isMember ? (
                 <Button
                   onClick={() => setShowJoinDialog(true)}
-                  className="bg-white text-primary hover:bg-white/90 font-bold px-6 py-3 text-base h-auto shadow-lg leading-tight"
+                  variant="secondary"
+                  size="lg"
+                  className="font-black uppercase"
                 >
-                  Join<br />Event
+                  Join Event
                 </Button>
               ) : (
                 <Button
                   onClick={handleLeaveClick}
-                  className="bg-white text-destructive hover:bg-destructive hover:text-white font-bold px-6 py-3 text-base h-auto shadow-lg transition-colors leading-tight"
+                  variant="destructive"
+                  size="lg"
+                  className="font-black uppercase"
                 >
-                  Leave<br />Event
+                  Leave Event
                 </Button>
               )}
             </div>
           </div>
-
-        <div className="flex flex-wrap gap-3 mb-6">
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 transition-all hover:bg-white/20">
-            <div className="h-10 w-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <div className="text-white/70 text-xs font-semibold uppercase tracking-wide">Date</div>
-              <div className="text-white font-bold">{formattedDate}</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 transition-all hover:bg-white/20">
-            <div className="h-10 w-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <div className="text-white/70 text-xs font-semibold uppercase tracking-wide">Location</div>
-              <div className="text-white font-bold">{event.location || "Location TBD"}</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 transition-all hover:bg-white/20">
-            <div className="h-10 w-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <Users className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <div className="text-white/70 text-xs font-semibold uppercase tracking-wide">Attendees</div>
-              <div className="text-white font-bold">{attendeeText}</div>
-            </div>
-          </div>
         </div>
 
-        <p className="text-white/80 text-lg max-w-3xl leading-relaxed">
-          {event.description || "No description available."}
-        </p>
+        {/* Event info bar */}
+        <div className="bg-card px-8 py-6 border-t-4 border-black dark:border-white">
+          <div className="flex flex-wrap gap-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-primary/10 flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-muted-foreground text-xs font-bold uppercase tracking-wide">Date</div>
+                <div className="text-foreground font-bold text-base">{formattedDate}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-primary/10 flex items-center justify-center">
+                <MapPin className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-muted-foreground text-xs font-bold uppercase tracking-wide">Location</div>
+                <div className="text-foreground font-bold text-base">{event.location || "Location TBD"}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-primary/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-muted-foreground text-xs font-bold uppercase tracking-wide">Attendees</div>
+                <div className="text-foreground font-bold text-base">{attendeeText}</div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-foreground text-base max-w-3xl leading-relaxed font-medium">
+            {event.description || "No description available."}
+          </p>
+        </div>
       </div>
-    </div>
 
     <JoinEventDialog
       eventId={event.id}

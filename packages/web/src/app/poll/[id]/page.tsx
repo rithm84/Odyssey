@@ -132,10 +132,10 @@ export default function PollPage({ params }: PollPageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading poll...</p>
+          <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent mx-auto mb-4"></div>
+          <p className="text-muted-foreground font-bold">Loading poll...</p>
         </div>
       </div>
     );
@@ -143,10 +143,10 @@ export default function PollPage({ params }: PollPageProps) {
 
   if (error && !poll) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive text-lg mb-2">Error loading poll</p>
-          <p className="text-muted-foreground">{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center border-brutal bg-card p-8 shadow-brutal">
+          <p className="text-destructive text-lg mb-2 font-black">Error loading poll</p>
+          <p className="text-muted-foreground font-medium">{error}</p>
         </div>
       </div>
     );
@@ -154,8 +154,10 @@ export default function PollPage({ params }: PollPageProps) {
 
   if (!poll) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Poll not found</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="border-brutal bg-card p-8 shadow-brutal">
+          <p className="text-muted-foreground font-bold">Poll not found</p>
+        </div>
       </div>
     );
   }
@@ -171,16 +173,16 @@ export default function PollPage({ params }: PollPageProps) {
         {/* Availability Section */}
         {poll.date_options && poll.time_slots && (
           <>
-            <div className="bg-card rounded-lg p-6 shadow-soft mb-6">
+            <div className="bg-card border-brutal p-6 shadow-brutal mb-6">
               {/* View Mode Toggle Button */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">
+                <h2 className="text-2xl font-black uppercase tracking-tight">
                   {viewMode === 'standard' ? 'Mark Your Availability' : 'Availability Overview'}
                 </h2>
                 <button
                   onClick={() => setViewMode(viewMode === 'standard' ? 'detail' : 'standard')}
                   disabled={viewMode === 'standard' && responses.length === 0}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
+                  className="px-4 py-2 bg-primary text-white dark:text-black border-2 border-black dark:border-white hover:shadow-brutal transition-all text-sm font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {viewMode === 'standard' ? 'View Details' : 'Go Back'}
                 </button>
@@ -202,22 +204,22 @@ export default function PollPage({ params }: PollPageProps) {
                     {/* Click or drag instruction and legend - under grid */}
                     <div className="ml-[75px]">
                       {!isClosed && (
-                        <p className="text-center text-sm text-muted-foreground mt-4">
+                        <p className="text-center text-sm text-muted-foreground mt-4 font-medium">
                           Click or drag to mark your availability
                         </p>
                       )}
 
-                      <div className="flex flex-wrap gap-4 mt-3 justify-center text-xs">
+                      <div className="flex flex-wrap gap-4 mt-3 justify-center text-xs font-bold">
                         <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded bg-[hsl(var(--poll-available))]" />
+                          <div className="w-5 h-5 bg-[hsl(var(--poll-available))] border-2 border-black dark:border-white" />
                           <span>Available</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded bg-[hsl(var(--poll-maybe))]" />
+                          <div className="w-5 h-5 bg-[hsl(var(--poll-maybe))] border-2 border-black dark:border-white" />
                           <span>If Necessary</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded bg-[hsl(var(--poll-unavailable))]" />
+                          <div className="w-5 h-5 bg-[hsl(var(--poll-unavailable))] border-2 border-black dark:border-white" />
                           <span>Not Available</span>
                         </div>
                       </div>
@@ -236,9 +238,7 @@ export default function PollPage({ params }: PollPageProps) {
 
                         {/* Gradient scale bar */}
                         <div className="w-[280px] ml-[75px] mt-4">
-                          <div className="h-6 rounded-lg" style={{
-                            background: 'linear-gradient(to right, hsl(var(--poll-unavailable)), #FFEECC, #FFD699, #FFB999, #FF9F66, #FF8533, #FF6B00)'
-                          }} />
+                          <div className="h-6 rounded-lg bg-gradient-to-r from-[hsl(var(--poll-unavailable))] via-[hsl(var(--poll-maybe))] to-[hsl(var(--poll-available))]" />
                           <div className="flex justify-between text-xs text-muted-foreground mt-1">
                             <span>0 available</span>
                             <span>{responses.length} available</span>
@@ -246,8 +246,8 @@ export default function PollPage({ params }: PollPageProps) {
                         </div>
                       </>
                     ) : (
-                      <div className="bg-muted rounded-lg p-12 text-center mt-10">
-                        <p className="text-muted-foreground">
+                      <div className="bg-muted border-2 border-border p-12 text-center mt-10">
+                        <p className="text-muted-foreground font-bold">
                           No responses yet. Be the first to vote!
                         </p>
                       </div>
@@ -271,9 +271,7 @@ export default function PollPage({ params }: PollPageProps) {
 
                         {/* Gradient scale bar */}
                         <div className="w-[280px] ml-[75px] mt-4">
-                          <div className="h-6 rounded-lg" style={{
-                            background: 'linear-gradient(to right, hsl(var(--poll-unavailable)), #FFEECC, #FFD699, #FFB999, #FF9F66, #FF8533, #FF6B00)'
-                          }} />
+                          <div className="h-6 rounded-lg bg-gradient-to-r from-[hsl(var(--poll-unavailable))] via-[hsl(var(--poll-maybe))] to-[hsl(var(--poll-available))]" />
                           <div className="flex justify-between text-xs text-muted-foreground mt-1">
                             <span>0 available</span>
                             <span>{responses.length} available</span>
@@ -281,8 +279,8 @@ export default function PollPage({ params }: PollPageProps) {
                         </div>
                       </>
                     ) : (
-                      <div className="bg-muted rounded-lg p-12 text-center mt-10">
-                        <p className="text-muted-foreground">
+                      <div className="bg-muted border-2 border-border p-12 text-center mt-10">
+                        <p className="text-muted-foreground font-bold">
                           No responses yet
                         </p>
                       </div>
@@ -309,19 +307,19 @@ export default function PollPage({ params }: PollPageProps) {
                 <button
                   onClick={handleSubmitVote}
                   disabled={saving}
-                  className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="px-6 py-3 bg-primary text-white dark:text-black border-2 border-black dark:border-white shadow-brutal font-bold uppercase hover:shadow-brutal-lg hover-lift disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   {saving ? 'Saving...' : hasVoted ? 'Update Vote' : 'Submit Vote'}
                 </button>
 
                 {hasVoted && (
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground font-medium">
                     You&apos;ve already voted. You can update your response anytime.
                   </span>
                 )}
 
                 {error && (
-                  <span className="text-sm text-destructive">
+                  <span className="text-sm text-destructive font-bold">
                     {error}
                   </span>
                 )}
@@ -340,8 +338,8 @@ export default function PollPage({ params }: PollPageProps) {
 
             {/* Closed poll message */}
             {isClosed && (
-              <div className="bg-muted rounded-lg p-6 text-center mt-6">
-                <p className="text-lg font-medium">
+              <div className="bg-muted border-brutal p-6 text-center mt-6 shadow-brutal">
+                <p className="text-lg font-black uppercase">
                   This poll was closed on {new Date(poll.closed_at!).toLocaleString()}
                 </p>
               </div>

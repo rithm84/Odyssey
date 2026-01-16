@@ -90,14 +90,14 @@ export function ServerFilter({
   return (
     <div className="text-right">
       <h3 className="text-sm font-semibold mb-2 text-muted-foreground">Filter by Server & Status</h3>
-      <div className="flex gap-2 justify-end">
+      <div className="flex gap-4 justify-end">
         {/* All Servers Button */}
         <Button
           variant={isAllActive ? "default" : "outline"}
           className={`px-4 ${
             isAllActive
               ? ""
-              : "!border !border-white bg-background/90 hover:bg-background"
+              : "border-2 border-black dark:border-white bg-background hover:bg-primary hover:text-white dark:hover:text-black"
           }`}
           onClick={handleAllServers}
         >
@@ -112,7 +112,7 @@ export function ServerFilter({
               className={`px-4 ${
                 !isAllActive
                   ? ""
-                  : "!border !border-white bg-background/90 hover:bg-background"
+                  : "border-2 border-black dark:border-white bg-background hover:bg-primary hover:text-white dark:hover:text-black"
               }`}
             >
               <Filter className="h-4 w-4 mr-2" />

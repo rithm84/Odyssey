@@ -18,9 +18,9 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <Button
-        variant="outline"
+        variant="ghost"
         size="icon"
-        className="rounded-full transition-smooth shadow-soft hover:shadow-medium"
+        className="rounded-full transition-smooth hover-scale"
       >
         <Sun className="h-4 w-4" />
       </Button>
@@ -29,10 +29,10 @@ export function ThemeToggle() {
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="rounded-full transition-smooth shadow-soft hover:shadow-medium hover-scale group"
+      className="rounded-full transition-smooth hover-scale group"
     >
       {theme === "light" ? (
         <Moon className="h-4 w-4 transition-transform group-hover:rotate-12" />

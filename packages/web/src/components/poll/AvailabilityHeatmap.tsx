@@ -83,25 +83,25 @@ export function AvailabilityHeatmap({
 
   const getHeatmapColor = (data: HeatmapData | undefined): string => {
     if (!data || data.totalResponses === 0) {
-      return 'bg-[hsl(var(--poll-unavailable))]'; // Base indigo for no responses
+      return 'bg-[hsl(var(--poll-unavailable))]'; // Base gray for no responses
     }
 
     // Calculate score: available = 1.0, maybe = 0.5
     const score = (data.availableCount + data.maybeCount * 0.5) / data.totalResponses;
 
-    // If score is 0 (no one available or maybe), return base indigo
+    // If score is 0 (no one available or maybe), return base gray
     if (score === 0) {
       return 'bg-[hsl(var(--poll-unavailable))]';
     }
 
-    // For scores > 0, use gradient from light yellow/orange to dark orange based on score
-    // Higher score = darker/more saturated orange
-    if (score >= 0.9) return 'bg-[#FF6B00]'; // Dark orange - highest availability
-    if (score >= 0.75) return 'bg-[#FF8533]'; // Medium-dark orange
-    if (score >= 0.6) return 'bg-[#FF9F66]'; // Medium orange
-    if (score >= 0.45) return 'bg-[#FFB999]'; // Light orange
-    if (score >= 0.3) return 'bg-[#FFD699]'; // Very light orange
-    return 'bg-[#FFEECC]'; // Pale yellow - lowest availability (but still some)
+    // For scores > 0, use gradient from light to dark based on score
+    // Higher score = darker/more saturated color (blue in light mode, orange in dark mode)
+    if (score >= 0.9) return 'bg-[hsl(var(--poll-heat-6))]'; // Darkest - highest availability
+    if (score >= 0.75) return 'bg-[hsl(var(--poll-heat-5))]'; // Medium-dark
+    if (score >= 0.6) return 'bg-[hsl(var(--poll-heat-4))]'; // Medium
+    if (score >= 0.45) return 'bg-[hsl(var(--poll-heat-3))]'; // Medium-light
+    if (score >= 0.3) return 'bg-[hsl(var(--poll-heat-2))]'; // Light
+    return 'bg-[hsl(var(--poll-heat-1))]'; // Very light - lowest availability (but still some)
   };
 
   const formatDateShort = (dateString: string): string => {

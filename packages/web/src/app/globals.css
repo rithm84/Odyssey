@@ -1,9 +1,8 @@
 /* ========================================
-   FONT IMPORTS
+   FONT IMPORTS - Neo-Brutalist Typography
    ======================================== */
-/* Day theme: Pacifico (headings) + Lora (body) - Elegant serif look */
-/* Night theme: Syne (headings) + Sour Gummy (body) - Bold modern sans-serif */
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Syne:wght@800&family=Lora:wght@400;500;600&family=Sour+Gummy:wght@400;500;600&display=swap');
+/* Syne only - bold, modern, brutalist aesthetic */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,151 +14,146 @@
 @layer base {
   :root {
     /* ========================================
-       DAY THEME - Orange-dominant with Light Blue/Indigo accents
+       LIGHT MODE - High Contrast Neo-Brutalist
        ======================================== */
 
     /* Typography */
-    --font-body: 'Lora', serif;
-    --font-heading: 'Pacifico', cursive;
+    --font-body: 'Syne', sans-serif;
+    --font-heading: 'Syne', sans-serif;
 
-    /* Base colors - Light backgrounds with dark text */
-    --background: 210 40% 96%;  /* Very light blue-gray background */
-    --foreground: 240 50% 12%;  /* Deep indigo text */
+    /* Base colors - Pure white background, near-black text */
+    --background: 0 0% 100%;            /* Pure white */
+    --foreground: 0 0% 4%;              /* Near black */
 
-    /* Card colors */
-    --card: 205 45% 97%;  /* Slightly lighter than background for elevated surfaces */
-    --card-foreground: 240 45% 15%;
+    /* Card colors - Very light surface */
+    --card: 0 0% 100%;                  /* White cards */
+    --card-foreground: 0 0% 4%;         /* Near black text */
 
     /* Popover colors */
-    --popover: 200 40% 96%;
-    --popover-foreground: 240 50% 12%;
+    --popover: 0 0% 100%;               /* White */
+    --popover-foreground: 0 0% 4%;      /* Near black */
 
-    /* Primary colors - Warm orange tones */
-    --primary: 18 95% 58%;  /* Vibrant orange */
-    --primary-foreground: 0 0% 100%;  /* White text on primary */
-    --primary-glow: 25 100% 62%;  /* Lighter orange for glows */
+    /* Primary colors - Vibrant Indigo */
+    --primary: 238 75% 59%;             /* #4F46E5 - Vibrant indigo */
+    --primary-foreground: 0 0% 100%;    /* White text */
+    --primary-glow: 238 75% 59%;        /* Same as primary */
 
-    /* Secondary colors - Cool blue tones */
-    --secondary: 220 65% 60%;  /* Soft blue */
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary colors - Vibrant Orange */
+    --secondary: 24 95% 53%;            /* #F97316 - Vibrant orange */
+    --secondary-foreground: 0 0% 100%;  /* White text */
 
-    /* Accent colors - Additional palette for avatars, badges, etc. */
-    --accent-blue: 215 70% 55%;  /* Used in TransportationModule avatars */
-    --accent-purple: 260 70% 55%;  /* Used in BudgetModule and AttendeesModule */
-    --accent-green: 160 70% 42%;  /* Used in AttendeesModule */
+    /* Muted colors - Light gray backgrounds */
+    --muted: 220 10% 97%;               /* Very light gray */
+    --muted-foreground: 0 0% 32%;       /* Medium gray text */
 
-    /* Poll availability colors - Day theme */
-    --poll-available: 18 100% 50%;  /* Dark orange for available (#FF6B00) */
-    --poll-maybe: 45 92% 58%;  /* Warm yellow for if necessary */
-    --poll-unavailable: 18 80% 88%;  /* Light orange for not available (background) */
+    /* Accent colors */
+    --accent: 238 75% 59%;              /* Indigo accent */
+    --accent-foreground: 0 0% 100%;     /* White */
 
-    /* Muted colors - Backgrounds and de-emphasized text */
-    --muted: 210 25% 88%;  /* Subtle gray-blue for muted backgrounds */
-    --muted-foreground: 220 30% 35%;  /* Muted text color */
-
-    /* Accent - Default accent color */
-    --accent: 22 90% 60%;  /* Warm accent */
-    --accent-foreground: 240 50% 12%;
-
-    /* Destructive - Error and warning states */
-    --destructive: 0 85% 50%;  /* Red for errors */
-    --destructive-foreground: 0 0% 100%;
+    /* Destructive - Error states */
+    --destructive: 0 85% 50%;           /* Red */
+    --destructive-foreground: 0 0% 100%; /* White */
 
     /* Form elements */
-    --border: 18 80% 58% / 0.25;  /* Transparent orange borders */
-    --input: 210 30% 86%;  /* Light input backgrounds */
-    --ring: 18 95% 58%;  /* Orange focus rings */
+    --border: 0 0% 0%;                  /* Pure black borders */
+    --input: 220 10% 97%;               /* Light gray inputs */
+    --ring: 238 75% 59%;                /* Indigo focus rings */
 
-    --radius: 0.375rem;  /* Default border radius (6px) */
+    --radius: 0.125rem;                 /* 2px - minimal radius */
 
-    /* Gradients - Orange to blue color transitions */
-    --gradient-primary: linear-gradient(135deg, hsl(16 95% 58%), hsl(22 88% 62%), hsl(220 60% 68%));  /* Orange → Blue */
-    --gradient-neon: linear-gradient(135deg, hsl(14 98% 60%), hsl(20 92% 64%), hsl(218 62% 70%), hsl(222 58% 74%));  /* Vibrant multi-stop gradient */
-    --gradient-hero: linear-gradient(135deg, hsl(16 95% 58%) 0%, hsl(20 90% 62%) 30%, hsl(220 60% 66%) 75%, hsl(224 58% 55%) 100%);  /* Used in hero sections */
-    --gradient-mesh: radial-gradient(at 0% 0%, hsl(16 92% 65% / 0.4) 0px, transparent 50%),  /* Top-left: Orange glow */
-                         radial-gradient(at 100% 0%, hsl(220 68% 75% / 0.45) 0px, transparent 50%),  /* Top-right: Blue glow */
-                         radial-gradient(at 100% 100%, hsl(20 85% 68% / 0.3) 0px, transparent 50%),  /* Bottom-right: Orange glow */
-                         radial-gradient(at 0% 100%, hsl(218 65% 72% / 0.38) 0px, transparent 50%);  /* Bottom-left: Blue glow */
+    /* Background mesh - subtle radial gradients */
+    --gradient-mesh: radial-gradient(at 0% 0%, hsl(238 75% 59% / 0.05) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, hsl(24 95% 53% / 0.05) 0px, transparent 50%),
+                     radial-gradient(at 100% 100%, hsl(238 75% 59% / 0.03) 0px, transparent 50%),
+                     radial-gradient(at 0% 100%, hsl(24 95% 53% / 0.03) 0px, transparent 50%);
 
-    /* Shadows - Layered depth effects with orange and blue tones */
-    --shadow-soft: 0 2px 16px hsl(18 90% 58% / 0.25), 0 1px 8px hsl(215 60% 60% / 0.15);  /* Subtle elevation */
-    --shadow-medium: 0 8px 32px hsl(18 90% 58% / 0.35), 0 4px 16px hsl(215 60% 60% / 0.2);  /* Card hover states */
-    --shadow-strong: 0 16px 64px hsl(18 90% 58% / 0.45), 0 8px 32px hsl(215 60% 60% / 0.25);  /* Used in WeatherForecast */
+    /* Shadows - Hard box shadows */
+    --shadow-brutal: 4px 4px 0px hsl(0 0% 0%);
+    --shadow-brutal-lg: 6px 6px 0px hsl(0 0% 0%);
 
-    /* Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);  /* Smooth easing for most animations */
+    /* Poll availability colors - Blue gradient */
+    --poll-available: 217 91% 60%;      /* Bright blue */
+    --poll-maybe: 217 91% 75%;          /* Light blue */
+    --poll-unavailable: 0 0% 85%;       /* Light gray #D9D9D9 */
+
+    /* Poll heatmap gradient steps (light mode - blue) */
+    --poll-heat-1: 217 91% 85%;         /* Very light blue */
+    --poll-heat-2: 217 91% 80%;         /* Light blue */
+    --poll-heat-3: 217 91% 70%;         /* Medium-light blue */
+    --poll-heat-4: 217 91% 65%;         /* Medium blue */
+    --poll-heat-5: 217 91% 55%;         /* Medium-dark blue */
+    --poll-heat-6: 217 91% 50%;         /* Dark blue */
   }
 
   .dark {
     /* ========================================
-       NIGHT THEME - Deep Indigo-dominant with Orange accents
+       DARK MODE - Orange Primary, Near-Black Backgrounds
        ======================================== */
 
-    /* Typography - Bolder, more modern fonts */
-    --font-body: 'Sour Gummy', sans-serif;
+    /* Typography - Same as light mode */
+    --font-body: 'Syne', sans-serif;
     --font-heading: 'Syne', sans-serif;
 
-    /* Base colors - Dark backgrounds with light text */
-    --background: 238 50% 5%;  /* Very dark indigo background */
-    --foreground: 30 40% 95%;  /* Warm off-white text */
+    /* Base colors - Near-black background, off-white text */
+    --background: 0 0% 4%;              /* Near black #0A0A0A */
+    --foreground: 0 0% 98%;             /* Off-white #FAFAFA */
 
-    /* Card colors */
-    --card: 238 52% 7%;  /* Slightly lighter than background */
-    --card-foreground: 28 35% 96%;
+    /* Card colors - Dark gray cards */
+    --card: 0 0% 9%;                    /* Dark gray #171717 */
+    --card-foreground: 0 0% 98%;        /* Off-white */
 
     /* Popover colors */
-    --popover: 238 55% 6%;
-    --popover-foreground: 30 38% 95%;
+    --popover: 0 0% 9%;                 /* Dark gray */
+    --popover-foreground: 0 0% 98%;     /* Off-white */
 
-    /* Primary colors - Vibrant indigo */
-    --primary: 238 80% 62%;  /* Bright indigo */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 245 85% 70%;  /* Lighter indigo for glows */
+    /* Primary colors - Vibrant Orange (flipped) */
+    --primary: 24 95% 60%;              /* #FB923C - Glowing orange */
+    --primary-foreground: 0 0% 100%;    /* White text */
+    --primary-glow: 24 95% 60%;         /* Same as primary */
 
-    /* Secondary colors - Warm orange */
-    --secondary: 18 85% 60%;  /* Orange becomes secondary in dark mode */
-    --secondary-foreground: 240 40% 10%;
+    /* Secondary colors - Light Indigo */
+    --secondary: 238 75% 70%;           /* #818CF8 - Light indigo */
+    --secondary-foreground: 0 0% 100%;  /* White text */
 
-    /* Accent colors - Brightened for dark backgrounds */
-    --accent-blue: 225 90% 68%;
-    --accent-purple: 270 85% 68%;
-    --accent-green: 160 70% 50%;
+    /* Muted colors - Dark gray backgrounds */
+    --muted: 0 0% 12%;                  /* Dark muted #1F1F1F */
+    --muted-foreground: 0 0% 64%;       /* Light gray text #A3A3A3 */
 
-    /* Poll availability colors - Night theme */
-    --poll-available: 18 95% 62%;  /* Bright orange for available */
-    --poll-maybe: 50 95% 65%;  /* Bright yellow for if necessary */
-    --poll-unavailable: 238 40% 25%;  /* Dark indigo for not available (background) */
-
-    /* Muted colors */
-    --muted: 238 35% 12%;  /* Dark muted backgrounds */
-    --muted-foreground: 235 25% 65%;  /* Lighter muted text */
-
-    /* Accent */
-    --accent: 240 85% 68%;  /* Bright indigo accent */
-    --accent-foreground: 30 35% 96%;
+    /* Accent colors */
+    --accent: 24 95% 60%;               /* Orange accent */
+    --accent-foreground: 0 0% 100%;     /* White */
 
     /* Destructive */
-    --destructive: 0 85% 55%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 85% 55%;           /* Brighter red */
+    --destructive-foreground: 0 0% 100%; /* White */
 
     /* Form elements */
-    --border: 238 80% 62% / 0.3;  /* Transparent indigo borders */
-    --input: 238 40% 10%;  /* Dark input backgrounds */
-    --ring: 238 80% 62%;  /* Indigo focus rings */
+    --border: 0 0% 100%;                /* White borders */
+    --input: 0 0% 12%;                  /* Dark inputs */
+    --ring: 24 95% 60%;                 /* Orange focus rings */
 
-    /* Gradients - Indigo to orange color transitions */
-    --gradient-primary: linear-gradient(135deg, hsl(238 80% 58%), hsl(242 78% 60%), hsl(18 75% 60%));  /* Indigo → Orange */
-    --gradient-neon: linear-gradient(135deg, hsl(240 85% 60%), hsl(244 82% 62%), hsl(248 78% 64%), hsl(25 80% 62%));  /* Multi-stop neon */
-    --gradient-hero: linear-gradient(135deg, hsl(238 80% 58%) 0%, hsl(242 75% 52%) 40%, hsl(18 80% 58%) 88%, hsl(25 85% 62%) 100%);  /* Hero gradient */
-    --gradient-mesh: radial-gradient(at 0% 0%, hsl(238 80% 48% / 0.6) 0px, transparent 50%),  /* Top-left: Strong indigo glow */
-                           radial-gradient(at 100% 0%, hsl(18 80% 58% / 0.2) 0px, transparent 50%),  /* Top-right: Subtle orange */
-                           radial-gradient(at 100% 100%, hsl(244 75% 52% / 0.5) 0px, transparent 50%),  /* Bottom-right: Indigo glow */
-                           radial-gradient(at 0% 100%, hsl(25 75% 60% / 0.15) 0px, transparent 50%);  /* Bottom-left: Subtle orange */
+    /* Background mesh - Stronger glows in dark mode */
+    --gradient-mesh: radial-gradient(at 0% 0%, hsl(238 75% 48% / 0.15) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, hsl(24 95% 60% / 0.12) 0px, transparent 50%),
+                     radial-gradient(at 100% 100%, hsl(238 75% 48% / 0.1) 0px, transparent 50%),
+                     radial-gradient(at 0% 100%, hsl(24 95% 60% / 0.08) 0px, transparent 50%);
 
-    /* Shadows - More intense glows for dark mode with indigo tones */
-    --shadow-soft: 0 4px 24px hsl(238 80% 58% / 0.45), 0 2px 12px hsl(18 80% 58% / 0.12);  /* Subtle glow */
-    --shadow-medium: 0 8px 40px hsl(238 80% 58% / 0.55), 0 4px 20px hsl(18 80% 58% / 0.18);  /* Medium glow */
-    --shadow-strong: 0 16px 80px hsl(238 80% 58% / 0.65), 0 8px 40px hsl(18 80% 58% / 0.22);  /* Strong glow */
+    /* Shadows - White shadows in dark mode */
+    --shadow-brutal: 4px 4px 0px hsl(0 0% 100%);
+    --shadow-brutal-lg: 6px 6px 0px hsl(0 0% 100%);
+
+    /* Poll availability colors - Orange gradient */
+    --poll-available: 24 95% 50%;       /* Deep orange */
+    --poll-maybe: 24 95% 65%;           /* Lighter orange */
+    --poll-unavailable: 0 0% 25%;       /* Dark gray #404040 */
+
+    /* Poll heatmap gradient steps (dark mode - orange) */
+    --poll-heat-1: 24 95% 75%;          /* Very light orange */
+    --poll-heat-2: 24 95% 70%;          /* Light orange */
+    --poll-heat-3: 24 95% 62%;          /* Medium-light orange */
+    --poll-heat-4: 24 95% 57%;          /* Medium orange */
+    --poll-heat-5: 24 95% 52%;          /* Medium-dark orange */
+    --poll-heat-6: 24 95% 47%;          /* Dark orange */
   }
 }
 
@@ -171,140 +165,172 @@
     @apply border-border;
   }
 
-  /* Body styles with font feature settings for better typography */
+  /* Body styles - Brutalist typography */
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;  /* Enable ligatures and contextual alternates */
     font-family: var(--font-body);
-    font-weight: 400;
-    transition: font-family 0.3s ease;
+    font-weight: 600;  /* Semi-bold base for readability */
+    letter-spacing: -0.01em;  /* Tight tracking for modern look */
   }
 
-  /* Dark mode body - heavier weight for better readability */
-  .dark body {
-    font-weight: 800;
-    letter-spacing: 0.01em;
-  }
-
-  /* Heading styles */
+  /* Heading styles - UPPERCASE BRUTALISM */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    font-weight: 400;
-    letter-spacing: 0.01em;
-    transition: font-family 0.3s ease;
-  }
-
-  /* Dark mode headings - bold, wide, lowercase for modern look */
-  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: lowercase;
+    font-weight: 800;  /* Extra bold */
+    letter-spacing: -0.02em;  /* Tighter for impact */
+    text-transform: uppercase;  /* ALL CAPS */
   }
 }
 
 /* ========================================
-   UTILITY CLASSES - Reusable style utilities
+   UTILITY CLASSES - Brutalist Design System
    ======================================== */
 @layer utilities {
   /* ========================================
-     GRADIENT UTILITIES
+     BORDER UTILITIES - Thick Brutalist Borders
      ======================================== */
-  .gradient-primary {
-    background: var(--gradient-primary);  /* Used in badges, buttons, and icons */
+  .border-brutal {
+    border: 4px solid hsl(var(--border));
   }
 
-  .gradient-neon {
-    background: var(--gradient-neon);  /* Used in schedule badges and special badges */
+  .border-brutal-indigo {
+    border: 4px solid hsl(var(--primary));
   }
 
-  .gradient-hero {
-    background: var(--gradient-hero);  /* Used in hero sections and event headers */
+  .border-brutal-orange {
+    border: 4px solid hsl(var(--secondary));
   }
 
-  .gradient-mesh {
-    background: var(--gradient-mesh);  /* Background mesh overlay for pages */
+  .border-brutal-t {
+    border-top: 4px solid hsl(var(--border));
+  }
+
+  .border-brutal-b {
+    border-bottom: 4px solid hsl(var(--border));
   }
 
   /* ========================================
-     SHADOW UTILITIES - Depth and elevation
+     SHADOW UTILITIES - Hard Box Shadows
      ======================================== */
+  .shadow-brutal {
+    box-shadow: var(--shadow-brutal);
+  }
+
+  .shadow-brutal-lg {
+    box-shadow: var(--shadow-brutal-lg);
+  }
+
+  .shadow-brutal-indigo {
+    box-shadow: 4px 4px 0px hsl(var(--primary));
+  }
+
+  .shadow-brutal-orange {
+    box-shadow: 4px 4px 0px hsl(var(--secondary));
+  }
+
+  .shadow-brutal-hover {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .shadow-brutal-hover:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-brutal-lg);
+  }
+
+  /* Legacy shadow utilities (mapped to brutalist equivalents) */
   .shadow-soft {
-    box-shadow: var(--shadow-soft);  /* Subtle elevation for cards */
+    box-shadow: var(--shadow-brutal);
   }
 
   .shadow-medium {
-    box-shadow: var(--shadow-medium);  /* Used on hover states */
-  }
-
-  .shadow-strong {
-    box-shadow: var(--shadow-strong);  /* Heavy elevation for WeatherForecast */
-  }
-
-  /* ========================================
-     TRANSITION UTILITIES
-     ======================================== */
-  .transition-smooth {
-    transition: var(--transition-smooth);  /* Smooth easing for UI interactions */
+    box-shadow: 2px 2px 0px hsl(var(--border));
   }
 
   .shadow-glow {
-    box-shadow: 0 0 30px hsl(var(--primary) / 0.6), 0 0 60px hsl(var(--primary) / 0.4);  /* Dynamic glow based on primary color */
+    box-shadow: var(--shadow-brutal);
   }
 
   /* ========================================
-     HOVER EFFECTS
+     COLOR BLOCKING - Solid Color Sections
      ======================================== */
-  .hover-scale {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .color-block-indigo {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 1.5rem 2rem;
   }
 
-  .hover-scale:hover {
-    transform: scale(1.02) translateY(-2px);  /* Subtle lift and scale on hover */
+  .color-block-orange {
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    padding: 1.5rem 2rem;
+  }
+
+  .color-block-black {
+    background: hsl(0 0% 0%);
+    color: hsl(0 0% 100%);
+    padding: 1.5rem 2rem;
+  }
+
+  .dark .color-block-black {
+    background: hsl(0 0% 100%);
+    color: hsl(0 0% 0%);
   }
 
   /* ========================================
-     GRID OVERLAYS - Background patterns
+     BACKGROUND MESH
      ======================================== */
-  .grid-overlay {
+  .gradient-mesh {
+    background: var(--gradient-mesh);
+  }
+
+  /* Legacy gradient utilities (solid colors for brutalism) */
+  .gradient-primary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .gradient-neon {
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+  }
+
+  /* ========================================
+     GRID OVERLAYS - Visible Grid Patterns
+     ======================================== */
+  .grid-lines {
     background-image:
-      linear-gradient(hsl(18 95% 58% / 0.2) 1px, transparent 1px),  /* Horizontal orange lines */
-      linear-gradient(90deg, hsl(215 70% 65% / 0.24) 1px, transparent 1px);  /* Vertical blue lines */
+      linear-gradient(hsl(var(--border) / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.1) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
-  .dark .grid-overlay {
-    background-image:
-      linear-gradient(hsl(238 80% 62% / 0.3) 1px, transparent 1px),  /* Indigo grid in dark mode */
-      linear-gradient(90deg, hsl(238 80% 62% / 0.3) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  .grid-overlay-dots {
-    background-image: radial-gradient(circle, hsl(215 70% 65% / 0.15) 1.5px, transparent 1.5px);  /* Subtle dot pattern */
-    background-size: 20px 20px;
-  }
-
-  .dark .grid-overlay-dots {
-    background-image: radial-gradient(circle, hsl(238 80% 62% / 0.28) 1.5px, transparent 1.5px);  /* Brighter dots in dark mode */
-    background-size: 20px 20px;
-  }
-
-  .hero-grid {
-    background-image:
-      linear-gradient(white 1px, transparent 1px),  /* White grid for hero sections */
-      linear-gradient(90deg, white 1px, transparent 1px);
-    background-size: 20px 20px;
-    opacity: 0.10;  /* Very subtle */
+  .grid-dots {
+    background-image: radial-gradient(circle, hsl(var(--border) / 0.15) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
   }
 
   /* ========================================
      TEXT EFFECTS
      ======================================== */
-  .text-gradient {
-    background: var(--gradient-primary);  /* Apply gradient to text */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .text-brutalist {
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+
+  /* ========================================
+     TRANSITION & HOVER UTILITIES
+     ======================================== */
+  .transition-smooth {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .hover-scale {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
   }
 
   /* ========================================
@@ -312,49 +338,79 @@
      ======================================== */
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }  /* Gentle floating motion */
+    50% { transform: translateY(-8px); }
   }
 
   @keyframes pulse-glow {
     0%, 100% {
       opacity: 1;
-      filter: brightness(1);
     }
     50% {
-      opacity: 0.8;
-      filter: brightness(1.2);  /* Pulse with brightness increase */
+      opacity: 0.7;
     }
   }
 
   @keyframes slide-up {
     from {
       opacity: 0;
-      transform: translateY(20px);  /* Start below */
+      transform: translateY(24px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);  /* Slide up to position */
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes border-pulse {
+    0%, 100% {
+      border-color: hsl(var(--border));
+    }
+    50% {
+      border-color: hsl(var(--primary));
     }
   }
 
   /* Animation utility classes */
   .animate-float {
-    animation: float 3s ease-in-out infinite;  /* Used in EventHeader and WeatherForecast icons */
+    animation: float 3s ease-in-out infinite;
   }
 
   .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;  /* Used for active indicators */
+    animation: pulse-glow 2s ease-in-out infinite;
   }
 
   .animate-slide-up {
-    animation: slide-up 0.6s ease-out forwards;  /* Page load animation */
+    animation: slide-up 0.5s ease-out forwards;
+  }
+
+  .animate-border-pulse {
+    animation: border-pulse 2s ease-in-out infinite;
   }
 
   /* Stagger delays for cascading animations */
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.3s; }
-  .stagger-4 { animation-delay: 0.4s; }
-  .stagger-5 { animation-delay: 0.5s; }
-  .stagger-6 { animation-delay: 0.6s; }
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+
+  /* ========================================
+     HOVER EFFECTS - Brutalist Interactions
+     ======================================== */
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+
+  .hover-border {
+    transition: border-color 0.2s ease;
+  }
+
+  .hover-border:hover {
+    border-color: hsl(var(--primary));
+  }
 }

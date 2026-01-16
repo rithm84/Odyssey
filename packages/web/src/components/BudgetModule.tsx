@@ -49,8 +49,8 @@ export function BudgetModule() {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-3xl font-black tracking-tight flex items-center gap-3 mb-2">
-              <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-medium">
-                <DollarSign className="h-5 w-5 text-white" />
+              <div className="h-10 w-10 bg-primary flex items-center justify-center border-2 border-black dark:border-white">
+                <DollarSign className="h-5 w-5 text-white dark:text-black" />
               </div>
               <span>Budget Tracker</span>
             </h2>
@@ -84,8 +84,8 @@ export function BudgetModule() {
                   <TableCell className="font-bold text-base dark:text-dark-base">{expense.item}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8 gradient-primary text-white shadow-medium">
-                        <AvatarFallback className="gradient-primary font-bold">
+                      <Avatar className="h-8 w-8 bg-primary text-white dark:text-black border-2 border-black dark:border-white">
+                        <AvatarFallback className="bg-primary text-white dark:text-black font-bold">
                           {expense.paidBy.initials}
                         </AvatarFallback>
                       </Avatar>
@@ -100,9 +100,9 @@ export function BudgetModule() {
                       {expense.splitBetween.map((person, i) => (
                         <Avatar
                           key={i}
-                          className="h-8 w-8 bg-[hsl(var(--accent-purple))] text-white border-2 border-background shadow-medium"
+                          className="h-8 w-8 bg-secondary text-white dark:text-black border-2 border-black dark:border-white"
                         >
-                          <AvatarFallback className="bg-[hsl(var(--accent-purple))] font-bold text-xs">
+                          <AvatarFallback className="bg-secondary text-white dark:text-black font-bold text-xs">
                             {person}
                           </AvatarFallback>
                         </Avatar>
